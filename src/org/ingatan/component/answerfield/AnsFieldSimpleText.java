@@ -185,7 +185,8 @@ public class AnsFieldSimpleText extends JPanel implements IAnswerField {
             txtField.setMaximumSize(new Dimension(200, 50));
             txtField.setBorder(BorderFactory.createLineBorder(ThemeConstants.borderUnselected));
             this.add(txtField);
-            txtField.setFont(ThemeConstants.niceFont.deriveFont(22.0f));
+            this.setMaximumSize(new Dimension(200, 50));
+            txtField.setFont(ThemeConstants.niceFont.deriveFont(14.0f));
             txtField.setText("");
             if (chkHints.isSelected()) {
                 this.add(btnGiveHint);
