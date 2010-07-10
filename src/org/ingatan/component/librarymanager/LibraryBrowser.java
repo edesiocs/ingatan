@@ -25,7 +25,6 @@
  * If you find this program useful, please tell me about it! I would be delighted
  * to hear from you at tom.ingatan@gmail.com.
  */
-
 package org.ingatan.component.librarymanager;
 
 import org.ingatan.data.Group;
@@ -302,14 +301,7 @@ public class LibraryBrowser extends JPanel {
      * library is selected.
      */
     public String getSelectedLibraryID() {
-        if (listLibraries.getSelectedIndex() == -1) {
-            return null;
-        }
-        if (comboGroups.getSelectedIndex() == ALL_LIBRARIES_GROUP_INDEX) {
-            return IOManager.getLibraryIDs()[listLibraries.getSelectedIndex()];
-        } else {
-            return IOManager.getGroup((String) comboGroups.getSelectedItem()).getLibraryIDs()[listLibraries.getSelectedIndex()];
-        }
+        return selectedLibraryID;
     }
 
     /**
@@ -464,8 +456,16 @@ public class LibraryBrowser extends JPanel {
                 }
             } else if (e.getSource() instanceof JComboBox) {
                 newEvent = new ActionEvent(LibraryBrowser.this, LibraryBrowser.GROUP_SELECTION_CHANGED, "GroupSelectionChanged");
+                //for this event, we will notify the actionListeners first, so that the library can be saved
+                for (int i = 0; i < actionListeners.length; i++) {
+                    actionListeners[i].actionPerformed(newEvent);
+                }
                 //update the libraries list
                 listLibraries.removeAll();
+                //the library has been saved by other means (by LibraryManagerWindow in the group selection changed event handling code)
+                //and also the library is no longer selected. By setting selectedLibraryID to null, we stop the selectedLibraryID library
+                //from being over-written next time the library selection changes.
+                selectedLibraryID = null;
                 String[] libNames;
                 if (comboGroups.getSelectedIndex() == ALL_LIBRARIES_GROUP_INDEX) {
                     libNames = IOManager.getLibraryNames();
@@ -474,12 +474,16 @@ public class LibraryBrowser extends JPanel {
                 }
 
                 listLibraries.setListData(libNames);
+                //can leave early, as we have already notified the action listeners for this particular event.
+                return;
             }
 
             if (newEvent == null) {
                 return;
             }
 
+
+            //Fire actionPerformed on all listeners using whichever action event was created above
             for (int i = 0; i < actionListeners.length; i++) {
                 actionListeners[i].actionPerformed(newEvent);
             }
@@ -489,9 +493,20 @@ public class LibraryBrowser extends JPanel {
     private class libListSelectionListener implements ListSelectionListener {
 
         public void valueChanged(ListSelectionEvent e) {
-            if (e.getValueIsAdjusting() == false)
+            if (e.getValueIsAdjusting() == false) {
                 return;
+            }
             previousLibraryID = selectedLibraryID;
+
+            //get the newly selected library
+            if (listLibraries.getSelectedIndex() == -1) {
+                selectedLibraryID = null;
+            } else if (comboGroups.getSelectedIndex() == ALL_LIBRARIES_GROUP_INDEX) {
+                selectedLibraryID = IOManager.getLibraryIDs()[listLibraries.getSelectedIndex()];
+            } else {
+                selectedLibraryID = IOManager.getGroup((String) comboGroups.getSelectedItem()).getLibraryIDs()[listLibraries.getSelectedIndex()];
+            }
+
             selectedLibraryID = getSelectedLibraryID();
             for (int i = 0; i < actionListeners.length; i++) {
                 actionListeners[i].actionPerformed(new ActionEvent(LibraryBrowser.this, LibraryBrowser.LIBRARY_SELECTION_CHANGED, "LibrarySelectionChanged"));

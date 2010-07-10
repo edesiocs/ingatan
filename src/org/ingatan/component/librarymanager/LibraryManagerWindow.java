@@ -25,7 +25,6 @@
  * If you find this program or any part of it useful, please tell me about it! I would be delighted
  * to hear from you at tom.ingatan@gmail.com.
  */
-
 package org.ingatan.component.librarymanager;
 
 import org.ingatan.ThemeConstants;
@@ -308,7 +307,6 @@ public class LibraryManagerWindow extends JFrame implements WindowListener {
     }
 
     public void windowClosed(WindowEvent e) {
-        
     }
 
     public void windowIconified(WindowEvent e) {
@@ -383,13 +381,27 @@ public class LibraryManagerWindow extends JFrame implements WindowListener {
                     exportImportMenu.show(libBrowser.btnExport.getParent(), libBrowser.btnExport.getX(), libBrowser.btnExport.getY());
                     break;
                 case LibraryBrowser.GROUP_SELECTION_CHANGED:
+                    questionList.updateQuestionsWithContent();
+                    if (libBrowser.getSelectedLibraryID() != null) {
+                        try {
+                            //not getPreviouslySelectedLibraryID as the library selection hasn't changed, just the group selection
+                            System.out.println("abotu to try to save the library with ID: " + libBrowser.getSelectedLibraryID() + " due to change in group");
+                            saveLibrary(libBrowser.getSelectedLibraryID());
+                        } catch (IOException ex) {
+                            Logger.getLogger(LibraryManagerWindow.class.getName()).log(Level.SEVERE, "While trying to save library with ID: " + libBrowser.getSelectedLibraryID() + "\n" +
+                                    "as a result of GROUP_SELECTION_CHANGED event (from LibraryBrowser).", ex);
+                        }
+                    }
                     questionList.removeAll();
+                    questionList.repaint();
                     break;
                 case LibraryBrowser.LIBRARY_SELECTION_CHANGED:
                     //try to save the previously selected library
                     try {
                         //no library was previously selected
+                        questionList.updateQuestionsWithContent();
                         if (libBrowser.getPreviouslySelectedLibraryID() != null) {
+                            System.out.println("saving library with ID: " + libBrowser.getPreviouslySelectedLibraryID() + " due to library selection change");
                             saveLibrary(libBrowser.getPreviouslySelectedLibraryID());
                         }
                     } catch (IOException ex) {
