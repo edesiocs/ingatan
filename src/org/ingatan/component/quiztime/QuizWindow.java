@@ -473,11 +473,12 @@ public class QuizWindow extends JFrame implements WindowListener {
             //otherwise, make sure that the user wants to finish up - if so, we'll first show the final screen
             resp = JOptionPane.showConfirmDialog(QuizWindow.this, "Are you sure you wish to end the quiz?\n\n"
                     + "Note: no questions have been answered, so no record will be made.", "End Quiz?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-            returnToOnClose.setVisible(true);
-            QuizWindow.this.dispose();
+            if (resp == JOptionPane.YES_OPTION) {
+                returnToOnClose.setVisible(true);
+                QuizWindow.this.dispose();
+            }
             return;
-        }
-        else {
+        } else {
             resp = JOptionPane.showConfirmDialog(QuizWindow.this, "Are you sure you wish to end the quiz?", "End Quiz?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
         }
 
