@@ -184,7 +184,7 @@ public class EditAnswerFieldsDialog extends JDialog {
 
                 //if the package name is not an empty string, then it is a default answer field, and we wish to
                 //hence disallow selection of this AnswerFieldEntry.
-                newEntry = new AnswerFieldEntry(ansField, ansField.getClass().getPackage().getName().isEmpty());
+                newEntry = new AnswerFieldEntry(ansField, ansField.getClass().getPackage() == null);
                 ansFieldEntries.add(newEntry);
                 scrollerContent.add(newEntry);
 
@@ -345,7 +345,7 @@ public class EditAnswerFieldsDialog extends JDialog {
         }
 
         public void actionPerformed(ActionEvent e) {
-            JOptionPane.showMessageDialog(EditAnswerFieldsDialog.this, "<html><font size='2'>Note: there are full tutorials available on the Ingatan project website.<br><br>"
+            JOptionPane.showMessageDialog(EditAnswerFieldsDialog.this, "<html><font size='2'>Note: there is a full tutorial available on the Ingatan project website (ingatan.org).<br><br>"
                     + "Creating custom answer fields in Ingatan is easy. An answer field is simply a Java<br>class that has the following features:<br>"
                     + "<ul><li>implements the ingatan.component.answerfield.IAnswerField interface</li>"
                     + "<li>extends JComponent</li>"
