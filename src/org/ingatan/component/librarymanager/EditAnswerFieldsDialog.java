@@ -329,6 +329,7 @@ public class EditAnswerFieldsDialog extends JDialog {
                     toRemove.add(curEntry);
                     IOManager.getAnswerFieldsFile().getAnswerFieldDefaults().remove(curEntry.getClassName());
                     IOManager.getAnswerFieldsFile().getAnswerFields().remove(curEntry.getClassName());
+                    new File(IOManager.getAnswerFieldPath() + curEntry.getClassName() + ".class").delete();
                 }
             }
 
