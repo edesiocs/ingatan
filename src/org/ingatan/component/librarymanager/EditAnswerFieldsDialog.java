@@ -270,6 +270,8 @@ public class EditAnswerFieldsDialog extends JDialog {
                 ParserWriter.writeAnswerFieldFile(IOManager.getAnswerFieldsFile());
 
                 buildList();
+                scrollerContent.validate();
+                EditAnswerFieldsDialog.this.repaint();
             }
         }
 
@@ -310,6 +312,8 @@ public class EditAnswerFieldsDialog extends JDialog {
 
             Iterator<AnswerFieldEntry> iterate = ansFieldEntries.iterator();
             AnswerFieldEntry curEntry;
+            //put any entries to remove in the following list.
+            ArrayList<AnswerFieldEntry> toRemove = new ArrayList<AnswerFieldEntry>();
 
             //if none were removed, tell the user that none were selected.
             boolean anyRemoved = false;
@@ -322,15 +326,20 @@ public class EditAnswerFieldsDialog extends JDialog {
                 if (curEntry.isSelected()) {
                     anyRemoved = true;
                     scrollerContent.remove(curEntry);
-                    ansFieldEntries.remove(curEntry);
+                    toRemove.add(curEntry);
                     IOManager.getAnswerFieldsFile().getAnswerFieldDefaults().remove(curEntry.getClassName());
                     IOManager.getAnswerFieldsFile().getAnswerFields().remove(curEntry.getClassName());
-                    ParserWriter.writeAnswerFieldFile(IOManager.getAnswerFieldsFile());
                 }
             }
 
+            ParserWriter.writeAnswerFieldFile(IOManager.getAnswerFieldsFile());
+            ansFieldEntries.removeAll(toRemove);
+
             if (!anyRemoved) {
                 JOptionPane.showMessageDialog(EditAnswerFieldsDialog.this, "No answer fields are selected, none were removed.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                scrollerContent.validate();
+                scrollerContent.repaint();
             }
         }
     }

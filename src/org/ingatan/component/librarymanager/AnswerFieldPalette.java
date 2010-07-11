@@ -264,6 +264,7 @@ public class AnswerFieldPalette extends PaintedJPanel {
             new EditAnswerFieldsDialog().setVisible(true);
             buildAnswerFieldList();
             AnswerFieldPalette.this.validate();
+            AnswerFieldPalette.this.repaint();
         }
     }
 }

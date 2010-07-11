@@ -318,7 +318,10 @@ public class RichTextArea extends JTextPane {
                 }
                 //instantiate answer field using ansFieldData[0], and set its content to ansFieldData[1].
                 try {
-                    IAnswerField newField = (IAnswerField) IOManager.getAnswerFieldClass(ansFieldData[0]).newInstance();
+                    Class ansField = IOManager.getAnswerFieldClass(ansFieldData[0]);
+                    IAnswerField newField = null;
+                    if (ansField != null)
+                        newField = (IAnswerField) ansField.newInstance();
                     if (newField != null) {
                         //tell the new field instance to read in the content text, and then insert it into the document.
                         newField.readInXML(ansFieldData[1].replace("[", CHARCODE_OPENING_SQUARE_BRACKET).replace("]", CHARCODE_CLOSING_SQUARE_BRACKET));
