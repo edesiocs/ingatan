@@ -333,6 +333,8 @@ public class LibraryManagerWindow extends JFrame implements WindowListener {
                     LibraryEditorDialog newLib = new LibraryEditorDialog(LibraryManagerWindow.this, true, libBrowser.getSelectedGroupName());
                     newLib.setLibraryNameText("Charles");
                     newLib.setLibraryDescriptionText("");
+                    newLib.libraryName.setSelectionStart(0);
+                    newLib.libraryName.setSelectionEnd(newLib.libraryName.getText().length());
                     newLib.setTitle("Create Library");
                     newLib.setVisible(true);
                     libBrowser.updateLibraries();
@@ -362,6 +364,8 @@ public class LibraryManagerWindow extends JFrame implements WindowListener {
                         Logger.getLogger(LibraryManagerWindow.class.getName()).log(Level.SEVERE, null, ex);
                     }
                     libEdit.setTitle("Edit Library");
+                    libEdit.libraryName.setSelectionStart(0);
+                    libEdit.libraryName.setSelectionEnd(libEdit.libraryName.getText().length());
                     libEdit.setVisible(true);
                     try {
                         IOManager.editLibrary(libBrowser.getSelectedLibraryID(), libEdit.getLibraryNameText(), libEdit.getLibraryDescriptionText(), libEdit.getClearStatistics());
