@@ -348,8 +348,8 @@ public class LibraryManagerWindow extends JFrame implements WindowListener {
                             + "the questions that it contains?", "Confirm deletion", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
                     if (resp == JOptionPane.YES_OPTION) {
                         IOManager.deleteLibrary(libBrowser.getSelectedLibraryID());
-                        libBrowser.updateLibraries();
                         libBrowser.notifyOfLibraryDeletion();
+                        libBrowser.updateLibraries();
                         questionList.removeAll();
                         LibraryManagerWindow.this.validate();
                     }
