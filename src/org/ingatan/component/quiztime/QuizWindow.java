@@ -97,6 +97,15 @@ public class QuizWindow extends JFrame implements WindowListener {
      */
     private static final float PENALTY_THRESHOLD = 0.85f;
     /**
+     * When a question template is used, the following style is applied to the 'question' text, where the rest
+     * of the template is left as plain text. These are the opening tags.
+     */
+    private static final String QUESTION_TEMPLATE_STYLE_OPEN = "[" + RichTextArea.TAG_FONT_SIZE + "]15[!" + RichTextArea.TAG_FONT_SIZE + "][b]";
+    /**
+     * The closing tags for the question template 'question' formatting. See QUESTION_TEMPLATE_STYLE_OPEN.
+     */
+    private static final String QUESTION_TEMPLATE_STYLE_CLOSE = "[" + RichTextArea.TAG_FONT_SIZE + "]11[!" + RichTextArea.TAG_FONT_SIZE + "][b]";
+    /**
      * Displays the question text.
      */
     private RichTextArea questionArea = new RichTextArea();
@@ -329,12 +338,12 @@ public class QuizWindow extends JFrame implements WindowListener {
 
             //set question text to include the question template
             if ((questionTemplate.trim().isEmpty() == false) && (questionTemplate.contains("[q]"))) {
-                questionText = questionTemplate.replace("[q]", questionText);
+                questionText = questionTemplate.replace("[q]", QUESTION_TEMPLATE_STYLE_OPEN + questionText + QUESTION_TEMPLATE_STYLE_CLOSE) + "[" + RichTextArea.TAG_DOCUMENT_END + "]";
             }
 
 
             //now create an appropriate answer field and set questionArea and answerArea text
-            questionArea.setText(questionText);
+            questionArea.setRichText(questionText);
             answerArea.setText("");
             //check for the type of answer required (MultiChoice, Written, or Both)
             if (ques.getParentTableQuestion().getQuizMethod() == TableQuestion.WRITTEN) {
