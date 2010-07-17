@@ -29,6 +29,7 @@ package org.ingatan.component.answerfield;
 
 import be.ugent.caagt.jmathtex.TeXConstants;
 import be.ugent.caagt.jmathtex.TeXFormula;
+import java.awt.event.ActionListener;
 import org.ingatan.ThemeConstants;
 import org.ingatan.component.image.ImageAcquisitionDialog;
 import org.ingatan.component.librarymanager.FlexiQuestionContainer;
@@ -443,6 +444,10 @@ public class AnsFieldLabelPicture extends JPanel implements IAnswerField, MouseL
     public void removeAllPoints() {
         picturePanel.removeAll();
         labelPoints = new ArrayList<LabelPoint>();
+    }
+
+    public void setQuizContinueListener(ActionListener listener) {
+        //this is not implemented, as there is no logical event to trigger continue action in the quiz.
     }
 
     private class GiveHintAction extends AbstractAction {

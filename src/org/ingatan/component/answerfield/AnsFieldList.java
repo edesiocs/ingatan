@@ -28,6 +28,7 @@
 package org.ingatan.component.answerfield;
 
 import java.awt.AWTKeyStroke;
+import java.awt.event.ActionListener;
 import org.ingatan.ThemeConstants;
 import org.ingatan.component.text.SimpleTextArea;
 import org.ingatan.component.text.SimpleTextField;
@@ -367,6 +368,10 @@ public class AnsFieldList extends JPanel implements IAnswerField {
 
     public void setParentLibraryID(String id) {
         return; //not implemented as this answer field does not require access to images.
+    }
+
+    public void setQuizContinueListener(ActionListener listener) {
+        //this is not implemented, as there is no logical event that should trigger the continue action in the quiz.
     }
 
     /**

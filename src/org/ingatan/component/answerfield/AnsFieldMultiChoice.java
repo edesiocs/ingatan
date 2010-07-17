@@ -44,8 +44,11 @@ import java.awt.Font;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.StringReader;
@@ -130,6 +133,16 @@ public class AnsFieldMultiChoice extends JPanel implements IAnswerField {
      * the <code>OptionEntry</code>s. Inserts any aquired image into the corresponding <code>RichTextArea</code>.
      */
     private TextToolbarListener textToolbarListener = new TextToolbarListener();
+    /**
+     * Action listener assigned by the quiz window. actionPerformed is called on this
+     * if the user double clicks an option (radio button).
+     */
+    private ActionListener actionListener = null;
+    /**
+     * Listens for a double click on any radio button option. Fires the actionPerformed event of the
+     * <code>actionListener</code> assigned by the quiz window to trigger the continue quiz action.
+     */
+    private OptionMouseListener optionMouseListener = new OptionMouseListener();
 
     /**
      * Creates a new instance of <code>AnsFieldMultiChoice</code>.
@@ -192,6 +205,9 @@ public class AnsFieldMultiChoice extends JPanel implements IAnswerField {
             while (iterate.hasNext()) {
                 curEntry = iterate.next();
                 curEntry.setEditContext(false);
+                //remove mouse listener in case it has previously been added, doesn't matter if it has never been added
+                curEntry.radioButton.removeMouseListener(optionMouseListener);
+                curEntry.radioButton.addMouseListener(optionMouseListener);
                 this.add(curEntry);
                 this.add(Box.createVerticalStrut(8));
             }
@@ -402,6 +418,29 @@ public class AnsFieldMultiChoice extends JPanel implements IAnswerField {
 
     public void setParentLibraryID(String id) {
         parentLibID = id;
+    }
+
+    public void setQuizContinueListener(ActionListener listener) {
+        actionListener = listener;
+    }
+
+    /**
+     * Listens for double click on a radio button as an event triggering the
+     * quiz continue action.
+     */
+    private class OptionMouseListener implements MouseListener {
+
+        public void mouseClicked(MouseEvent e) {
+            if ((e.getClickCount() == 2) && (actionListener != null) && (libraryContext == false)) {
+                actionListener.actionPerformed(null);
+            }
+        }
+
+        public void mousePressed(MouseEvent e) {}
+        public void mouseReleased(MouseEvent e) {}
+        public void mouseEntered(MouseEvent e) {}
+        public void mouseExited(MouseEvent e) {}
+
     }
 
     public class AddAction extends AbstractAction {

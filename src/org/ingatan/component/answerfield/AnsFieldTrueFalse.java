@@ -25,14 +25,16 @@
  * If you find this program useful, please tell me about it! I would be delighted
  * to hear from you at tom.ingatan@gmail.com.
  */
-
 package org.ingatan.component.answerfield;
 
+import java.awt.event.MouseEvent;
 import org.ingatan.ThemeConstants;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.logging.Level;
@@ -93,6 +95,11 @@ public class AnsFieldTrueFalse extends JPanel implements IAnswerField {
      * Whether the answer is true or false.
      */
     private boolean correctAnswer = true;
+    /**
+     * Action listener assigned by the quiz window. actionPerformed is called on this
+     * if the user double clicks an option (yes or no radio button).
+     */
+    private ActionListener actionListener = null;
 
     /**
      * Creates a new instance of <code>AnsFieldTrueFalse</code>.
@@ -104,10 +111,12 @@ public class AnsFieldTrueFalse extends JPanel implements IAnswerField {
         radioTrue.setOpaque(false);
         radioTrue.setAlignmentX(LEFT_ALIGNMENT);
         radioTrue.setSelected(true);
+        radioTrue.addMouseListener(new OptionMouseListener());
         radioGroup.add(radioTrue);
 
         radioFalse.setOpaque(false);
         radioFalse.setAlignmentX(LEFT_ALIGNMENT);
+        radioFalse.addMouseListener(new OptionMouseListener());
         radioGroup.add(radioFalse);
 
         //make spinner uneditable
@@ -177,8 +186,9 @@ public class AnsFieldTrueFalse extends JPanel implements IAnswerField {
         lblPoints.setVisible(inLibraryContext);
         spinMarks.setVisible(inLibraryContext);
         btnToggle.setVisible(inLibraryContext);
-        if (!inLibraryContext)
+        if (!inLibraryContext) {
             radioTrue.setSelected(true);
+        }
     }
 
     public String writeToXML() {
@@ -228,8 +238,7 @@ public class AnsFieldTrueFalse extends JPanel implements IAnswerField {
 
             if (correctAnswer) {
                 radioTrue.setSelected(true);
-            }
-            else {
+            } else {
                 radioFalse.setSelected(true);
             }
 
@@ -244,6 +253,28 @@ public class AnsFieldTrueFalse extends JPanel implements IAnswerField {
 
     public void setParentLibraryID(String id) {
         return; //not implemented as this answer field does not required image IO
+    }
+
+    public void setQuizContinueListener(ActionListener listener) {
+        actionListener = listener;
+    }
+
+    /**
+     * Listens for a double click on a radio button as an event to trigger the
+     * quiz continue action.
+     */
+    private class OptionMouseListener implements MouseListener {
+
+        public void mouseClicked(MouseEvent e) {
+            if ((actionListener != null) && (e.getClickCount() == 2) && (lblPoints.isVisible() == false)) {
+                actionListener.actionPerformed(null);
+            }
+        }
+
+        public void mousePressed(MouseEvent e) {}
+        public void mouseReleased(MouseEvent e) {}
+        public void mouseEntered(MouseEvent e) {}
+        public void mouseExited(MouseEvent e) {}
     }
 
     private class ToggleAction extends AbstractAction {

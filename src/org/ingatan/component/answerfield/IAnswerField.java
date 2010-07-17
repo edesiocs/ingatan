@@ -28,6 +28,8 @@
 
 package org.ingatan.component.answerfield;
 
+import java.awt.event.ActionListener;
+
 /**
  * Interface for the answer fields. Answer fields are used in Ingatan as an alternative
  * to set question types. Rather than inserting a 'multiple choice question' or
@@ -138,4 +140,17 @@ public interface IAnswerField {
      * @param id the ID of the library within which this answer field exists.
      */
     public void setParentLibraryID(String id);
+    /**
+     * Sets the <code>ActionListener</code> for this answer field. This method will be called by the quiz window
+     * when the answer field is created. When the user interacts with the answer field in a way that should submit their answer,
+     * then the action listener should have its <code>actionPerformed</code> method fired with a <code>null ActionEvent</code>. This
+     * will tell the <code>QuizWindow</code> that the user has submitted the answer. An example is the user pressing enter when in a text
+     * field, or double clicking a multiple choice option.<br>
+     * <br>
+     * <b>Note:<b> an <code>ActionListener</code> will only be set by the <code>QuizWindow</code> if the answer field is on its own. This is because
+     * the user may submit their answer for one answer field, but still need to fill in data for another answer field. Be sure to test that a listener
+     * has been set.
+     * @param listener the <code>ActionListener</code> set by the <code>QuizWindow</code> for this answer field instance.
+     */
+    public void setQuizContinueListener(ActionListener listener);
 }

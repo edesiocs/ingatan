@@ -28,6 +28,7 @@
 
 package org.ingatan.component.answerfield;
 
+import java.awt.event.KeyEvent;
 import org.ingatan.ThemeConstants;
 import org.ingatan.component.text.NumericJTextField;
 import org.ingatan.component.text.SimpleTextField;
@@ -35,6 +36,8 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyListener;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.logging.Level;
@@ -114,6 +117,11 @@ public class AnsFieldSimpleText extends JPanel implements IAnswerField {
      * Number of hints that have been given: an extra letter is given each time.
      */
     private int hintsGiven = 0;
+    /**
+     * Action listener assigned by the quiz window. actionPerformed is called on this
+     * if the user double pressed enter in the text field.
+     */
+    private ActionListener actionListener = null;
 
     /**
      * Create a new instance of <code>BasicTextField</code>.
@@ -129,6 +137,7 @@ public class AnsFieldSimpleText extends JPanel implements IAnswerField {
         lblInstruct.setAlignmentX(LEFT_ALIGNMENT);
 
         txtField.setAlignmentX(LEFT_ALIGNMENT);
+        txtField.addKeyListener(new ContinueKeyListener());
 
         btnGiveHint.setFont(ThemeConstants.niceFont);
         btnGiveHint.setAlignmentX(LEFT_ALIGNMENT);
@@ -294,6 +303,27 @@ public class AnsFieldSimpleText extends JPanel implements IAnswerField {
             Logger.getLogger(AnsFieldSimpleText.class.getName()).log(Level.SEVERE, "While reading in from XML, attempting to convert the number of marks awarded for a correct answer\n"
                     + "into an integer value (from String).", ex);
         }
+
+    }
+
+    public void setQuizContinueListener(ActionListener listener) {
+        actionListener = listener;
+    }
+
+    /**
+     * Listens for the enter key and triggers the quiz continue action.
+     */
+    private class ContinueKeyListener implements KeyListener {
+
+        public void keyTyped(KeyEvent e) {}
+
+        public void keyPressed(KeyEvent e) {
+            if ((actionListener != null) && (e.getKeyCode() == KeyEvent.VK_ENTER) && (inLibManager == false)) {
+                actionListener.actionPerformed(null);
+            }
+        }
+
+        public void keyReleased(KeyEvent e) { }
 
     }
 

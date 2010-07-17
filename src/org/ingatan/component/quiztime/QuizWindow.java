@@ -45,6 +45,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -369,6 +370,13 @@ public class QuizWindow extends JFrame implements WindowListener {
         resetSize(answerArea);
         resetSize(questionArea);
 
+        /*set an answer field listener to an answer field if it is the only one in the answer area. This
+         * listener is fired when a logical event occurs (as determined by the answer field author) that
+         * the quiz ContinueAction should occur (i.e. pressing enter in an answer field text box). Only occurs
+         * if there is one answer field in the area, because otherwise the user might not have entered data into
+         * all separate answer fields before the ContinueAction occurs.
+         */
+        setAnswerFieldListener();
         //request focus for the top-most answer field in the answer field area.
         focusFirstAnswerField();
     }
@@ -456,6 +464,45 @@ public class QuizWindow extends JFrame implements WindowListener {
         retField.setParentLibraryID(ques.getParentLibrary());
 
         return retField;
+    }
+
+    /**
+     * Traverses the answer area and finds all answer fields. If there exist more than one answer fields, then
+     * no listeners are applied, as the sole purpose of the listener is to fire the ContinueAction. If there are
+     * multiple answer fields, then no one answer field should be able to fire the ContinueAction, as the user
+     * may still need to input data into other answer fields.
+     */
+    public void setAnswerFieldListener() {
+        //traverse the answer text area until we find an answer field
+        Element curEl;
+        AttributeSet curAttr;
+        int runCount;
+        int answerFieldCount = 0;
+        IAnswerField field = null;
+
+        for (int i = 0; i < answerArea.getDocument().getDefaultRootElement().getElementCount(); i++) {
+            //each paragraph has 'runCount' runs
+            runCount = answerArea.getDocument().getDefaultRootElement().getElement(i).getElementCount();
+            for (int j = 0; j < runCount; j++) {
+                curEl = answerArea.getDocument().getDefaultRootElement().getElement(i).getElement(j);
+                curAttr = curEl.getAttributes();
+
+                if (curEl.getName().equals(StyleConstants.ComponentElementName)) {
+                    //this run is a component. May be an answer field, picture or math text component.
+                    Component o = (Component) curAttr.getAttribute(StyleConstants.ComponentAttribute);
+                    if (o instanceof IAnswerField) {
+                        //set focus to the answer field
+                        field = (IAnswerField) o;
+                        answerFieldCount++;
+                    }
+                }
+            }
+        }
+
+        //add the listener
+        if ((answerFieldCount == 1) && (field != null)) {
+            field.setQuizContinueListener(new ContinueActionListener());
+        }
     }
 
     /**
@@ -640,6 +687,21 @@ public class QuizWindow extends JFrame implements WindowListener {
 
         } catch (Exception e2) {
             Logger.getLogger(FlexiQuestionContainer.class.getName()).log(Level.WARNING, "Could not resize the text area to fit content.", e2);
+        }
+    }
+
+    /**
+     * Listens to answer fields, and triggers the ContinueAction action if an answer field
+     * fires this listener. This will occur when the answer field has received a logical input that
+     * this should occur, as determined by the answer field programmer, but only if there is only 1 answer
+     * field currently in the answer text area. If there are others, the user will still need to see to those
+     * answer fields. If this listener is fired, then it is neccessarily so that there is only one answer field
+     * in the answer field area, as this listener is only added to the answer field if it is the only one.
+     */
+    private class ContinueActionListener implements ActionListener {
+
+        public void actionPerformed(ActionEvent e) {
+            new ContinueAction().actionPerformed(null);
         }
     }
 

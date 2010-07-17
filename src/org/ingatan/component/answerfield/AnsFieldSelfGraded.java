@@ -27,6 +27,7 @@
  */
 package org.ingatan.component.answerfield;
 
+import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import org.ingatan.ThemeConstants;
 import org.ingatan.component.image.ImageAcquisitionDialog;
@@ -235,6 +236,10 @@ public class AnsFieldSelfGraded extends JPanel implements IAnswerField {
 
     public void setParentLibraryID(String id) {
         parentLibraryID = id;
+    }
+
+    public void setQuizContinueListener(ActionListener listener) {
+        //this is not implemented, as there is no logical event that should trigger the quiz continue action.
     }
 
     private class AnswerEvaluationDialog extends JDialog {
