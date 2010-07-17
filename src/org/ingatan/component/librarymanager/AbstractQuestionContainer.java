@@ -41,7 +41,6 @@ import java.awt.geom.RoundRectangle2D;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 
 /**
  * This abstract class provides the container for question components. The idea is that

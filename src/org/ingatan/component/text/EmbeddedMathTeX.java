@@ -101,6 +101,9 @@ public class EmbeddedMathTeX extends EmbeddedGraphic {
      * Render size
      */
     protected int size = 25;
+    /**
+     * The colour of the rendered math text.
+     */
     protected Color renderColour = Color.black;
 
     public EmbeddedMathTeX(String mathTeX, int size, Color colour) {

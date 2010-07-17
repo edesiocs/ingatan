@@ -57,7 +57,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
-import org.ingatan.component.librarymanager.FlexiQuestionContainer.TextFocusListener;
 import org.ingatan.component.text.RichTextToolbar;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -325,6 +324,12 @@ public class AnsFieldSelfGraded extends JPanel implements IAnswerField {
 
             this.setSize(600, 400);
             this.setLocationRelativeTo(null);
+        }
+
+
+        @Override
+        public void requestFocus() {
+            txtArea.requestFocus();
         }
 
         /**

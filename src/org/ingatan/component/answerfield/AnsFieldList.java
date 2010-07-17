@@ -190,7 +190,7 @@ public class AnsFieldList extends JPanel implements IAnswerField {
 
             String cat = "";
             for (int i = 0; i < correctAnswers.length; i++) {
-                cat += correctAnswers[i] + ((i == correctAnswers.length-1) ? "" : "\n");
+                cat += correctAnswers[i] + ((i == correctAnswers.length - 1) ? "" : "\n");
             }
             txtArea.setText(cat);
         } else {
@@ -205,6 +205,13 @@ public class AnsFieldList extends JPanel implements IAnswerField {
                     this.add(btnGiveHint);
                 }
             }
+        }
+    }
+
+    @Override
+    public void requestFocus() {
+        if (txtListItemFields.length >= 1) {
+            txtListItemFields[0].requestFocus();
         }
     }
 

@@ -35,7 +35,6 @@ import org.ingatan.data.Library;
 import org.ingatan.data.TableQuestion;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;

@@ -359,6 +359,9 @@ public class QuizWindow extends JFrame implements WindowListener {
 
         resetSize(answerArea);
         resetSize(questionArea);
+
+        //request focus for the top-most answer field in the answer field area.
+        focusFirstAnswerField();
     }
 
     /**
@@ -444,6 +447,38 @@ public class QuizWindow extends JFrame implements WindowListener {
         retField.setParentLibraryID(ques.getParentLibrary());
 
         return retField;
+    }
+
+    /**
+     * This find the first (top most) answer field in the answer text area and
+     * calls its .requestFocus() method. If an answer field wants to handle this
+     * event in a special way (for example pass focus to the correct sub-component) then
+     * this can be done by overriding the <code>requestFocus</code> method.
+     */
+    public void focusFirstAnswerField() {
+        //traverse the answer text area until we find an answer field
+        Element curEl;
+        AttributeSet curAttr;
+        int runCount;
+
+        for (int i = 0; i < answerArea.getDocument().getDefaultRootElement().getElementCount(); i++) {
+            //each paragraph has 'runCount' runs
+            runCount = answerArea.getDocument().getDefaultRootElement().getElement(i).getElementCount();
+            for (int j = 0; j < runCount; j++) {
+                curEl = answerArea.getDocument().getDefaultRootElement().getElement(i).getElement(j);
+                curAttr = curEl.getAttributes();
+
+                if (curEl.getName().equals(StyleConstants.ComponentElementName)) {
+                    //this run is a component. May be an answer field, picture or math text component.
+                    Component o = (Component) curAttr.getAttribute(StyleConstants.ComponentAttribute);
+                    if (o instanceof IAnswerField) {
+                        //set focus to the answer field
+                        o.requestFocus();
+                        return;
+                    }
+                }
+            }
+        }
     }
 
     /**

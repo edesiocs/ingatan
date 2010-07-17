@@ -333,4 +333,9 @@ public class AnsFieldSimpleText extends JPanel implements IAnswerField {
         //not implemented the parent library ID.
         return;
     }
+
+    @Override
+    public void requestFocus() {
+        txtField.requestFocus();
+    }
 }
