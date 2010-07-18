@@ -38,6 +38,7 @@ import java.awt.Font;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.HashSet;
@@ -415,9 +416,24 @@ public class AnsFieldList extends JPanel implements IAnswerField {
 
             //set both tab and enter to be active focus traversal keys
             HashSet<AWTKeyStroke> keyset = new HashSet<AWTKeyStroke>();
-            keyset.add(AWTKeyStroke.getAWTKeyStroke(KeyEvent.VK_ENTER, 0));
             keyset.add(AWTKeyStroke.getAWTKeyStroke(KeyEvent.VK_TAB, 0));
             txtField.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, keyset);
+            
+            //the following key listener listens for the enter key, and if the symbol menu is not
+            //showing, focusses the next component.
+            txtField.addKeyListener(new KeyListener() {
+
+                public void keyTyped(KeyEvent e) {}
+
+                public void keyPressed(KeyEvent e) {
+                    //if enter key and not on symbol menu, focus the next component
+                    if ((e.getKeyCode() == KeyEvent.VK_ENTER) && (txtField.getSymbolMenu().isVisible() == false)) {
+                        KeyboardFocusManager.getCurrentKeyboardFocusManager().focusNextComponent();
+                    }
+                }
+
+                public void keyReleased(KeyEvent e) {}
+            });
         }
 
         @Override
