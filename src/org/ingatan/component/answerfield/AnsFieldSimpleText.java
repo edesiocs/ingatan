@@ -319,7 +319,7 @@ public class AnsFieldSimpleText extends JPanel implements IAnswerField {
 
         public void keyPressed(KeyEvent e) {
             if ((actionListener != null) && (e.getKeyCode() == KeyEvent.VK_ENTER) && (inLibManager == false)) {
-                actionListener.actionPerformed(null);
+                actionListener.actionPerformed(new ActionEvent(AnsFieldSimpleText.this, 0, ""));
             }
         }
 

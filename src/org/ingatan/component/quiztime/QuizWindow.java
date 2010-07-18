@@ -64,6 +64,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.InputMap;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -186,6 +187,11 @@ public class QuizWindow extends JFrame implements WindowListener {
      * Keeps track of how may times the user improved on the historic correctness of a question.
      */
     private int improvementCount = 0;
+    /**
+     * The number of answer fields that currently exist in the answer text area. This is set when
+     * a new question is displayed.
+     */
+    private ArrayList<IAnswerField> currentAnswerFields = new ArrayList<IAnswerField>();
 
     /**
      * Creates a new instance of QuizWindow with the specified owner. The owner is the
@@ -370,11 +376,14 @@ public class QuizWindow extends JFrame implements WindowListener {
         resetSize(answerArea);
         resetSize(questionArea);
 
-        /*set an answer field listener to an answer field if it is the only one in the answer area. This
-         * listener is fired when a logical event occurs (as determined by the answer field author) that
-         * the quiz ContinueAction should occur (i.e. pressing enter in an answer field text box). Only occurs
-         * if there is one answer field in the area, because otherwise the user might not have entered data into
-         * all separate answer fields before the ContinueAction occurs.
+        //clear the currentAnswerFields array, this is repopulated in the setAnswerFieldListener method.
+        currentAnswerFields = new ArrayList<IAnswerField>();
+        /*
+         * Sets answer field listeners to all answer fields in the answer text area. It used to be such that the listener
+         * was only added if there was only one answer field in the answer text area. Now, when a listener is fired, if there
+         * is only 1 answer field in the area, then the ContinueAction is called, otherwise the next field is focussed.
+         *
+         * This is also where the currentAnswerFields array list is populated.
          */
         setAnswerFieldListener();
         //request focus for the top-most answer field in the answer field area.
@@ -467,18 +476,14 @@ public class QuizWindow extends JFrame implements WindowListener {
     }
 
     /**
-     * Traverses the answer area and finds all answer fields. If there exist more than one answer fields, then
-     * no listeners are applied, as the sole purpose of the listener is to fire the ContinueAction. If there are
-     * multiple answer fields, then no one answer field should be able to fire the ContinueAction, as the user
-     * may still need to input data into other answer fields.
+     * Traverses the answer area and finds all answer fields. Adds the answer field listener to each
+     * answer field found.
      */
     public void setAnswerFieldListener() {
         //traverse the answer text area until we find an answer field
         Element curEl;
         AttributeSet curAttr;
         int runCount;
-        int answerFieldCount = 0;
-        IAnswerField field = null;
 
         for (int i = 0; i < answerArea.getDocument().getDefaultRootElement().getElementCount(); i++) {
             //each paragraph has 'runCount' runs
@@ -491,18 +496,14 @@ public class QuizWindow extends JFrame implements WindowListener {
                     //this run is a component. May be an answer field, picture or math text component.
                     Component o = (Component) curAttr.getAttribute(StyleConstants.ComponentAttribute);
                     if (o instanceof IAnswerField) {
-                        //set focus to the answer field
-                        field = (IAnswerField) o;
-                        answerFieldCount++;
+                        //add the ContinueActionListener
+                        ((IAnswerField) o).setQuizContinueListener(new ContinueActionListener());
+                        currentAnswerFields.add((IAnswerField) o);
                     }
                 }
             }
         }
 
-        //add the listener
-        if ((answerFieldCount == 1) && (field != null)) {
-            field.setQuizContinueListener(new ContinueActionListener());
-        }
     }
 
     /**
@@ -695,13 +696,24 @@ public class QuizWindow extends JFrame implements WindowListener {
      * fires this listener. This will occur when the answer field has received a logical input that
      * this should occur, as determined by the answer field programmer, but only if there is only 1 answer
      * field currently in the answer text area. If there are others, the user will still need to see to those
-     * answer fields. If this listener is fired, then it is neccessarily so that there is only one answer field
-     * in the answer field area, as this listener is only added to the answer field if it is the only one.
+     * answer fields, and so if this listener is fired all that occurs is that focus is shifted to the next listener
+     * in the answer area.
      */
     private class ContinueActionListener implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
-            new ContinueAction().actionPerformed(null);
+            if (currentAnswerFields.size() == 1) {
+                //continue action
+                new ContinueAction().actionPerformed(null);
+            } else if (currentAnswerFields.size() > 1) {
+                //focus change
+                int index = currentAnswerFields.indexOf(e.getSource());
+                if (index < currentAnswerFields.size()-1) {
+                    ((JComponent) currentAnswerFields.get(index+1)).requestFocus();
+                } else if (index == currentAnswerFields.size()-1) {
+                    ((JComponent) currentAnswerFields.get(0)).requestFocus();
+                }
+            }
         }
     }
 

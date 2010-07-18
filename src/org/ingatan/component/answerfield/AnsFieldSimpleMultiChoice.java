@@ -351,7 +351,7 @@ public class AnsFieldSimpleMultiChoice extends JPanel implements IAnswerField {
 
         public void mouseClicked(MouseEvent e) {
             if ((actionListener != null) && (e.getClickCount() == 2) && (libraryContext == false)) {
-                actionListener.actionPerformed(null);
+                actionListener.actionPerformed(new ActionEvent(AnsFieldSimpleMultiChoice.this, 0, ""));
             }
         }
 

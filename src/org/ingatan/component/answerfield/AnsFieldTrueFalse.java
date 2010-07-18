@@ -267,7 +267,7 @@ public class AnsFieldTrueFalse extends JPanel implements IAnswerField {
 
         public void mouseClicked(MouseEvent e) {
             if ((actionListener != null) && (e.getClickCount() == 2) && (lblPoints.isVisible() == false)) {
-                actionListener.actionPerformed(null);
+                actionListener.actionPerformed(new ActionEvent(AnsFieldTrueFalse.this, 0, ""));
             }
         }
 

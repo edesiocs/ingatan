@@ -143,13 +143,13 @@ public interface IAnswerField {
     /**
      * Sets the <code>ActionListener</code> for this answer field. This method will be called by the quiz window
      * when the answer field is created. When the user interacts with the answer field in a way that should submit their answer,
-     * then the action listener should have its <code>actionPerformed</code> method fired with a <code>null ActionEvent</code>. This
-     * will tell the <code>QuizWindow</code> that the user has submitted the answer. An example is the user pressing enter when in a text
-     * field, or double clicking a multiple choice option.<br>
+     * then the action listener should have its <code>actionPerformed</code> method fired with an <code>ActionEvent</code> that contains
+     * the source of the event (i.e. the answer field object). This will tell the <code>QuizWindow</code> that the user has submitted the answer.
+     * An example is the user pressing enter when in a text field, or double clicking a multiple choice option.<br>
      * <br>
-     * <b>Note:<b> an <code>ActionListener</code> will only be set by the <code>QuizWindow</code> if the answer field is on its own. This is because
-     * the user may submit their answer for one answer field, but still need to fill in data for another answer field. Be sure to test that a listener
-     * has been set.
+     * <b>Note:<b> if the answer field is the only one for the current question, firing the actionPerformed method of this listener will
+     * be the equivalent of the user pressing the 'Continue' button at quiz time. If there are other answer fields present, then all that
+     * occurs is that the focus is shifted to the next answer field in the area.
      * @param listener the <code>ActionListener</code> set by the <code>QuizWindow</code> for this answer field instance.
      */
     public void setQuizContinueListener(ActionListener listener);
