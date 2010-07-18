@@ -25,7 +25,6 @@
  * If you find this program useful, please tell me about it! I would be delighted
  * to hear from you at tom.ingatan@gmail.com.
  */
-
 package org.ingatan.component.text;
 
 import org.ingatan.ThemeConstants;
@@ -191,6 +190,8 @@ public class DataTable extends JTable {
         inMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "null");
         inMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "null");
         inMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "null");
+        inMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), "null");
+
 
         aMap.put("null", new NullAction());
         editor.setInputMap(DataTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT, inMap);
