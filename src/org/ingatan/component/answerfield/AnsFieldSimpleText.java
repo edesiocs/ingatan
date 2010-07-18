@@ -96,7 +96,7 @@ public class AnsFieldSimpleText extends JPanel implements IAnswerField {
     /**
      * Instruction label indicating how to specify multiple correct answers
      */
-    private JLabel lblInstruct = new JLabel("Separate acceptable answers using double comma ,,");
+    private JLabel lblInstruct = new JLabel("Separate answers with double comma ,,");
     /**
      * Button for the user at quiz time that provides a hint for the answer, letter by letter.
      */
@@ -129,7 +129,8 @@ public class AnsFieldSimpleText extends JPanel implements IAnswerField {
     public AnsFieldSimpleText() {
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.setOpaque(false);
-        this.setMaximumSize(new Dimension(330, 100));
+        this.setMaximumSize(new Dimension(200, 100));
+        this.setMinimumSize(new Dimension(50,100));
 
         lblInstruct.setFont(ThemeConstants.niceFont.deriveFont(Font.ITALIC).deriveFont(9.5f));
         lblNumMarks.setFont(ThemeConstants.niceFont.deriveFont(Font.ITALIC));
