@@ -391,8 +391,8 @@ public class LibraryManagerWindow extends JFrame implements WindowListener {
                             //not getPreviouslySelectedLibraryID as the library selection hasn't changed, just the group selection
                             saveLibrary(libBrowser.getSelectedLibraryID());
                         } catch (IOException ex) {
-                            Logger.getLogger(LibraryManagerWindow.class.getName()).log(Level.SEVERE, "While trying to save library with ID: " + libBrowser.getSelectedLibraryID() + "\n" +
-                                    "as a result of GROUP_SELECTION_CHANGED event (from LibraryBrowser).", ex);
+                            Logger.getLogger(LibraryManagerWindow.class.getName()).log(Level.SEVERE, "While trying to save library with ID: " + libBrowser.getSelectedLibraryID() + "\n"
+                                    + "as a result of GROUP_SELECTION_CHANGED event (from LibraryBrowser).", ex);
                         }
                     }
                     questionList.removeAll();
@@ -551,18 +551,35 @@ public class LibraryManagerWindow extends JFrame implements WindowListener {
             }
             if (c instanceof RichTextArea) {
                 RichTextArea rta = (RichTextArea) c;
-                //if this rich text area is not an answer text field
-                if (rta.equals(((FlexiQuestionContainer) rta.getParent().getParent().getParent().getParent()).answerText) == false) {
-                    JOptionPane.showMessageDialog(LibraryManagerWindow.this, "You can only insert answer fields into the answer text box.", "Cannot Insert Answer Field", JOptionPane.INFORMATION_MESSAGE);
-                    return;
+                FlexiQuestionContainer flexiQ;
+
+                try {
+                    flexiQ = (FlexiQuestionContainer) rta.getParent().getParent().getParent().getParent();
+                }
+                catch (ClassCastException ex) {
+                    JOptionPane.showMessageDialog(LibraryManagerWindow.this, "Can only insert an answer field into a flexi question text area.\n" +
+                            "Detected due to exception thrown when casting RichTextArea's ancestor to FlexiQuestionContainer.", "Cannot Insert Answer Field", JOptionPane.INFORMATION_MESSAGE);
+                        return;
                 }
                 //try to instantiate the answer field, and then add it to the text field
                 try {
                     IAnswerField ansField = (IAnswerField) IOManager.getAnswerFieldClass(e.getActionCommand()).newInstance();
                     ansField.setContext(true);
+                    if (ansField.isOnlyForAnswerArea() && (rta.equals(flexiQ.answerText) == false)) {
+                        JOptionPane.showMessageDialog(LibraryManagerWindow.this, "The '" + ansField.getDisplayName() + "' answer field\n" +
+                                "can only be inserted into the answer text area.", "Cannot Insert Answer Field", JOptionPane.INFORMATION_MESSAGE);
+                        return;
+                    }
+                    //ensure that the rich text area currently in focus is one of the three flexi question container rich text areas (and not, for instance
+                    //the rich text area of a self-graded question answer field).
+                    if (rta.equals(flexiQ.answerText) || rta.equals(flexiQ.questionText) || rta.equals(flexiQ.postAnswerText)) {
                     ansField.readInXML((String) IOManager.getAnswerFieldsFile().getAnswerFieldDefaults().get(ansField.getClass().getName()));
                     ansField.setParentLibraryID(libBrowser.getSelectedLibraryID());
                     rta.insertComponent((JComponent) ansField);
+                    } else {
+                        JOptionPane.showMessageDialog(LibraryManagerWindow.this, "Can only insert an answer field into a flexi question text area.", "Cannot Insert Answer Field", JOptionPane.INFORMATION_MESSAGE);
+                        return;
+                    }
                 } catch (InstantiationException ex) {
                     JOptionPane.showMessageDialog(LibraryManagerWindow.this, "There was a problem instantiating the answer field.\nIt cannot be inserted.", "Instantiation Exception", JOptionPane.ERROR_MESSAGE);
                     return;
