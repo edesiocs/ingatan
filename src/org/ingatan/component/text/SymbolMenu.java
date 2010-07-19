@@ -358,7 +358,8 @@ public class SymbolMenu extends JPanel {
         for (int i = 0; i < str.length(); i++) {
             str2 += str.charAt(i) + " ";
         }
-        return this.getGraphics().getFontMetrics().stringWidth(str2);
+
+        return this.getFontMetrics(this.getFont()).stringWidth(str2);
     }
 
     /**

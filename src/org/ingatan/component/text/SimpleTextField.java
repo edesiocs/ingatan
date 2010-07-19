@@ -183,6 +183,8 @@ public class SimpleTextField extends JTextField {
                     } else {
                         symbolMenu.setLocation(p.x + 1, p.y - 1);
                     }
+
+                    SimpleTextField.this.getRootPane().validate();
                     
                     symbolMenu.requestFocus();
                     symbolMenu.repaint();
@@ -208,6 +210,8 @@ public class SimpleTextField extends JTextField {
     }
 
     private void revertSize() {
+
+        System.out.println(":: revert size ::");
         if ((previousSize == null) || (previousMaximumSize == null) || (previousMinimumSize == null) || (previousPreferredSize == null)) {
             return;
         }

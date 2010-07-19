@@ -340,6 +340,8 @@ public class AnsFieldSimpleText extends JPanel implements IAnswerField {
         public void componentResized(ComponentEvent e) {
             AnsFieldSimpleText.this.setMaximumSize(txtField.getMaximumSize());
             AnsFieldSimpleText.this.setMinimumSize(txtField.getMinimumSize());
+            AnsFieldSimpleText.this.setSize(txtField.getMinimumSize());
+            System.out.println("parent updated");
         }
 
         public void componentMoved(ComponentEvent e) {}
