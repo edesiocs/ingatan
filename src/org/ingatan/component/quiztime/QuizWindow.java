@@ -391,6 +391,8 @@ public class QuizWindow extends JFrame implements WindowListener {
         setAnswerFieldListener();
         //request focus for the top-most answer field in the answer field area.
         focusFirstAnswerField();
+
+        QuizWindow.this.getRootPane().validate();
     }
 
     /**

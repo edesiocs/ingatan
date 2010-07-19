@@ -179,7 +179,7 @@ public class SimpleTextField extends JTextField {
                         if (proposedXLocation < 0) {
                             proposedXLocation = 0;
                         }
-                        symbolMenu.setLocation(SimpleTextField.this.getWidth() - (symbolMenu.getStringWidth() + 5), p.y - 1);
+                        symbolMenu.setLocation(proposedXLocation, p.y - 1);
                     } else {
                         symbolMenu.setLocation(p.x + 1, p.y - 1);
                     }
@@ -211,7 +211,6 @@ public class SimpleTextField extends JTextField {
 
     private void revertSize() {
 
-        System.out.println(":: revert size ::");
         if ((previousSize == null) || (previousMaximumSize == null) || (previousMinimumSize == null) || (previousPreferredSize == null)) {
             return;
         }
