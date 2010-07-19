@@ -25,7 +25,6 @@
  * If you find this program useful, please tell me about it! I would be delighted
  * to hear from you at tom.ingatan@gmail.com.
  */
-
 package org.ingatan.io;
 
 import java.awt.Image;
@@ -321,8 +320,8 @@ public abstract class IOManager {
                 //that it exists..
                 if (doc == null) {
                     System.out.println("Groups doc says it exists, but it cannot be accessed. Terminating.");
-                    Logger.getLogger(IOManager.class.getName()).log(Level.SEVERE, "The groups file apparently exists, but it could not be accessed.\n" +
-                            "Without access to the groups file, there is not a lot that can be done.");
+                    Logger.getLogger(IOManager.class.getName()).log(Level.SEVERE, "The groups file apparently exists, but it could not be accessed.\n"
+                            + "Without access to the groups file, there is not a lot that can be done.");
                     System.exit(-1);
                 }
                 try {
@@ -435,21 +434,20 @@ public abstract class IOManager {
      * @return the randomly selected main menu image.
      */
     public static BufferedImage getNewMenuBackground() {
-        String[] images = new String[] {
+        String[] images = new String[]{
             "resources/AaronLogan.png",
             "resources/Daisy.png",
             "resources/WolfgangWander.png",
             "resources/PineNuts.png",
             "resources/Michael.png",
-            "resources/MichaelSleep.png",
-        };
+            "resources/MichaelSleep.png",};
 
         //load a random image from the above
         BufferedImage img = null;
         try {
             img = ImageIO.read(Thread.currentThread().getContextClassLoader().getResource(images[random.nextInt(images.length)]));
         } catch (Exception e) {
-            Logger.getLogger(IOManager.class.getName()).log(Level.SEVERE,"while trying to load one of the background images for the main menu",e);
+            Logger.getLogger(IOManager.class.getName()).log(Level.SEVERE, "while trying to load one of the background images for the main menu", e);
         }
 
         return img;
@@ -909,25 +907,9 @@ public abstract class IOManager {
 
             packageLibrary(libID);
 
-
-            //delete temp directory
-            if (tempPath != null) {
-                //must delete the temporary path and all files within it
-                File[] files = tempPath.listFiles();
-                for (int i = 0; i < files.length; i++) {
-                    files[i].delete();
-                }
-                tempPath.delete();
-            }
-
         } else {
             copy(libraryToImport.getAbsolutePath(), getLibraryPath() + libID);
             lib = loadLibrary(libID);
-            //update libraries array
-            Library[] temp = new Library[libraries.length + 1];
-            System.arraycopy(libraries, 0, temp, 0, libraries.length);
-            temp[libraries.length] = lib;
-            libraries = temp;
         }
 
         //update library IDs array
@@ -1287,17 +1269,18 @@ public abstract class IOManager {
         //     images too, and they are not bound to using the same method of serialisation.
         File[] filesInLibrary = getLibraryFromID(libID).getPathTempLib().listFiles();
         String libString = ParserWriter.writeLibraryToString(getLibraryFromID(libID));
-
-        for (int i = 0; i < filesInLibrary.length; i++) {
-            if ((filesInLibrary[i].getName().equals(libID) == false) && (libString.contains(filesInLibrary[i].getName()) == false)) {
-                //this file is not the library file, and it is not contained within the library string representation
-                //so delete it
-                if (filesInLibrary[i].delete() == false) {
-                    System.out.println("\n-----> could not clean up unused image '" + filesInLibrary[i].getName() + "' from library '" + libID + "' before repacking.");
+        if (filesInLibrary != null) {
+            for (int i = 0; i < filesInLibrary.length; i++) {
+                if ((filesInLibrary[i].getName().equals(libID) == false) && (libString.contains(filesInLibrary[i].getName()) == false)) {
+                    //this file is not the library file, and it is not contained within the library string representation
+                    //so delete it
+                    if (filesInLibrary[i].delete() == false) {
+                        System.out.println("\n-----> could not clean up unused image '" + filesInLibrary[i].getName() + "' from library '" + libID + "' before repacking.");
+                    }
                 }
             }
         }
-
+        System.out.println("getLibraryFromID(libID).getPathTempLib() = " + getLibraryFromID(libID).getPathTempLib().toString());
         ZipTools.createZip(getLibraryFromID(libID).getPathTempLib().listFiles(), new File(getLibraryPath() + libID));
     }
 
@@ -1615,10 +1598,10 @@ public abstract class IOManager {
         try {
             imageIn = ImageIO.read(new File(imageFileName));
         } catch (Exception evt) {
-            Logger.getLogger(IOManager.class.getName()).log(Level.SEVERE, "While attempting to load the image: " + imageFileName,evt);
+            Logger.getLogger(IOManager.class.getName()).log(Level.SEVERE, "While attempting to load the image: " + imageFileName, evt);
             return "";
         } catch (OutOfMemoryError evt) {
-            Logger.getLogger(IOManager.class.getName()).log(Level.SEVERE, "While attempting to load the image: " + imageFileName,evt);
+            Logger.getLogger(IOManager.class.getName()).log(Level.SEVERE, "While attempting to load the image: " + imageFileName, evt);
             return "";
         }
 
@@ -1793,10 +1776,8 @@ public abstract class IOManager {
         copy(filename, newFile.getAbsolutePath());
     }
 
-
-
     public static String getSafeID(String id) {
-        char[] illegalChars = new char[]{ '/', '\n', '\r', '\t', '\0', '\f', '`', '?', '*', '\\', '<', '>', '|', '\"', ':' };
+        char[] illegalChars = new char[]{'/', '\n', '\r', '\t', '\0', '\f', '`', '?', '*', '\\', '<', '>', '|', '\"', ':'};
         for (int i = 0; i < illegalChars.length; i++) {
             id = id.replace(illegalChars[i], 'A');
         }
