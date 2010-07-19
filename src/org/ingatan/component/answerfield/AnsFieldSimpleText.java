@@ -25,9 +25,9 @@
  * If you find this program useful, please tell me about it! I would be delighted
  * to hear from you at tom.ingatan@gmail.com.
  */
-
 package org.ingatan.component.answerfield;
 
+import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import org.ingatan.ThemeConstants;
 import org.ingatan.component.text.NumericJTextField;
@@ -35,6 +35,7 @@ import org.ingatan.component.text.SimpleTextField;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyListener;
@@ -80,11 +81,11 @@ public class AnsFieldSimpleText extends JPanel implements IAnswerField {
      * Whether or not this component is currently being displayed in the library
      * manager (<code>true</code> value) or quiz time (<code>false</code> value).
      */
-    private boolean inLibManager = false;
+    private boolean inLibManager = true;
     /**
      * Text entry field.
      */
-    private SimpleTextField txtField = new SimpleTextField();
+    private SimpleTextField txtField = new SimpleTextField(6);
     /**
      * Text field for setting how many marks to award for a correct answer
      */
@@ -130,7 +131,7 @@ public class AnsFieldSimpleText extends JPanel implements IAnswerField {
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.setOpaque(false);
         this.setMaximumSize(new Dimension(200, 100));
-        this.setMinimumSize(new Dimension(50,100));
+        this.setMinimumSize(new Dimension(50, 100));
 
         lblInstruct.setFont(ThemeConstants.niceFont.deriveFont(Font.ITALIC).deriveFont(9.5f));
         lblNumMarks.setFont(ThemeConstants.niceFont.deriveFont(Font.ITALIC));
@@ -151,8 +152,8 @@ public class AnsFieldSimpleText extends JPanel implements IAnswerField {
         numMarks.setToolTipText("The number of marks to award if the user types the correct answer.");
         chkHints.setToolTipText("If checked, a 'hint' button will appear at quiz time allowing the user to be shown an extra letter of the correct answers with each click.");
 
-        numMarks.setMaximumSize(new Dimension(50,25));
-        numMarks.setMinimumSize(new Dimension(30,25));
+        numMarks.setMaximumSize(new Dimension(50, 25));
+        numMarks.setMinimumSize(new Dimension(30, 25));
 
         popupHint.add(lblHint);
 
@@ -192,15 +193,35 @@ public class AnsFieldSimpleText extends JPanel implements IAnswerField {
             txtField.setText(cat);
             numMarks.setText(String.valueOf(marksIfCorrect));
         } else {
-            txtField.setMaximumSize(new Dimension(200, 50));
+            txtField.setMaximumSize(new Dimension(getAverageAnswerWidth(txtField.getFontMetrics(txtField.getFont())), 30));
+            txtField.setMinimumSize(new Dimension(getAverageAnswerWidth(txtField.getFontMetrics(txtField.getFont())), 30));
+            this.setMaximumSize(txtField.getMaximumSize());
+            this.setMinimumSize(txtField.getMinimumSize());
+            
             txtField.setBorder(BorderFactory.createLineBorder(ThemeConstants.borderUnselected));
             this.add(txtField);
-            this.setMaximumSize(new Dimension(200, 50));
+
             txtField.setFont(ThemeConstants.niceFont.deriveFont(14.0f));
             txtField.setText("");
             if (chkHints.isSelected()) {
                 this.add(btnGiveHint);
             }
+        }
+    }
+
+    public int getAverageAnswerWidth(FontMetrics fm) {
+        float widthSum = 0;
+
+        for (int i = 0; i < correctAnswers.length; i++) {
+            widthSum += fm.stringWidth(correctAnswers[i]);
+        }
+
+        if ((widthSum / correctAnswers.length) < 10) {
+            return 10;
+        } else if ((widthSum / correctAnswers.length) > 160) {
+            return 160;
+        } else {
+            return (int) (widthSum / correctAnswers.length);
         }
     }
 
@@ -316,7 +337,8 @@ public class AnsFieldSimpleText extends JPanel implements IAnswerField {
      */
     private class ContinueKeyListener implements KeyListener {
 
-        public void keyTyped(KeyEvent e) {}
+        public void keyTyped(KeyEvent e) {
+        }
 
         public void keyPressed(KeyEvent e) {
             if ((actionListener != null) && (e.getKeyCode() == KeyEvent.VK_ENTER) && (inLibManager == false)) {
@@ -324,8 +346,8 @@ public class AnsFieldSimpleText extends JPanel implements IAnswerField {
             }
         }
 
-        public void keyReleased(KeyEvent e) { }
-
+        public void keyReleased(KeyEvent e) {
+        }
     }
 
     private class GiveHintAction extends AbstractAction {
@@ -340,7 +362,7 @@ public class AnsFieldSimpleText extends JPanel implements IAnswerField {
             String buildText = "<html><h3>Hints</h3>The following are partial possible answers:<ul>";
             for (int i = 0; i < correctAnswers.length; i++) {
                 if (correctAnswers[i].length() > hintsGiven) {
-                    buildText += "<li>" + correctAnswers[i].substring(0,hintsGiven) + "</li>";
+                    buildText += "<li>" + correctAnswers[i].substring(0, hintsGiven) + "</li>";
                 } else {
                     buildText += "<li>" + correctAnswers[i] + "</li>";
                 }

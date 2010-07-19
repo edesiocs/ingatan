@@ -64,6 +64,11 @@ public class SimpleTextField extends JTextField {
         this("");
     }
 
+    public SimpleTextField(int columns) {
+        super(columns);
+        setUp();
+    }
+
     public SimpleTextField(String text) {
         this.setText(text);
         setUp();

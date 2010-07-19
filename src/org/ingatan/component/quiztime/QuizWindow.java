@@ -72,6 +72,7 @@ import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Element;
@@ -274,8 +275,8 @@ public class QuizWindow extends JFrame implements WindowListener {
         horiz.setMaximumSize(new Dimension(2000, 40));
         contentPane.add(horiz);
 
+        this.setPreferredSize(new Dimension(500,600));
         this.pack();
-        this.setSize(500, 600);
 
     }
 
