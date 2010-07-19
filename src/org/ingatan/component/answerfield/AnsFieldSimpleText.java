@@ -27,8 +27,6 @@
  */
 package org.ingatan.component.answerfield;
 
-import java.awt.Color;
-import java.awt.Rectangle;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import org.ingatan.ThemeConstants;
@@ -231,6 +229,10 @@ public class AnsFieldSimpleText extends JPanel implements IAnswerField {
 
     public String getDisplayName() {
         return "Simple Text Box";
+    }
+
+    public boolean isOnlyForAnswerArea() {
+        return true;
     }
 
     public float checkAnswer() {

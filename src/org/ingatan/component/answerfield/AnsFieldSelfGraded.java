@@ -84,7 +84,6 @@ public class AnsFieldSelfGraded extends JPanel implements IAnswerField {
      */
     private RichTextArea txtArea;
 
-    ;
     /**
      * Label for the number of marks to award spinner.
      */
@@ -142,6 +141,10 @@ public class AnsFieldSelfGraded extends JPanel implements IAnswerField {
 
     public String getDisplayName() {
         return "Self Graded Question";
+    }
+
+    public boolean isOnlyForAnswerArea() {
+        return true;
     }
 
     public float checkAnswer() {

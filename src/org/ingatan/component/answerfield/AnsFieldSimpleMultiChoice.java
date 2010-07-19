@@ -198,6 +198,10 @@ public class AnsFieldSimpleMultiChoice extends JPanel implements IAnswerField {
         return "Simple Multiple Choice";
     }
 
+    public boolean isOnlyForAnswerArea() {
+        return true;
+    }
+
     public float checkAnswer() {
         ListIterator<OptionEntry> iterate = optionEntries.listIterator();
         OptionEntry curEntry;

@@ -149,6 +149,10 @@ public class AnsFieldTrueFalse extends JPanel implements IAnswerField {
         return "True or False";
     }
 
+    public boolean isOnlyForAnswerArea() {
+        return true;
+    }
+
     public float checkAnswer() {
         if (radioTrue.isSelected() && correctAnswer) {
             return 1.0f;

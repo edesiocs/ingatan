@@ -221,6 +221,10 @@ public class AnsFieldList extends JPanel implements IAnswerField {
         return "Fill in the List";
     }
 
+    public boolean isOnlyForAnswerArea() {
+        return true;
+    }
+
     public float checkAnswer() {
         int correctAnsCount = 0;
 

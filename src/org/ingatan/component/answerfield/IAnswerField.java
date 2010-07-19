@@ -55,6 +55,21 @@ public interface IAnswerField {
     public String getDisplayName();
 
     /**
+     * Gets whether or not this answer field can be added to the question and post-answer text areas,
+     * or if it should only be added to the answer text area of a flexi question. This is useful for
+     * creating answer fields that don't necessarily take answers, but are more for embedding data. One
+     * example is the audio answer field, used to embed audio data.<br>
+     * <br>
+     * <b>Note:</b> Regardless of the value that this method returns, only answer fields in the answer text area
+     * will be counted when marking the question at quiz time. Answer fields in the question and post-answer areas
+     * will be ignored.
+     * @return <code>true</code> if this answer field can only be inserted into the answer text area of a
+     * flexi question and not into either the question or post-answer text, and <code>false</code> if this
+     * answer field can be inserted into any of the text areas of a flexi question container.
+     */
+    public boolean isOnlyForAnswerArea();
+
+    /**
      * This method looks at the answer provided by the user and compares it to the correct
      * answer. The returned value should be a decimal percentage (i.e. 0 for 0%, 0.5 for 50%, 1.0 for 100%).
      * @return the correctness of the given answer as a decimal percentage.

@@ -218,6 +218,10 @@ public class AnsFieldMultiChoice extends JPanel implements IAnswerField {
         return "Rich Multiple Choice";
     }
 
+    public boolean isOnlyForAnswerArea() {
+        return true;
+    }
+
     public float checkAnswer() {
         ListIterator<OptionEntry> iterate = optionEntries.listIterator();
         OptionEntry curEntry;

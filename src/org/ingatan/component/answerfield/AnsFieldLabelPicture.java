@@ -219,6 +219,10 @@ public class AnsFieldLabelPicture extends JPanel implements IAnswerField, MouseL
         return "Label the Picture";
     }
 
+    public boolean isOnlyForAnswerArea() {
+        return true;
+    }
+
     public float checkAnswer() {
         //avoid divide by zero
         if (labelPoints.size() == 0) {
