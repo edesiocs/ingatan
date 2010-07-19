@@ -377,6 +377,8 @@ public class QuizWindow extends JFrame implements WindowListener {
         resetSize(answerArea);
         resetSize(questionArea);
 
+        SwingUtilities.updateComponentTreeUI(this);
+
         //clear the currentAnswerFields array, this is repopulated in the setAnswerFieldListener method.
         currentAnswerFields = new ArrayList<IAnswerField>();
         /*

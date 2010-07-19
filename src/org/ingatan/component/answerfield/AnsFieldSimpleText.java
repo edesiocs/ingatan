@@ -28,6 +28,7 @@
 package org.ingatan.component.answerfield;
 
 import java.awt.Rectangle;
+import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import org.ingatan.ThemeConstants;
 import org.ingatan.component.text.NumericJTextField;
@@ -38,6 +39,7 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentListener;
 import java.awt.event.KeyListener;
 import java.io.IOException;
 import java.io.StringReader;
@@ -130,7 +132,7 @@ public class AnsFieldSimpleText extends JPanel implements IAnswerField {
     public AnsFieldSimpleText() {
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.setOpaque(false);
-        this.setMaximumSize(new Dimension(200, 100));
+        this.setMaximumSize(new Dimension(250, 100));
         this.setMinimumSize(new Dimension(50, 100));
 
         lblInstruct.setFont(ThemeConstants.niceFont.deriveFont(Font.ITALIC).deriveFont(9.5f));
@@ -140,6 +142,7 @@ public class AnsFieldSimpleText extends JPanel implements IAnswerField {
 
         txtField.setAlignmentX(LEFT_ALIGNMENT);
         txtField.addKeyListener(new ContinueKeyListener());
+        txtField.addComponentListener(new TextComponentListener());
 
         btnGiveHint.setFont(ThemeConstants.niceFont);
         btnGiveHint.setAlignmentX(LEFT_ALIGNMENT);
@@ -216,8 +219,8 @@ public class AnsFieldSimpleText extends JPanel implements IAnswerField {
             widthSum += fm.stringWidth(correctAnswers[i]);
         }
 
-        if ((widthSum / correctAnswers.length) < 10) {
-            return 10;
+        if ((widthSum / correctAnswers.length) < 60) {
+            return 60;
         } else if ((widthSum / correctAnswers.length) > 160) {
             return 160;
         } else {
@@ -330,6 +333,19 @@ public class AnsFieldSimpleText extends JPanel implements IAnswerField {
 
     public void setQuizContinueListener(ActionListener listener) {
         actionListener = listener;
+    }
+
+    private class TextComponentListener implements ComponentListener {
+
+        public void componentResized(ComponentEvent e) {
+            AnsFieldSimpleText.this.setMaximumSize(txtField.getMaximumSize());
+            AnsFieldSimpleText.this.setMinimumSize(txtField.getMinimumSize());
+        }
+
+        public void componentMoved(ComponentEvent e) {}
+        public void componentShown(ComponentEvent e) {}
+        public void componentHidden(ComponentEvent e) {}
+
     }
 
     /**

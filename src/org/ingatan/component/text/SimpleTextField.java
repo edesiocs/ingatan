@@ -25,10 +25,12 @@
  * If you find this program useful, please tell me about it! I would be delighted
  * to hear from you at tom.ingatan@gmail.com.
  */
-
 package org.ingatan.component.text;
 
+import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -59,6 +61,26 @@ public class SimpleTextField extends JTextField {
      * will determine the base character for the symbol menu.
      */
     private boolean menuActivated = false;
+    /**
+     * The size of the <code>SimpleTextField</code> before the symbol menu was shown. The field will
+     * be restored to this size once the <code>SymbolMenu</code> has been hidden.
+     */
+    private Dimension previousSize = null;
+    /**
+     * The minimum size of the <code>SimpleTextField</code> before the symbol menu was shown. The field will
+     * be restored to this size once the <code>SymbolMenu</code> has been hidden.
+     */
+    private Dimension previousMinimumSize = null;
+    /**
+     * The preferred size of the <code>SimpleTextField</code> before the symbol menu was shown. The field will
+     * be restored to this size once the <code>SymbolMenu</code> has been hidden.
+     */
+    private Dimension previousPreferredSize = null;
+    /**
+     * The maximum size of the <code>SimpleTextField</code> before the symbol menu was shown. The field will
+     * be restored to this size once the <code>SymbolMenu</code> has been hidden.
+     */
+    private Dimension previousMaximumSize = null;
 
     public SimpleTextField() {
         this("");
@@ -113,6 +135,7 @@ public class SimpleTextField extends JTextField {
         symbolMenu.setVisible(false);
         this.addKeyListener(new TextKeyListener());
         symbolMenu.addKeyListener(new MenuKeyListener());
+        symbolMenu.addFocusListener(new SymbolMenuListener());
     }
 
     /**
@@ -129,8 +152,10 @@ public class SimpleTextField extends JTextField {
             } else if (menuActivated) {
 
                 //shift will deactivate the symbol menu otherwise, meaning that capital letters can't be accessed
-                if (e.getKeyCode() == KeyEvent.VK_SHIFT) return;
-                
+                if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
+                    return;
+                }
+
                 menuActivated = false;
                 if (symbolMenu.charHasSpecialChars(e.getKeyChar())) //if the baseCharacter is valid...
                 {
@@ -143,20 +168,67 @@ public class SimpleTextField extends JTextField {
                         p = new Point(2, SimpleTextField.this.getHeight() / 2 - 8);
                     }
 
+                    symbolMenu.setVisible(true);
+
+                    if (SimpleTextField.this.getWidth() < (symbolMenu.getWidth() + 20)) {
+                        setTempSize(new Dimension(symbolMenu.getWidth()+p.x+10, (int) SimpleTextField.this.getHeight()));
+                    }
+
                     if (symbolMenu.getStringWidth() > (SimpleTextField.this.getWidth() - p.x)) {
+                        int proposedXLocation = SimpleTextField.this.getWidth() - (symbolMenu.getStringWidth() + 5);
+                        if (proposedXLocation < 0) {
+                            proposedXLocation = 0;
+                        }
                         symbolMenu.setLocation(SimpleTextField.this.getWidth() - (symbolMenu.getStringWidth() + 5), p.y - 1);
                     } else {
                         symbolMenu.setLocation(p.x + 1, p.y - 1);
                     }
-
-                    symbolMenu.setVisible(true);
+                    
                     symbolMenu.requestFocus();
                     symbolMenu.repaint();
+                    SimpleTextField.this.repaint();
                 }
             }
         }
 
         public void keyReleased(KeyEvent e) {
+        }
+    }
+
+    private void setTempSize(Dimension newSize) {
+        previousSize = this.getSize();
+        previousMaximumSize = this.getMaximumSize();
+        previousMinimumSize = this.getMinimumSize();
+        previousPreferredSize = this.getPreferredSize();
+
+        this.setSize(newSize);
+        this.setMaximumSize(newSize);
+        this.setMinimumSize(newSize);
+        this.setPreferredSize(newSize);
+    }
+
+    private void revertSize() {
+        if ((previousSize == null) || (previousMaximumSize == null) || (previousMinimumSize == null) || (previousPreferredSize == null)) {
+            return;
+        }
+
+        this.setSize(previousSize);
+        this.setMaximumSize(previousMaximumSize);
+        this.setMinimumSize(previousMinimumSize);
+        this.setPreferredSize(previousPreferredSize);
+    }
+
+    /**
+     * Listener for the symbol menu. If it loses focus, it has been hidden and we need to restore this
+     * <code>SimpleTextField</code> to its original size.
+     */
+    private class SymbolMenuListener implements FocusListener {
+
+        public void focusGained(FocusEvent e) {
+        }
+
+        public void focusLost(FocusEvent e) {
+            revertSize();
         }
     }
 
@@ -185,6 +257,7 @@ public class SimpleTextField extends JTextField {
                 SimpleTextField.this.select(SimpleTextField.this.getCaretPosition() - 1, SimpleTextField.this.getCaretPosition());
                 SimpleTextField.this.replaceSelection("" + symbolMenu.getSelectedCharacter());
                 symbolMenu.setVisible(false);
+                revertSize();
                 SimpleTextField.this.requestFocus();
             } else if (e.getKeyCode() == 27) { //escape key
                 symbolMenu.setVisible(false);
