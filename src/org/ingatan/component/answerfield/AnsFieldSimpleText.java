@@ -27,6 +27,7 @@
  */
 package org.ingatan.component.answerfield;
 
+import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
@@ -142,7 +143,7 @@ public class AnsFieldSimpleText extends JPanel implements IAnswerField {
 
         txtField.setAlignmentX(LEFT_ALIGNMENT);
         txtField.addKeyListener(new ContinueKeyListener());
-        txtField.addComponentListener(new TextComponentListener());
+        txtField.getSymbolMenu().addComponentListener(new TextComponentListener());
 
         btnGiveHint.setFont(ThemeConstants.niceFont);
         btnGiveHint.setAlignmentX(LEFT_ALIGNMENT);
@@ -200,7 +201,7 @@ public class AnsFieldSimpleText extends JPanel implements IAnswerField {
             txtField.setMinimumSize(new Dimension(getAverageAnswerWidth(txtField.getFontMetrics(txtField.getFont())), 30));
             this.setMaximumSize(txtField.getMaximumSize());
             this.setMinimumSize(txtField.getMinimumSize());
-            
+
             txtField.setBorder(BorderFactory.createLineBorder(ThemeConstants.borderUnselected));
             this.add(txtField);
 
@@ -251,22 +252,34 @@ public class AnsFieldSimpleText extends JPanel implements IAnswerField {
 
     public void displayCorrectAnswer() {
         txtField.setEditable(false);
+        JLabel lblCorrectOrNot = new JLabel();
         String ansText = "<html><body>";
         if (checkAnswer() == 1.0f) {
-            ansText += "<b>CORRECT</b>, ";
+            ansText += "<b>CORRECT</b>";
+            lblCorrectOrNot.setForeground(ThemeConstants.quizPassGreen);
         } else {
-            ansText += "<b>INCORRECT</b>, ";
+            ansText += "<b>INCORRECT</b>";
+            lblCorrectOrNot.setForeground(ThemeConstants.quizFailRed);
         }
+        lblCorrectOrNot.setText(ansText);
+        lblCorrectOrNot.setFont(ThemeConstants.niceFont);
+
+
+        ansText = "<html><body>";
 
         ansText += "possible answers are:<ul>";
         for (int i = 0; i < correctAnswers.length; i++) {
             ansText += "<li>" + correctAnswers[i] + "</li>";
         }
         ansText += "</ul>";
-        JLabel answerDisplay = new JLabel(ansText);
-        answerDisplay.setFont(ThemeConstants.niceFont);
+        JLabel lblAnsDisplay = new JLabel(ansText);
+        lblAnsDisplay.setFont(ThemeConstants.niceFont);
         btnGiveHint.setVisible(false);
-        this.add(answerDisplay);
+
+        this.add(lblCorrectOrNot);
+        this.add(lblAnsDisplay);
+
+        this.setMaximumSize(new Dimension(Math.max(lblAnsDisplay.getMinimumSize().width,lblCorrectOrNot.getMinimumSize().width), lblAnsDisplay.getMinimumSize().height + lblCorrectOrNot.getMinimumSize().height + 30));
     }
 
     public void setContext(boolean inLibraryContext) {
@@ -335,18 +348,26 @@ public class AnsFieldSimpleText extends JPanel implements IAnswerField {
         actionListener = listener;
     }
 
+    /**
+     * This listener is added to the text field's symbol menu so that this answer field is resized when the
+     * symbol menu is shown. This allows the text field to resize to accomodate for the symbol menu's size.
+     */
     private class TextComponentListener implements ComponentListener {
 
         public void componentResized(ComponentEvent e) {
+        }
+
+        public void componentMoved(ComponentEvent e) {
+        }
+
+        public void componentShown(ComponentEvent e) {
             AnsFieldSimpleText.this.setMaximumSize(txtField.getMaximumSize());
             AnsFieldSimpleText.this.setMinimumSize(txtField.getMinimumSize());
             AnsFieldSimpleText.this.setSize(txtField.getMinimumSize());
         }
 
-        public void componentMoved(ComponentEvent e) {}
-        public void componentShown(ComponentEvent e) {}
-        public void componentHidden(ComponentEvent e) {}
-
+        public void componentHidden(ComponentEvent e) {
+        }
     }
 
     /**

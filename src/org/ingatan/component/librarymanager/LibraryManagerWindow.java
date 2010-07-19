@@ -389,7 +389,6 @@ public class LibraryManagerWindow extends JFrame implements WindowListener {
                     if (libBrowser.getSelectedLibraryID() != null) {
                         try {
                             //not getPreviouslySelectedLibraryID as the library selection hasn't changed, just the group selection
-                            System.out.println("abotu to try to save the library with ID: " + libBrowser.getSelectedLibraryID() + " due to change in group");
                             saveLibrary(libBrowser.getSelectedLibraryID());
                         } catch (IOException ex) {
                             Logger.getLogger(LibraryManagerWindow.class.getName()).log(Level.SEVERE, "While trying to save library with ID: " + libBrowser.getSelectedLibraryID() + "\n" +
@@ -405,7 +404,6 @@ public class LibraryManagerWindow extends JFrame implements WindowListener {
                         //no library was previously selected
                         questionList.updateQuestionsWithContent();
                         if (libBrowser.getPreviouslySelectedLibraryID() != null) {
-                            System.out.println("saving library with ID: " + libBrowser.getPreviouslySelectedLibraryID() + " due to library selection change");
                             saveLibrary(libBrowser.getPreviouslySelectedLibraryID());
                         }
                     } catch (IOException ex) {
