@@ -1703,7 +1703,7 @@ public abstract class IOManager {
      * Saves the specified file to the specified library. A unique fileID of
      * no more than 15 characters is automatically generated from the given
      * filename. This method copies the specified file to the specified library.
-     * Note: has not been well tested.
+     * Note: has only been marginally tested.
      * @param libID the library to which this file should be saved.
      * @param filename the file to save to the specified library.
      * @return String the unique fileID that this file has been assigned. Returns
@@ -1713,7 +1713,7 @@ public abstract class IOManager {
     public static String saveResource(String libID, String filename) throws IOException {
         File fileIn = new File(filename);
 
-        //if the image is null, then return nothing
+        //if the file is null, then return nothing
         if (fileIn == null) {
             return "";
         }
@@ -1730,12 +1730,12 @@ public abstract class IOManager {
         //ensure there are no illegal characters (/,?,:,...etc.)
         fileID = getSafeID(fileID);
 
-        //check that the imageID is a legal length
+        //check that the fileID is a legal length
         if (fileID.length() > MAX_IMAGE_ID_LENGTH) {
             fileID = fileID.substring(0, MAX_IMAGE_ID_LENGTH - 2);
         }
 
-        //ensure that imageID is unique for this library
+        //ensure that fileID is unique for this library
         File newFile = new File(libTempPath.getAbsolutePath() + "/" + fileID);
         int suffix = 0;
         if (newFile.exists()) {

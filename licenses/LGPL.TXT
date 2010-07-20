@@ -1,4 +1,5 @@
 Arrow2D.java is made available under the GNU Lesser General Public License, as included in full below.
+JOgg and JOrbis (from www.jcraft.com) are made available under the GNU Lesser General Public License, as included in full below.
 
                    GNU LESSER GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007

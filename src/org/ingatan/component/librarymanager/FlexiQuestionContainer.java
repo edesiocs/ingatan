@@ -214,7 +214,12 @@ public class FlexiQuestionContainer extends AbstractQuestionContainer {
         SwingUtilities.invokeLater(new Runnable() {
 
             public void run() {
-                contextualiseAnswerFields();
+                contextualiseAnswerFields(answerText);
+                //answer fields are not confined to the answerText area, and so
+                //the other text areas must also be contextualised (this was not
+                //always the case).
+                contextualiseAnswerFields(questionText);
+                contextualiseAnswerFields(postAnswerText);
             }
         });
 
@@ -248,18 +253,18 @@ public class FlexiQuestionContainer extends AbstractQuestionContainer {
      * Traverses the elements of the answerText <code>RichTextArea</code> and tells
      * all IAnswerField components found that they exist in the library editor context.
      */
-    public void contextualiseAnswerFields() {
+    public void contextualiseAnswerFields(RichTextArea textArea) {
         int runCount;
-        int paragraphCount = answerText.getDocument().getDefaultRootElement().getElementCount();
+        int paragraphCount = textArea.getDocument().getDefaultRootElement().getElementCount();
         Element curEl = null;
         AttributeSet curAttr = null;
         AttributeSet prevAttr = null;
 
         for (int i = 0; i < paragraphCount; i++) {
             //each paragraph has 'runCount' runs
-            runCount = answerText.getDocument().getDefaultRootElement().getElement(i).getElementCount();
+            runCount = textArea.getDocument().getDefaultRootElement().getElement(i).getElementCount();
             for (int j = 0; j < runCount; j++) {
-                curEl = answerText.getDocument().getDefaultRootElement().getElement(i).getElement(j);
+                curEl = textArea.getDocument().getDefaultRootElement().getElement(i).getElement(j);
                 curAttr = curEl.getAttributes();
 
                 if (curEl.getName().equals(StyleConstants.ComponentElementName)) //this is a component

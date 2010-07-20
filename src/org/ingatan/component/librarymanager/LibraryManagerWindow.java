@@ -564,7 +564,6 @@ public class LibraryManagerWindow extends JFrame implements WindowListener {
                 //try to instantiate the answer field, and then add it to the text field
                 try {
                     IAnswerField ansField = (IAnswerField) IOManager.getAnswerFieldClass(e.getActionCommand()).newInstance();
-                    ansField.setContext(true);
                     if (ansField.isOnlyForAnswerArea() && (rta.equals(flexiQ.answerText) == false)) {
                         JOptionPane.showMessageDialog(LibraryManagerWindow.this, "The '" + ansField.getDisplayName() + "' answer field\n" +
                                 "can only be inserted into the answer text area.", "Cannot Insert Answer Field", JOptionPane.INFORMATION_MESSAGE);
@@ -576,6 +575,7 @@ public class LibraryManagerWindow extends JFrame implements WindowListener {
                     ansField.readInXML((String) IOManager.getAnswerFieldsFile().getAnswerFieldDefaults().get(ansField.getClass().getName()));
                     ansField.setParentLibraryID(libBrowser.getSelectedLibraryID());
                     rta.insertComponent((JComponent) ansField);
+                    ansField.setContext(true);
                     } else {
                         JOptionPane.showMessageDialog(LibraryManagerWindow.this, "Can only insert an answer field into a flexi question text area.", "Cannot Insert Answer Field", JOptionPane.INFORMATION_MESSAGE);
                         return;

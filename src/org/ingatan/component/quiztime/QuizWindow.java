@@ -312,9 +312,10 @@ public class QuizWindow extends JFrame implements WindowListener {
             questionArea.setRichText(((FlexiQuestion) currentQuestion).getQuestionText());
             answerArea.setRichText(((FlexiQuestion) currentQuestion).getAnswerText());
             answerArea.setCaretPosition(0);
-            //contextualisation of answer fields: the answer area is traversed, and any answer field found is told
+            //contextualisation of answer fields: the answer and question areas are traversed, and any answer field found is told
             //that it is in quiz mode through the setContext method that exists in the IAnswerField interface.
-            contextualiseAnswerFields();
+            contextualiseAnswerFields(answerArea);
+            contextualiseAnswerFields(questionArea);
         } else if (currentQuestion instanceof TableQuestionUnit) {
             TableQuestionUnit ques = (TableQuestionUnit) currentQuestion;
             String questionText = "";
@@ -641,18 +642,18 @@ public class QuizWindow extends JFrame implements WindowListener {
      * Traverses the elements of the answerArea <code>RichTextArea</code> and tells
      * all IAnswerField components found that they exist in the quizTime context.
      */
-    private void contextualiseAnswerFields() {
+    private void contextualiseAnswerFields(RichTextArea textArea) {
         int runCount;
-        int paragraphCount = answerArea.getDocument().getDefaultRootElement().getElementCount();
+        int paragraphCount = textArea.getDocument().getDefaultRootElement().getElementCount();
         Element curEl = null;
         AttributeSet curAttr = null;
         AttributeSet prevAttr = null;
 
         for (int i = 0; i < paragraphCount; i++) {
             //each paragraph has 'runCount' runs
-            runCount = answerArea.getDocument().getDefaultRootElement().getElement(i).getElementCount();
+            runCount = textArea.getDocument().getDefaultRootElement().getElement(i).getElementCount();
             for (int j = 0; j < runCount; j++) {
-                curEl = answerArea.getDocument().getDefaultRootElement().getElement(i).getElement(j);
+                curEl = textArea.getDocument().getDefaultRootElement().getElement(i).getElement(j);
                 curAttr = curEl.getAttributes();
 
                 if (curEl.getName().equals(StyleConstants.ComponentElementName)) //this is a component
@@ -866,6 +867,7 @@ public class QuizWindow extends JFrame implements WindowListener {
                     FlexiQuestion q = (FlexiQuestion) currentQuestion;
                     if (q.isUsingPostAnswerText()) {
                         questionArea.setRichText(q.getPostAnswerText());
+                        contextualiseAnswerFields(questionArea);
                     }
                 }
 

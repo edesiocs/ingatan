@@ -70,6 +70,7 @@ public class AboutWindow extends JDialog {
                 "[u]JMathTeX[u][br]jmathtex.sf.net: GNU GPL[br]A superb, clean, and lightweight java math text rendering library. Original author: Kurt Vermeulen, current developers: Kris Coolsaet, Nico Van Cleemput[br][br]" +
                 "[u]SketchEl[u][br]sketchel.sf.net: GNU GPL[br]A great little chemistry structure drawing program that is sure to make my organic chem study much easier. Written by Dr. Alex M. Clark.[br][br]" +
                 "[u]Silk Icon Set[u][br]www.famfamfam.com: Creative Commons Attribution 2.5 License[br]A great set of icons by Mark James. Thank you![br][br]" +
+                "[u]JOgg and JOrbis[u] from www.jcraft.com under LGPL 3 - Great libraries made so much easier using the EasyOgg wrapper by Kevin from http://www.cokeandcode.com.[br][br][br]" +
                 "[u]Arrow2D.java[u] from www.geotools.org under LGPL 2.1 - Thankyou, I was so glad not to write my own.[br][br][br]" +
                 "Thankyou to Hugh for the time he spent bug-hunting for me.[end]");
 
