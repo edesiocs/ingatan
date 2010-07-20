@@ -36,11 +36,16 @@ import org.jdom.output.XMLOutputter;
 import org.newdawn.easyogg.OggClip;
 
 /**
+ * Answer field that allows the user to embed OGG format audio into questions. This is based on
+ * the JOgg and JOrbis libraries, using the EasyOgg wrapper from www.cokeandcode.com. The answer field
+ * consists of a play button (which doubles as a pause button with correct change in icon), a stop button,
+ * and in the edit context only, a 'select file' button.
  *
+ * The audio file is saved to this library using the <code>IOManager</code>'s <code>saveResource</code> method.
  * @author Thomas Everingham
  * @version 1.0
  */
-public class AnsFieldEmbeddedAudio extends JPanel implements IAnswerField, FocusListener {
+public class AnsFieldEmbeddedAudio extends JPanel implements IAnswerField, FocusListener, ActionListener {
 
     /**
      * Whether or not the answer field is currently in the edit context.
@@ -223,6 +228,7 @@ public class AnsFieldEmbeddedAudio extends JPanel implements IAnswerField, Focus
         //try to create the OggClip object (easyogg)
         try {
             audioClip = new OggClip(inputStream);
+            audioClip.addActionListener(this);
         } catch (IOException ex) {
             Logger.getLogger(AnsFieldEmbeddedAudio.class.getName()).log(Level.SEVERE, "Occurred while trying to create the EasyOgg audio clip", ex);
         }
@@ -247,6 +253,19 @@ public class AnsFieldEmbeddedAudio extends JPanel implements IAnswerField, Focus
         if ((audioClip != null) && (audioClip.isPaused() == false)) {
             audioClip.pause();
             btnPlay.getAction().putValue(PlayAction.LARGE_ICON_KEY, new ImageIcon(AnsFieldEmbeddedAudio.class.getResource("/resources/icons/play.png")));
+        }
+    }
+
+    /**
+     * This action is performed when the oggclip playback stops. This is added as an
+     * <code>ActionListener</code> to the <code>OggClip</code>.
+     * @param e the <code>ActionEvent</code> - will be <code>null</code>.
+     */
+    public void actionPerformed(ActionEvent e) {
+        System.out.println("end action occurred");
+        if (audioClip != null) {
+            btnPlay.getAction().putValue(PlayAction.LARGE_ICON_KEY, new ImageIcon(AnsFieldEmbeddedAudio.class.getResource("/resources/icons/play.png")));
+            playing = false;
         }
     }
 
@@ -317,6 +336,7 @@ public class AnsFieldEmbeddedAudio extends JPanel implements IAnswerField, Focus
 
             try {
                 audioClip = new OggClip(IOManager.loadResource(parentLibraryID, audioFileID));
+                audioClip.addActionListener(this);
             } catch (IOException ex) {
                 Logger.getLogger(AnsFieldEmbeddedAudio.class.getName()).log(Level.SEVERE, "While trying to create an new EasyOgg OggClip object from the selected audio file.", ex);
             }
@@ -372,6 +392,7 @@ public class AnsFieldEmbeddedAudio extends JPanel implements IAnswerField, Focus
 
                 try {
                     audioClip = new OggClip(IOManager.loadResource(parentLibraryID, audioFileID));
+                    audioClip.addActionListener(this);
                 } catch (IOException ex) {
                     Logger.getLogger(AnsFieldEmbeddedAudio.class.getName()).log(Level.SEVERE, "While trying to load the audio file for this answer field"
                             + " from file after the playback was stopped.", ex);
