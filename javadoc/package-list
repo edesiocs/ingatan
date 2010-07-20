@@ -1,5 +1,7 @@
 be.ugent.caagt.jmathtex
 be.ugent.caagt.jmathtex.mathml
+com.jcraft.jogg
+com.jcraft.jorbis
 net.sf.sketchel
 net.sf.sketchel.ds
 org.geotools.renderer.geom
@@ -24,3 +26,4 @@ org.jdom.input
 org.jdom.output
 org.jdom.transform
 org.jdom.xpath
+org.newdawn.easyogg
