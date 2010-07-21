@@ -76,7 +76,7 @@ public class DataTable extends JTable {
      * Custom table cell editor allowing for automatic selection upon edit mode,
      * and other custom behaviour.
      */
-    CustomTableCellEditor mtce = new CustomTableCellEditor(editor);
+    public CustomTableCellEditor mtce = new CustomTableCellEditor(editor);
     /**
      * Table model for this table. The override simply adds the custom cell editor
      * whenever the setDataVector method is called.
@@ -368,7 +368,7 @@ public class DataTable extends JTable {
      * Selects all text when the cell editor is initiated so that the user may easily
      * type over what has already been entered.
      */
-    private class CustomTableCellEditor extends DefaultCellEditor {
+    public class CustomTableCellEditor extends DefaultCellEditor {
 
         public CustomTableCellEditor(JTextField field) {
             super(field);

@@ -34,6 +34,7 @@ import org.ingatan.data.TableQuestion;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -91,6 +92,7 @@ public class TableQuestionContainer extends AbstractQuestionContainer {
         //right or down.
         optionPane.getEnterKeyMoveRight().setAction(new EnterKeyActionAssignmentAction());
         optionPane.getEnterKeyMoveRight().setSelected(true);
+        optionPane.setFontsComboActionListener(new FontChangeListener());
 
         lblSeparateAnswers.setFont(ThemeConstants.niceFont);
 
@@ -242,6 +244,16 @@ public class TableQuestionContainer extends AbstractQuestionContainer {
             Dimension d = TableQuestionContainer.this.getLayout().minimumLayoutSize(TableQuestionContainer.this);
             TableQuestionContainer.this.setPreferredSize(new Dimension((int) d.getWidth(), (int) (d.getHeight() + scroller.getPreferredSize().getHeight())));
             
+        }
+
+    }
+
+    private class FontChangeListener implements ActionListener {
+
+        public void actionPerformed(ActionEvent e) {
+            table.setFont(optionPane.getSelectedFont());
+            table.repaint();
+            table.mtce.getComponent().setFont(optionPane.getSelectedFont());
         }
 
     }

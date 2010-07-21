@@ -25,20 +25,29 @@
  * If you find this program useful, please tell me about it! I would be delighted
  * to hear from you at tom.ingatan@gmail.com.
  */
-
 package org.ingatan.component.librarymanager;
 
+import java.awt.event.ActionEvent;
 import org.ingatan.ThemeConstants;
 import org.ingatan.component.text.NumericJTextField;
 import org.ingatan.component.text.SimpleTextField;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GraphicsEnvironment;
+import java.awt.event.ActionListener;
+import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import org.ingatan.component.ThinScrollComboBoxUI;
 
 /**
  * Option pane that appears below the table in the TableQuestionContainer. Includes
@@ -53,12 +62,11 @@ public class TableQuestionOptionPane extends JPanel {
     /**
      * Maximum size of the text fields and combo boxes.
      */
-    private final static Dimension MAX_FIELD_SIZE = new Dimension(140,20);
+    private final static Dimension MAX_FIELD_SIZE = new Dimension(140, 20);
     /**
      * Minimum size of the text fields and combo boxes.
      */
-    private final static Dimension MIN_FIELD_SIZE = new Dimension(50,20);
-
+    private final static Dimension MIN_FIELD_SIZE = new Dimension(50, 20);
     /**
      * The ask style determines how the questions will be asked at quiz time. A question taken
      * from the first column can be put to the user, and the answer can then be typed. This is
@@ -66,29 +74,25 @@ public class TableQuestionOptionPane extends JPanel {
      * from the other data in the table. This is good for the early stages of learning.
      * Both methods may be used, in which case they are used randomly during quiz time.
      */
-    JComboBox askStyle = new JComboBox(new String[] {"Text field", "Multiple choice", "Random"});
-
+    JComboBox askStyle = new JComboBox(new String[]{"Text field", "Multiple choice", "Random"});
     /**
      * If this is checked then, at quiz time, questions will be generated from both columns, rather than
      * just one. This is useful for vocabulary training, where the user would not want to rote learn
      * just Spanish to Swedish, for example, but also Swedish to Spanish.
      */
     JCheckBox askInReverse = new JCheckBox("can ask in reverse");
-
     /**
      * If this is checked then, at quiz time, questions will be generated from both columns, rather than
      * just one. This is useful for vocabulary training, where the user would not want to rote learn
      * just Spanish to Swedish, for example, but also Swedish to Spanish.
      */
     JCheckBox enterKeyMoveLeft = new JCheckBox("set by action in container class");
-    
     /**
      * The question template allows the user to set a template for each question, where
      * the data taken from the table is substituted into the template. This makes things
      * a little nicer than just being presented with a word.
      */
     SimpleTextField fwdQuestionTemplate = new SimpleTextField();
-
     /**
      * The question template allows the user to set a template for each question, where
      * the data taken from the table is substituted into the template. This makes things
@@ -99,32 +103,52 @@ public class TableQuestionOptionPane extends JPanel {
      */
     SimpleTextField bwdQuestionTemplate = new SimpleTextField();
     /**
+     * listener that is notified when the fonts combo box changes value.
+     */
+    ActionListener listener = null;
+    /**
      * Number of marks to award per correct answer.
      */
     NumericJTextField marksPerAnswer = new NumericJTextField(1);
-
+    /**
+     * Font chooser combo box.
+     */
+    private JComboBox comboFonts;
+    /**
+     * "Answer field to use" label.
+     */
     JLabel lblAskStyle = new JLabel("Answer field to use: ");
-    
+    /**
+     * "Marks per correct answer:" label.
+     */
     JLabel lblNumberMarks = new JLabel("Marks per correct answer: ");
-
+    /**
+     * "Question template (forward)" label.
+     */
     JLabel lblForwardTemplate = new JLabel("Question template (forward): ");
-
+    /**
+     * "Question template (backward)" label.
+     */
     JLabel lblBackwardTemplate = new JLabel("Question template (backward): ");
-
+    /**
+     * "[q] is the placeholder for both templates." label.
+     */
     JLabel lblTemplateInfo = new JLabel("[q] is the placeholder for both templates.");
-
-
+    /**
+     * "Font:" label.
+     */
+    JLabel lblFont = new JLabel("Font: ");
 
     /**
      * Creates a new <code>TableQuestionOptionPane<code>.
      */
-    public TableQuestionOptionPane()
-    {
+    public TableQuestionOptionPane() {
 
         lblAskStyle.setFont(ThemeConstants.niceFont);
         lblNumberMarks.setFont(ThemeConstants.niceFont);
         lblForwardTemplate.setFont(ThemeConstants.niceFont);
         lblBackwardTemplate.setFont(ThemeConstants.niceFont);
+        lblFont.setFont(ThemeConstants.niceFont);
         askStyle.setFont(ThemeConstants.niceFont);
         askInReverse.setFont(ThemeConstants.niceFont);
         enterKeyMoveLeft.setFont(ThemeConstants.niceFont);
@@ -136,21 +160,35 @@ public class TableQuestionOptionPane extends JPanel {
         bwdQuestionTemplate.setToolTipText("The question if asking backwards - use [q] where you would like the question word to appear.");
         fwdQuestionTemplate.setToolTipText("The question if asking forwards - use [q] where you would like the question word to appear.");
 
+        comboFonts = createCombo(GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames());
 
-        
+
+
         this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         this.setOpaque(false);
         askInReverse.setOpaque(false);
         enterKeyMoveLeft.setOpaque(false);
         askStyle.setBackground(Color.white);
+        comboFonts.setBackground(Color.white);
 
-        
+
         this.add(askInReverse);
         this.add(enterKeyMoveLeft);
         askInReverse.setAlignmentX(LEFT_ALIGNMENT);
         enterKeyMoveLeft.setAlignmentX(LEFT_ALIGNMENT);
 
         Box b = Box.createHorizontalBox();
+        b.setAlignmentX(LEFT_ALIGNMENT);
+        b.add(lblFont);
+        b.add(Box.createHorizontalGlue());
+        b.add(comboFonts);
+        comboFonts.setMaximumSize(MAX_FIELD_SIZE);
+        comboFonts.setPreferredSize(MAX_FIELD_SIZE);
+        comboFonts.setMinimumSize(MIN_FIELD_SIZE);
+
+        this.add(b);
+
+        b = Box.createHorizontalBox();
         b.setAlignmentX(LEFT_ALIGNMENT);
         b.add(lblAskStyle);
         b.add(Box.createHorizontalGlue());
@@ -201,6 +239,13 @@ public class TableQuestionOptionPane extends JPanel {
         this.validate();
     }
 
+    private JComboBox createCombo(String[] listItems) {
+        JComboBox combo = new JComboBox(listItems);
+        combo.setFont(new Font(this.getFont().getFamily(), Font.PLAIN, 9));
+        combo.addActionListener(new ComboActionListener());
+        return combo;
+    }
+
     public JCheckBox getAskInReverse() {
         return askInReverse;
     }
@@ -225,6 +270,26 @@ public class TableQuestionOptionPane extends JPanel {
         return marksPerAnswer;
     }
 
+    private class ComboActionListener extends AbstractAction {
 
+        public void actionPerformed(ActionEvent e) {
+            if (listener == null)
+                return;
+
+            listener.actionPerformed(e);
+        }
+
+    }
+
+    /**
+     * Sets the action listener is fired when a change in font selection occurs.
+     */
+    public void setFontsComboActionListener(ActionListener listener) {
+        this.listener = listener;
+    }
+
+    public Font getSelectedFont() {
+        return new Font((String) comboFonts.getSelectedItem(),Font.PLAIN,ThemeConstants.tableCellEditorFont.getSize());
+    }
 }
 
