@@ -31,6 +31,7 @@ package org.ingatan.data;
 import org.ingatan.component.quiztime.TableQuestionUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
+import org.ingatan.ThemeConstants;
 
 /**
  * This is an implementation of the IQuestion interface.
@@ -118,6 +119,14 @@ public class TableQuestion implements IQuestion {
      * The libraryID of the library that this question belongs to.
      */
     protected String parentLibrary;
+    /**
+     * The font to use for this table question.
+     */
+    protected String fontFamilyName=ThemeConstants.niceFont.getFamily();
+    /**
+     * The font size to display the questions at during quiz time.
+     */
+    protected int fontSize = 12;
 
     /**
      * Creats a new TableQuestion object.
@@ -134,7 +143,7 @@ public class TableQuestion implements IQuestion {
      * @param timesAsked the number of times each entry has been asked.
      */
     public TableQuestion(String parent, String questionTemplateFwd, String questionTemplateBwd, String[] col1Data, String[] col2Data,
-            boolean askInReverse, int quizMethod, int[] marksAwarded, int[] marksAvailable,
+            boolean askInReverse, int quizMethod, String fontName, int fontSize, int[] marksAwarded, int[] marksAvailable,
             int marksPerCorrectAnswer, int[] timesAsked) {
 
         if (col1Data.length != col2Data.length)
@@ -150,6 +159,8 @@ public class TableQuestion implements IQuestion {
         this.marksPerCorrectAnswer = marksPerCorrectAnswer;
         this.timesAsked = timesAsked;
         this.parentLibrary = parent;
+        this.fontFamilyName = fontName;
+        this.fontSize = fontSize;
     }
 
     /**
@@ -443,6 +454,38 @@ public class TableQuestion implements IQuestion {
      */
     public String getParentLibrary() {
         return parentLibrary;
+    }
+
+    /**
+     * Gets the font family name used by this table question.
+     * @return the font used by this table question.
+     */
+    public String getFontFamilyName() {
+        return fontFamilyName;
+    }
+
+    /**
+     * Sets the font family name used by this table question.
+     * @param fontFamilyName the new font name that should be used by this question.
+     */
+    public void setFontFamilyName(String fontFamilyName) {
+        this.fontFamilyName = fontFamilyName;
+    }
+
+    /**
+     * Gets the display size for this table question at quiz-time.
+     * @return the display size for this table question at quiz-time.
+     */
+    public int getFontSize() {
+        return fontSize;
+    }
+
+    /**
+     * Sets the display size for this table question at quiz-time.
+     * @param fontSize the new display size for this table question at quiz-time.
+     */
+    public void setFontSize(int fontSize) {
+        this.fontSize = fontSize;
     }
 
     /**

@@ -84,7 +84,7 @@ import org.ingatan.image.ImageUtils;
 public class FlexiQuestionContainer extends AbstractQuestionContainer {
 
     private static Dimension TEXT_AREA_MAX_SIZE = new Dimension(1000, 600);
-    private static Dimension TEXT_AREA_MIN_SIZE = new Dimension(200, 60);
+    private static Dimension TEXT_AREA_MIN_SIZE = new Dimension(200, 80);
     private static Dimension TEXT_AREA_PREF_SIZE = new Dimension(400, 300);
     /**
      * Static text focus listener is added to every <code>RichTextArea</code> contained
@@ -351,7 +351,7 @@ public class FlexiQuestionContainer extends AbstractQuestionContainer {
         super.maximise();
         int prefHeight = questionText.getSize().height + answerText.getSize().height + 50;
         if (usePostAnswerText.isSelected()) {
-            prefHeight += postAnswerText.getSize().height;
+            prefHeight += postAnswerText.getSize().height + 30;
         }
         this.setPreferredSize(new Dimension(this.getPreferredSize().width, prefHeight));
         this.setMaximumSize(new Dimension((int) 1000, 500));

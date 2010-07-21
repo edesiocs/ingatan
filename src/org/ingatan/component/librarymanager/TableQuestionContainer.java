@@ -32,6 +32,7 @@ import org.ingatan.ThemeConstants;
 import org.ingatan.component.text.DataTable;
 import org.ingatan.data.TableQuestion;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -110,6 +111,10 @@ public class TableQuestionContainer extends AbstractQuestionContainer {
         table.setOpaque(false);
         table.getTableHeader().setReorderingAllowed(false);
         table.getModel().addTableModelListener(new TableListener());
+
+        table.setFont(new Font(ques.getFontFamilyName(), Font.PLAIN, ques.getFontSize()));
+        optionPane.comboFonts.setSelectedItem(ques.getFontFamilyName());
+        optionPane.spinnerFontSize.setValue(ques.getFontSize());
 
         this.addToContentPane(Box.createVerticalGlue(), false);
         this.addToContentPane(optionPane, false);

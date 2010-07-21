@@ -99,15 +99,15 @@ public class QuizWindow extends JFrame implements WindowListener {
      * subtraction only occurs if the score is less than what it has been historically (i.e. not an improvement).
      */
     private static final float PENALTY_THRESHOLD = 0.85f;
-    /**
-     * When a question template is used, the following style is applied to the 'question' text, where the rest
-     * of the template is left as plain text. These are the opening tags.
-     */
-    private static final String QUESTION_TEMPLATE_STYLE_OPEN = "[" + RichTextArea.TAG_FONT_SIZE + "]15[!" + RichTextArea.TAG_FONT_SIZE + "][b]";
-    /**
-     * The closing tags for the question template 'question' formatting. See QUESTION_TEMPLATE_STYLE_OPEN.
-     */
-    private static final String QUESTION_TEMPLATE_STYLE_CLOSE = "[" + RichTextArea.TAG_FONT_SIZE + "]11[!" + RichTextArea.TAG_FONT_SIZE + "][b]";
+//    /**
+//     * When a question template is used, the following style is applied to the 'question' text, where the rest
+//     * of the template is left as plain text. These are the opening tags.
+//     */
+//    private static final String QUESTION_TEMPLATE_STYLE_OPEN = "[" + RichTextArea.TAG_FONT_SIZE + "]15[!" + RichTextArea.TAG_FONT_SIZE + "][b]";
+//    /**
+//     * The closing tags for the question template 'question' formatting. See QUESTION_TEMPLATE_STYLE_OPEN.
+//     */
+//    private static final String QUESTION_TEMPLATE_STYLE_CLOSE = "[" + RichTextArea.TAG_FONT_SIZE + "]11[!" + RichTextArea.TAG_FONT_SIZE + "][b]";
     /**
      * Displays the question text.
      */
@@ -275,7 +275,7 @@ public class QuizWindow extends JFrame implements WindowListener {
         horiz.setMaximumSize(new Dimension(2000, 40));
         contentPane.add(horiz);
 
-        this.setPreferredSize(new Dimension(500,600));
+        this.setPreferredSize(new Dimension(500, 600));
         this.pack();
 
     }
@@ -345,9 +345,23 @@ public class QuizWindow extends JFrame implements WindowListener {
 
             //set question text to include the question template if we can.
             if ((questionTemplate.trim().isEmpty() == false) && (questionTemplate.contains("[q]"))) {
-                questionText = questionTemplate.replace("[q]", QUESTION_TEMPLATE_STYLE_OPEN + questionText + QUESTION_TEMPLATE_STYLE_CLOSE) + "[" + RichTextArea.TAG_DOCUMENT_END + "]";
+                //so we can restore the font for the rest of the template.
+                String fontName = questionArea.getFont().getFamily();
+                int fontSize = questionArea.getFont().getSize();
+
+                String insertText = "[" + RichTextArea.TAG_FONT_FAMILY + "]" + ques.getParentTableQuestion().getFontFamilyName() + "[!" + RichTextArea.TAG_FONT_FAMILY + "]"
+                        + "[" + RichTextArea.TAG_FONT_SIZE + "]" + ques.getParentTableQuestion().getFontSize() + "[!" + RichTextArea.TAG_FONT_SIZE + "]"
+                        + questionText
+                        + "[" + RichTextArea.TAG_FONT_FAMILY + "]" + fontName + "[!" + RichTextArea.TAG_FONT_FAMILY + "]"
+                        + "[" + RichTextArea.TAG_FONT_SIZE + "]" + fontSize + "[!" + RichTextArea.TAG_FONT_SIZE + "]";
+
+                //questionText = questionTemplate.replace("[q]", QUESTION_TEMPLATE_STYLE_OPEN + insertText + QUESTION_TEMPLATE_STYLE_CLOSE);
+                questionText = questionTemplate.replace("[q]", insertText) + "[" + RichTextArea.TAG_DOCUMENT_END + "]";
             } else {
-                questionText += "[" + RichTextArea.TAG_DOCUMENT_END + "]";
+                questionText = "[" + RichTextArea.TAG_FONT_FAMILY + "]" + ques.getParentTableQuestion().getFontFamilyName() + "[!" + RichTextArea.TAG_FONT_FAMILY + "]"
+                        + "[" + RichTextArea.TAG_FONT_SIZE + "]" + ques.getParentTableQuestion().getFontSize() + "[!" + RichTextArea.TAG_FONT_SIZE + "]"
+                        + questionText
+                        + "[" + RichTextArea.TAG_DOCUMENT_END + "]";
             }
 
             //now create an appropriate answer field and set questionArea and answerArea text
@@ -713,9 +727,9 @@ public class QuizWindow extends JFrame implements WindowListener {
             } else if (currentAnswerFields.size() > 1) {
                 //focus change
                 int index = currentAnswerFields.indexOf(e.getSource());
-                if (index < currentAnswerFields.size()-1) {
-                    ((JComponent) currentAnswerFields.get(index+1)).requestFocus();
-                } else if (index == currentAnswerFields.size()-1) {
+                if (index < currentAnswerFields.size() - 1) {
+                    ((JComponent) currentAnswerFields.get(index + 1)).requestFocus();
+                } else if (index == currentAnswerFields.size() - 1) {
                     ((JComponent) currentAnswerFields.get(0)).requestFocus();
                 }
             }

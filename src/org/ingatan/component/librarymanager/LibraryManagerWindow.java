@@ -530,7 +530,7 @@ public class LibraryManagerWindow extends JFrame implements WindowListener {
         }
 
         public void actionPerformed(ActionEvent e) {
-            TableQuestion question = new TableQuestion(libBrowser.getSelectedLibraryID(), "", "", new String[]{""}, new String[]{""}, false, TableQuestion.WRITTEN, new int[]{0}, new int[]{0}, 1, new int[]{0});
+            TableQuestion question = new TableQuestion(libBrowser.getSelectedLibraryID(), "", "", new String[]{""}, new String[]{""}, false, TableQuestion.WRITTEN, ThemeConstants.tableCellEditorFont.getFontName(), ThemeConstants.tableCellEditorFont.getSize(), new int[]{0}, new int[]{0}, 1, new int[]{0});
             questionList.addQuestion(question);
             questionList.scrollerContent.validate();
             questionList.repaint();

@@ -607,8 +607,8 @@ public class QuestionList extends JPanel {
         }
 
         newContainer.setPreferredSize(new Dimension(scrollerContent.getWidth() - 20, 500));
-        newContainer.setMinimumSize(new Dimension(scrollerContent.getWidth() - 50, (question instanceof TableQuestion) ? 250 : 350));
-        newContainer.setMaximumSize(new Dimension(maximumQuestionContainerWidth, 600));
+        newContainer.setMinimumSize(new Dimension(scrollerContent.getWidth() - 50, (question instanceof TableQuestion) ? 250 : 440));
+        newContainer.setMaximumSize(new Dimension(maximumQuestionContainerWidth, (question instanceof TableQuestion) ? 500 : 600));
         newContainer.setSelected(selected);
         newContainer.minimise();
 
@@ -780,6 +780,8 @@ public class QuestionList extends JPanel {
                 tquestion.setQuestionTemplateFwd(tcontainer.getOptionPane().getFwdQuestionTemplate().getText());
                 tquestion.setQuestionTemplateBwd(tcontainer.getOptionPane().getBwdQuestionTemplate().getText());
                 tquestion.setQuizMethod(tcontainer.getOptionPane().getAskStyle().getSelectedIndex());
+                tquestion.setFontFamilyName(tcontainer.getOptionPane().getSelectedFont().getFamily());
+                tquestion.setFontSize(tcontainer.getOptionPane().getSelectedFontSize());
 
                 //ensure that the column data array sizes are equal, and extend or shrink
                 //the length of the timesAsked, marksAwarded, and marksAcheived arrays

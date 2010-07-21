@@ -32,22 +32,19 @@ import org.ingatan.ThemeConstants;
 import org.ingatan.component.text.NumericJTextField;
 import org.ingatan.component.text.SimpleTextField;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionListener;
 import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import org.ingatan.component.ThinScrollComboBoxUI;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 
 /**
  * Option pane that appears below the table in the TableQuestionContainer. Includes
@@ -113,7 +110,11 @@ public class TableQuestionOptionPane extends JPanel {
     /**
      * Font chooser combo box.
      */
-    private JComboBox comboFonts;
+    JComboBox comboFonts;
+    /**
+     * Spinner for font size.
+     */
+    JSpinner spinnerFontSize = new JSpinner(new SpinnerNumberModel(12, 3, 200, 1));
     /**
      * "Answer field to use" label.
      */
@@ -137,7 +138,7 @@ public class TableQuestionOptionPane extends JPanel {
     /**
      * "Font:" label.
      */
-    JLabel lblFont = new JLabel("Font: ");
+    JLabel lblFont = new JLabel("Font and Size: ");
 
     /**
      * Creates a new <code>TableQuestionOptionPane<code>.
@@ -156,11 +157,20 @@ public class TableQuestionOptionPane extends JPanel {
         bwdQuestionTemplate.setFont(ThemeConstants.niceFont);
         lblTemplateInfo.setFont(ThemeConstants.niceFont);
 
+        comboFonts = createCombo(GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames());
+        
+        JSpinner.NumberEditor numberEditor = new JSpinner.NumberEditor(spinnerFontSize);
+        spinnerFontSize.setFont(ThemeConstants.niceFont);
+        spinnerFontSize.setEditor(numberEditor);
+        spinnerFontSize.setMaximumSize(new Dimension(50,MAX_FIELD_SIZE.height));
+        spinnerFontSize.setMinimumSize(new Dimension(50,MAX_FIELD_SIZE.height));
+        spinnerFontSize.setPreferredSize(new Dimension(50,MAX_FIELD_SIZE.height));
+        spinnerFontSize.setToolTipText("The size of the font for display during a quiz.");
+        comboFonts.setToolTipText("The font to use for the table data. Allows you to use kanji, etc. as part of the table question.");
+
 
         bwdQuestionTemplate.setToolTipText("The question if asking backwards - use [q] where you would like the question word to appear.");
         fwdQuestionTemplate.setToolTipText("The question if asking forwards - use [q] where you would like the question word to appear.");
-
-        comboFonts = createCombo(GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames());
 
 
 
@@ -181,6 +191,8 @@ public class TableQuestionOptionPane extends JPanel {
         b.setAlignmentX(LEFT_ALIGNMENT);
         b.add(lblFont);
         b.add(Box.createHorizontalGlue());
+        b.add(spinnerFontSize);
+        b.add(Box.createHorizontalStrut(2));
         b.add(comboFonts);
         comboFonts.setMaximumSize(MAX_FIELD_SIZE);
         comboFonts.setPreferredSize(MAX_FIELD_SIZE);
@@ -290,6 +302,14 @@ public class TableQuestionOptionPane extends JPanel {
 
     public Font getSelectedFont() {
         return new Font((String) comboFonts.getSelectedItem(),Font.PLAIN,ThemeConstants.tableCellEditorFont.getSize());
+    }
+
+    /**
+     * Gets the specified quiz-time display font size.
+     * @return the quiz-time display font size.
+     */
+    public int getSelectedFontSize() {
+        return ((SpinnerNumberModel) spinnerFontSize.getModel()).getNumber().intValue();
     }
 }
 

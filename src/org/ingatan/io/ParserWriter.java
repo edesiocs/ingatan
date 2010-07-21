@@ -36,13 +36,10 @@ import org.ingatan.data.Library;
 import org.ingatan.data.QuizHistoryEntry;
 import org.ingatan.data.QuizHistoryFile;
 import org.ingatan.data.TableQuestion;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
@@ -419,6 +416,7 @@ public abstract class ParserWriter {
             //Flexi question here
             FlexiQuestion ques = (FlexiQuestion) questionIn;
             metaData = new Element("metaData");
+            metaData.setAttribute("version", "1.0");
             metaData.setAttribute("timesAsked", "" + ques.getTimesAsked());
             metaData.setAttribute("marksAwarded", "" + ques.getMarksAwarded());
             metaData.setAttribute("marksAvailable", "" + ques.getMarksAvailable());
@@ -435,9 +433,12 @@ public abstract class ParserWriter {
 
             metaData = new Element("metaData");
 
+            metaData.setAttribute("version", "1.0");
             metaData.setAttribute("marksPerAns", "" + ques.getMarksPerCorrectAnswer());
             metaData.setAttribute("quizMethod", "" + ques.getQuizMethod());
             metaData.setAttribute("askInReverse", "" + ques.isAskInReverse());
+            metaData.setAttribute("font",ques.getFontFamilyName());
+            metaData.setAttribute("quizFontSize",String.valueOf(ques.getFontSize()));
 
             //marks awarded
             String strTemp = "";
@@ -531,6 +532,8 @@ public abstract class ParserWriter {
             int marksPerAns = e.getChild("metaData").getAttribute("marksPerAns").getIntValue();
             int quizMethod = e.getChild("metaData").getAttribute("quizMethod").getIntValue();
             boolean askInReverse = e.getChild("metaData").getAttribute("askInReverse").getBooleanValue();
+            String fontName = e.getChild("metaData").getAttributeValue("font");
+            int fontSize = e.getChild("metaData").getAttribute("quizFontSize").getIntValue();
             String tempMarksAwarded = e.getChild("metaData").getChild("marksAwarded").getText();
             String tempMarksAvailable = e.getChild("metaData").getChild("marksAvailable").getText();
             String tempTimesAsked = e.getChild("metaData").getChild("timesAsked").getText();
@@ -553,7 +556,7 @@ public abstract class ParserWriter {
                 marksAvailable[i] = Integer.valueOf(strMarksAvailable[i]);
             }
 
-            return new TableQuestion(libParent, quesTemplateFwd, quesTemplateBwd, quesColumnData, ansColumnData, askInReverse, quizMethod, marksAwarded, marksAvailable, marksPerAns, timesAsked);
+            return new TableQuestion(libParent, quesTemplateFwd, quesTemplateBwd, quesColumnData, ansColumnData, askInReverse, quizMethod, fontName, fontSize, marksAwarded, marksAvailable, marksPerAns, timesAsked);
 
 
         } else if (questionType == IQuestion.OTHER_QUESTION) {
