@@ -343,13 +343,12 @@ public class QuizWindow extends JFrame implements WindowListener {
                 questionTemplate = ques.getParentTableQuestion().getQuestionTemplateFwd();
             }
 
-
-
-            //set question text to include the question template
+            //set question text to include the question template if we can.
             if ((questionTemplate.trim().isEmpty() == false) && (questionTemplate.contains("[q]"))) {
                 questionText = questionTemplate.replace("[q]", QUESTION_TEMPLATE_STYLE_OPEN + questionText + QUESTION_TEMPLATE_STYLE_CLOSE) + "[" + RichTextArea.TAG_DOCUMENT_END + "]";
+            } else {
+                questionText += "[" + RichTextArea.TAG_DOCUMENT_END + "]";
             }
-
 
             //now create an appropriate answer field and set questionArea and answerArea text
             questionArea.setRichText(questionText);
@@ -415,8 +414,8 @@ public class QuizWindow extends JFrame implements WindowListener {
         }
 
         AnsFieldSimpleText retField = new AnsFieldSimpleText();
-        retField.setContext(false);
         retField.setValues(answers, ques.getParentTableQuestion().getMarksPerCorrectAnswer());
+        retField.setContext(false);
         return retField;
     }
 

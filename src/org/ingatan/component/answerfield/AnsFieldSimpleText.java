@@ -218,6 +218,9 @@ public class AnsFieldSimpleText extends JPanel implements IAnswerField {
             widthSum += fm.stringWidth(correctAnswers[i]);
         }
 
+        if (correctAnswers.length == 0)
+            return 60;
+
         if ((widthSum / correctAnswers.length) < 60) {
             return 60;
         } else if ((widthSum / correctAnswers.length) > 160) {
@@ -292,6 +295,7 @@ public class AnsFieldSimpleText extends JPanel implements IAnswerField {
     public void setValues(String[] correctAnswers, int marksAvailable) {
         this.correctAnswers = correctAnswers;
         this.marksIfCorrect = marksAvailable;
+        rebuild();
     }
 
     public String writeToXML() {
