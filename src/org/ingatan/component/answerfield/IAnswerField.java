@@ -162,9 +162,22 @@ public interface IAnswerField {
      * the source of the event (i.e. the answer field object). This will tell the <code>QuizWindow</code> that the user has submitted the answer.
      * An example is the user pressing enter when in a text field, or double clicking a multiple choice option.<br>
      * <br>
-     * <b>Note:<b> if the answer field is the only one for the current question, firing the actionPerformed method of this listener will
+     * <b>Note:</b> if the answer field is the only one for the current question, firing the actionPerformed method of this listener will
      * be the equivalent of the user pressing the 'Continue' button at quiz time. If there are other answer fields present, then all that
-     * occurs is that the focus is shifted to the next answer field in the area.
+     * occurs is that the focus is shifted to the next answer field in the area.<br>
+     * <br>
+     * <b>Note: </b> When calling the <code>actionPerformed</code> method of this listener, ensure that your hot key does not conflict with the
+     * Shift+Enter or Ctrl+Enter hot keys of the <code>QuizWindow</code>. For example:<br>
+     * <br>
+     * <code>
+     * if ((e.getKeyCode == KeyEvent.VK_ENTER) && (e.getModifiers == 0)) {<br>
+     *     listener.actionPerformed(new ActionEvent(AnsField.this,0,""));<br>
+     * }
+     * </code><br>
+     * <br>
+     * will ensure that the <code>actionPerformed</code> method will only occur if the enter key is pressed. The modifiers=0 condition ensures that
+     * the <code>actionPerformed</code> method is only called if the neither the control nor shift key is down. This respects the QuizWindow hotkeys.
+     * Also ensure that Ctrl+S is not used.
      * @param listener the <code>ActionListener</code> set by the <code>QuizWindow</code> for this answer field instance.
      */
     public void setQuizContinueListener(ActionListener listener);

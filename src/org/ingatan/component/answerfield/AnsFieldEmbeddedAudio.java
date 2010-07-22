@@ -4,7 +4,6 @@
  */
 package org.ingatan.component.answerfield;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
