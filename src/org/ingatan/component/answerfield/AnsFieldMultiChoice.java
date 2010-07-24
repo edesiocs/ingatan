@@ -759,7 +759,7 @@ public class AnsFieldMultiChoice extends JPanel implements IAnswerField {
                     return;
                 }
                 //open an image acquisition dialog
-                ImageAcquisitionDialog imgDialog = new ImageAcquisitionDialog((JFrame) AnsFieldMultiChoice.this.getRootPane().getParent());
+                ImageAcquisitionDialog imgDialog = IOManager.getImageAcquisitionDialog();
                 imgDialog.setVisible(true);
 
                 EmbeddedGraphic eg = null;

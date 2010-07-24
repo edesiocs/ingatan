@@ -25,21 +25,21 @@
  * If you find this program useful, please tell me about it! I would be delighted
  * to hear from you at tom.ingatan@gmail.com.
  */
-
 package org.ingatan.component.image;
 
 import be.ugent.caagt.jmathtex.ParseException;
 import be.ugent.caagt.jmathtex.TeXConstants;
 import be.ugent.caagt.jmathtex.TeXFormula;
+import java.awt.Color;
 import org.ingatan.component.FileChooserPreviewPane;
 import org.ingatan.component.IconFileView;
 import org.ingatan.component.PaintedJPanel;
 import org.ingatan.io.IOManager;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -189,7 +189,7 @@ public class ImageAcquisitionDialog extends JDialog implements WindowListener {
      * SketchEl chemistry editor pane. For the drawing of nice vector chem sketches.
      * (c) 2007-2009 Dr. Alex M. Clark, under the GNU License: www.gnu.org for details.
      */
-    protected MainPanel chemEditorPane = new MainPanel(null, MainPanel.MODE_NORMAL,null);
+    protected MainPanel chemEditorPane = new MainPanel(null, MainPanel.MODE_NORMAL, null);
     /**
      * The image that has been acquired in whatever way chosen. This will be generated
      * when the user selects the 'use image' button.
@@ -217,8 +217,8 @@ public class ImageAcquisitionDialog extends JDialog implements WindowListener {
      * @param owner The JFrame to which this dialog belongs. This is a modal dialog, and the owner will be disabled while this
      * dialog is displayed.
      */
-    public ImageAcquisitionDialog(Window owner) {
-        super(owner);
+    public ImageAcquisitionDialog() {//Window owner) {
+        super();
         this.setModal(true);
 
         this.setContentPane(new JPanel());
@@ -338,6 +338,32 @@ public class ImageAcquisitionDialog extends JDialog implements WindowListener {
         this.pack();
     }
 
+    /**
+     * Reset the image acquisition dialog so that it no longer contains the previous selection data.
+     */
+    public void reset() {
+        //ensure we're not in editor only
+        setEditorOnly(false);
+
+        ImageAcquisitionDialog.this.getContentPane().remove(libResourceBrowser);
+        ImageAcquisitionDialog.this.getContentPane().remove(collectionBrowser);
+        ImageAcquisitionDialog.this.getContentPane().remove(mathTeXCreationPane);
+        mathTeXCreationPane.clearTextField();
+        ImageAcquisitionDialog.this.getContentPane().remove(editorPane);
+        ImageAcquisitionDialog.this.getContentPane().remove(chemEditorPane);
+        chemEditorPane.editorPane().clear();
+        ImageAcquisitionDialog.this.getContentPane().remove(choose);
+
+        acquiredImage = null;
+        acquiredImageSource = "";
+        imageSource = ImageAcquisitionDialog.NONE;
+
+        editorPane.setDocumentImage(new BufferedImage(150, 150, editorPane.getCanvasImage().getType()));
+        Graphics2D g = (Graphics2D) editorPane.getCanvasImage().getGraphics();
+        g.setPaint(Color.white);
+        g.fillRect(0, 0, 150, 150);
+    }
+
     public void windowOpened(WindowEvent e) {
     }
 
@@ -426,7 +452,27 @@ public class ImageAcquisitionDialog extends JDialog implements WindowListener {
 
     public void setEditorOnly(boolean editor) {
         menuPanel.removeAll();
-        menuPanel.add(btnUseImage);
+
+        if (editor == true) {
+            menuPanel.add(btnUseImage);
+        } else {
+            menuPanel.add(btnFile);
+            menuPanel.add(Box.createVerticalStrut(7));
+            menuPanel.add(btnLibrary);
+            menuPanel.add(Box.createVerticalStrut(7));
+            menuPanel.add(btnCollection);
+            menuPanel.add(Box.createVerticalStrut(7));
+            menuPanel.add(btnCreateNew);
+            menuPanel.add(Box.createVerticalStrut(7));
+            menuPanel.add(btnChemDraw);
+            menuPanel.add(Box.createVerticalStrut(7));
+            menuPanel.add(btnMathText);
+            menuPanel.add(Box.createVerticalStrut(16));
+            menuPanel.add(btnUseImage);
+            menuPanel.add(Box.createVerticalStrut(7));
+            menuPanel.add(btnEditFirst);
+        }
+        
         editorPane.setUpKeyBindings(ImageAcquisitionDialog.this.getRootPane());
         ImageAcquisitionDialog.this.getContentPane().remove(choose);
         ImageAcquisitionDialog.this.getContentPane().remove(libResourceBrowser);

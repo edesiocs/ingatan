@@ -797,7 +797,7 @@ public class AnsFieldLabelPicture extends JPanel implements IAnswerField, MouseL
                 JOptionPane.showMessageDialog(AnsFieldLabelPicture.this, "You cannot set a default image for this answer field.", "Cannot Set Image", JOptionPane.INFORMATION_MESSAGE);
                 return;
             }
-            ImageAcquisitionDialog imgDialog = new ImageAcquisitionDialog((Window) AnsFieldLabelPicture.this.getRootPane().getParent());
+            ImageAcquisitionDialog imgDialog = IOManager.getImageAcquisitionDialog();//(Window) AnsFieldLabelPicture.this.getRootPane().getParent());
 
             imgDialog.setVisible(true);
 
@@ -805,7 +805,7 @@ public class AnsFieldLabelPicture extends JPanel implements IAnswerField, MouseL
 
             //if there has already been an image loaded, and the user is about to replace it (i.e. !=NONE user didn't cancel)
             //then offer for the user to erase all points.
-            if ((image != null) && (imgDialog.getAcquisitionSource() != imgDialog.NONE)) {
+            if ((image != null) && (imgDialog.getAcquisitionSource() != ImageAcquisitionDialog.NONE)) {
                 int resp = JOptionPane.showConfirmDialog(AnsFieldLabelPicture.this, "You have changed the image. Would you like to delete all of the\n"
                         + "currently existing label points? ", "Delete Labels?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 

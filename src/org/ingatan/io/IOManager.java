@@ -64,6 +64,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import org.ingatan.component.answerfield.AnsFieldEmbeddedAudio;
+import org.ingatan.component.image.ImageAcquisitionDialog;
 import org.jdom.DataConversionException;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -211,6 +212,10 @@ public abstract class IOManager {
      * Whether or not a little michael icon should be used to indicate selection in the question list.
      */
     private static boolean useMichaelForSelectorTabs = false;
+    /**
+     * Image acquisition dialog so that a new one does not need to be loaded every time.
+     */
+    private static ImageAcquisitionDialog imgAcquisition;
 
     /**
      * Initiates the IOManager. Loads all group files, and a list of all library files.
@@ -415,6 +420,9 @@ public abstract class IOManager {
             }
         }
 
+        //LOAD THE IMAGE ACQUISITION MENU
+        imgAcquisition = new ImageAcquisitionDialog();
+
         //LOAD THE WINDOW ICON AND THE SELECTOR TAB ICONS
         try {
             windowIcon = ImageIO.read(Thread.currentThread().getContextClassLoader().getResource("resources/icons/windowIcon.png"));
@@ -452,6 +460,16 @@ public abstract class IOManager {
         }
 
         return img;
+    }
+
+    /**
+     * Gets the ImageAcquisitionDialog object held by the IOManager. The <code>reset</code>
+     * method is called before returning the object.
+     * @return the reset <code>ImageAcquisitionDialog</code>.
+     */
+    public static ImageAcquisitionDialog getImageAcquisitionDialog() {
+        imgAcquisition.reset();
+        return imgAcquisition;
     }
 
     /**

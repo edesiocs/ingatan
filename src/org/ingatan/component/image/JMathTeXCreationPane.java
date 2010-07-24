@@ -101,6 +101,13 @@ public class JMathTeXCreationPane extends JPanel {
     }
 
     /**
+     * Clears the math text box.
+     */
+    public void clearTextField() {
+        txtMath.setText("");
+    }
+
+    /**
      * Gets the math text that has been entered by the user.
      * @return the math text that has been entered by the user.
      */

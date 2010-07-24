@@ -486,7 +486,7 @@ public class FlexiQuestionContainer extends AbstractQuestionContainer {
         public void buttonPressed(RichTextToolbarEvent e) {
             if (e.getEventID() == RichTextToolbarEvent.INSERT_PICTURE) {
                 //open an image acquisition dialog
-                ImageAcquisitionDialog imgDialog = new ImageAcquisitionDialog((JFrame) FlexiQuestionContainer.this.getRootPane().getParent());
+                ImageAcquisitionDialog imgDialog = IOManager.getImageAcquisitionDialog();
                 imgDialog.setVisible(true);
 
                 EmbeddedGraphic eg = null;

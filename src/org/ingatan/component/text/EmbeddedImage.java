@@ -144,7 +144,7 @@ public class EmbeddedImage extends EmbeddedGraphic implements MouseListener {
                 //if the rich text area is not editable, then we should not allow the embedded image to be editable.
                 return;
             }
-            ImageAcquisitionDialog imgDialog = new ImageAcquisitionDialog(null);
+            ImageAcquisitionDialog imgDialog = IOManager.getImageAcquisitionDialog();
             imgDialog.setEditorDocumentImage(image);
             imgDialog.setEditorOnly(true);
             imgDialog.setUpKeyBindingsForEditorPane();
