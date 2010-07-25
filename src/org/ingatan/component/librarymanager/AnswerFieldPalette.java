@@ -89,8 +89,8 @@ public class AnswerFieldPalette extends PaintedJPanel {
         scrollerContent.setLayout(new BoxLayout(scrollerContent, BoxLayout.Y_AXIS));
 
         scroller.setViewportView(scrollerContent);
-        scroller.setMinimumSize(new Dimension(150, 100));
-        scroller.setPreferredSize(new Dimension(150, 250));
+        scroller.setMinimumSize(new Dimension(180, 100));
+        scroller.setPreferredSize(new Dimension(180, 270));
         scroller.getViewport().setOpaque(false);
         scroller.setOpaque(false);
 

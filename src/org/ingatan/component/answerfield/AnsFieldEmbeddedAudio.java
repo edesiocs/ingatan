@@ -166,6 +166,9 @@ public class AnsFieldEmbeddedAudio extends JPanel implements IAnswerField, Focus
     }
 
     public RichTextArea getContainerTextArea() {
+        if (this.getParent() == null)
+            return null;
+        
         if (this.getParent().getParent() instanceof RichTextArea) {
             return (RichTextArea) this.getParent().getParent();
         } else {
