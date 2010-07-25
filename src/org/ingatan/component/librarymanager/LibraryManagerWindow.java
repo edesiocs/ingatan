@@ -555,8 +555,11 @@ public class LibraryManagerWindow extends JFrame implements WindowListener {
 
                 try {
                     flexiQ = (FlexiQuestionContainer) rta.getParent().getParent().getParent().getParent();
+                    if (flexiQ == null) {
+                        throw new NullPointerException();
+                    }
                 }
-                catch (ClassCastException ex) {
+                catch (Exception ex) {
                     JOptionPane.showMessageDialog(LibraryManagerWindow.this, "Can only insert an answer field into a flexi question text area.\n" +
                             "Detected due to exception thrown when casting RichTextArea's ancestor to FlexiQuestionContainer.", "Cannot Insert Answer Field", JOptionPane.INFORMATION_MESSAGE);
                         return;
