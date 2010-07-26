@@ -732,11 +732,7 @@ public class AnsFieldMultiChoice extends JPanel implements IAnswerField {
                 AnsFieldMultiChoice.this.validate();
 
             } catch (Exception e2) {
-                Logger.getLogger(AnsFieldMultiChoice.class.getName()).log(Level.WARNING, "Could not resize the text area to fit content.\n"
-                        + "txtArea null? " + (txtArea == null)
-                        + " || dim d null? " + (d == null)
-                        + " || rect r null? " + (r == null)
-                        + " || doc.length=" + doc.getLength(), e2);
+                //ignore this exception, nothing can be done.
             }
 
         }

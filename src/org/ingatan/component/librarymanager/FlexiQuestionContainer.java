@@ -724,7 +724,7 @@ public class FlexiQuestionContainer extends AbstractQuestionContainer {
             }
 
             String parentLibID = doc.getRootElement().getAttributeValue("parentLib");
-            String richText = doc.getRootElement().getText();//.replace(RichTextArea.CHARCODE_OPENING_SQUARE_BRACKET, "[").replace(RichTextArea.CHARCODE_CLOSING_SQUARE_BRACKET, "]");
+            String richText = doc.getRootElement().getText();
 
             //need to ensure we are in the same library as the original library, if not, need to resolve images/files
             if (parentLibID.equals(question.getParentLibrary()) == false) {
