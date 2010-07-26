@@ -263,6 +263,10 @@ public class AnsFieldTrueFalse extends JPanel implements IAnswerField {
         actionListener = listener;
     }
 
+    public void resaveImagesAndResources(String lib) {
+        //not implemented as true/false does not use images or file resources
+    }
+
     /**
      * Listens for a double click on a radio button as an event to trigger the
      * quiz continue action.

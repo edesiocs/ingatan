@@ -271,6 +271,10 @@ public class AnsFieldEmbeddedAudio extends JPanel implements IAnswerField, Focus
         //this is not implemented as there is no logical event that should trigger the ContinueAction of the QuizWindow
     }
 
+    public void resaveImagesAndResources(String newParentLibrary) {
+        audioFileID = IOManager.copyResource(parentLibraryID, audioFileID, newParentLibrary);
+    }
+
     public void focusGained(FocusEvent e) {
     }
 

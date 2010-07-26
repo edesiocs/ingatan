@@ -111,6 +111,14 @@ public class EmbeddedImage extends EmbeddedGraphic implements MouseListener {
         return libraryID;
     }
 
+    public void setParentLibraryID(String libID) {
+        libraryID = libID;
+    }
+
+    public void setImageID(String imgID) {
+        imageID = imgID;
+    }
+
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);

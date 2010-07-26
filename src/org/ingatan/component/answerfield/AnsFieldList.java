@@ -379,6 +379,10 @@ public class AnsFieldList extends JPanel implements IAnswerField {
         //this is not implemented, as there is no logical event that should trigger the continue action in the quiz.
     }
 
+    public void resaveImagesAndResources(String lib) {
+        //not implemented as true/false does not use images or file resources
+    }
+
     /**
      * Simply a <code>JPanel</code> containing a <code>SimpleTextField</code> for user input and
      * a <code>JLabel</code> to display the correct answer beside the field at the appropraite time.

@@ -39,6 +39,7 @@ import org.ingatan.event.RichTextToolbarEvent;
 import org.ingatan.event.RichTextToolbarListener;
 import org.ingatan.io.IOManager;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusListener;
@@ -52,12 +53,13 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.StyleConstants;
 import org.ingatan.component.text.RichTextToolbar;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -243,6 +245,36 @@ public class AnsFieldSelfGraded extends JPanel implements IAnswerField {
 
     public void setQuizContinueListener(ActionListener listener) {
         //this is not implemented, as there is no logical event that should trigger the quiz continue action.
+    }
+
+    public void resaveImagesAndResources(String newLibraryID) {
+        //traverse the rich text area for any embedded images, and reset their parentLibrary values
+        //as well as resaving resources to the new library
+        int runCount;
+        int paragraphCount = txtArea.getDocument().getDefaultRootElement().getElementCount();
+        javax.swing.text.Element curEl = null;
+        AttributeSet curAttr = null;
+        AttributeSet prevAttr = null;
+
+        for (int i = 0; i < paragraphCount; i++) {
+            //each paragraph has 'runCount' runs
+            runCount = txtArea.getDocument().getDefaultRootElement().getElement(i).getElementCount();
+            for (int j = 0; j < runCount; j++) {
+                curEl = txtArea.getDocument().getDefaultRootElement().getElement(i).getElement(j);
+                curAttr = curEl.getAttributes();
+
+                if (curEl.getName().equals(StyleConstants.ComponentElementName)) //this is a component
+                {
+                    //this run is a component. May be an answer field, picture or math text component.
+                    Component o = (Component) curAttr.getAttribute(StyleConstants.ComponentAttribute);
+                    if (o instanceof EmbeddedImage) {
+                        IOManager.copyImage(((EmbeddedImage) o).getParentLibraryID(), ((EmbeddedImage) o).getImageID(), newLibraryID);
+                        ((EmbeddedImage) o).setParentLibraryID(newLibraryID);
+
+                    }
+                }
+            }
+        }
     }
 
     private class AnswerEvaluationDialog extends JDialog {

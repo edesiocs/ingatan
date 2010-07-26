@@ -52,22 +52,18 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
-import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
-import javax.swing.InputMap;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 import javax.swing.event.DocumentEvent;
@@ -75,7 +71,6 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.Element;
 import javax.swing.text.StyleConstants;
-import org.ingatan.component.answerfield.AnsFieldHint;
 import org.ingatan.image.ImageUtils;
 import org.jdom.Document;
 import org.jdom.JDOMException;
@@ -653,7 +648,15 @@ public class FlexiQuestionContainer extends AbstractQuestionContainer {
             }
         }
 
+        /**
+         * Parses clipboard representation of rich text area markup. Resolves all references if the parent library ID has changed. Saves
+         * all resolved resources.
+         * @param xml the clipboard representation of copied rich text markup.
+         * @return the raw rich text representation that can now be passed to a <code>RichTextArea</code>. All references in this text have been resolved
+         * to the newly created files (if library id has changed).
+         */
         private String parseData(String xml) {
+
             //nothing to parse, so leave
             if (xml.trim().equals("") == true) {
                 return null;
@@ -675,10 +678,51 @@ public class FlexiQuestionContainer extends AbstractQuestionContainer {
                 return null;
             }
 
-            //need to ensure we are in the same library as the original library, if not, need to resolve images/files
             String parentLibID = doc.getRootElement().getAttributeValue("parentLib");
+            String richText = doc.getRootElement().getText().replace(RichTextArea.CHARCODE_OPENING_SQUARE_BRACKET, "[").replace(RichTextArea.CHARCODE_CLOSING_SQUARE_BRACKET, "]");
+
+            //need to ensure we are in the same library as the original library, if not, need to resolve images/files
+            if (parentLibID.equals(question.getParentLibrary()) == false) {
+                RichTextArea tempEditArea = new RichTextArea();
+                tempEditArea.setRichText(richText);
+
+                //traverse the rich text area for any components, and reset their parentLibrary values
+                int runCount;
+                int paragraphCount = tempEditArea.getDocument().getDefaultRootElement().getElementCount();
+                Element curEl = null;
+                AttributeSet curAttr = null;
+                AttributeSet prevAttr = null;
+
+                for (int i = 0; i < paragraphCount; i++) {
+                    //each paragraph has 'runCount' runs
+                    runCount = tempEditArea.getDocument().getDefaultRootElement().getElement(i).getElementCount();
+                    for (int j = 0; j < runCount; j++) {
+                        curEl = tempEditArea.getDocument().getDefaultRootElement().getElement(i).getElement(j);
+                        curAttr = curEl.getAttributes();
+
+                        if (curEl.getName().equals(StyleConstants.ComponentElementName)) //this is a component
+                        {
+                            //this run is a component. May be an answer field, picture or math text component.
+                            Component o = (Component) curAttr.getAttribute(StyleConstants.ComponentAttribute);
+                            if (o instanceof IAnswerField) {
+                                ((IAnswerField) o).resaveImagesAndResources(question.getParentLibrary());
+                                ((IAnswerField) o).setParentLibraryID(question.getParentLibrary());
+                            } else if (o instanceof EmbeddedImage) {
+
+                                String id =IOManager.copyImage(((EmbeddedImage) o).getParentLibraryID(), ((EmbeddedImage) o).getImageID(), question.getParentLibrary());
+                                ((EmbeddedImage) o).setParentLibraryID(question.getParentLibrary());
+                                ((EmbeddedImage) o).setImageID(id);
+
+
+                            }
+                        }
+                    }
+                }
+                richText = tempEditArea.getRichText();
+            }
+
             //this will be challenging particularly for answer fields. Guess: load field, change parent library, save field? What triggers IOManager save of images?
-            return doc.getRootElement().getText().replace(RichTextArea.CHARCODE_OPENING_SQUARE_BRACKET, "[").replace(RichTextArea.CHARCODE_CLOSING_SQUARE_BRACKET, "]");
+            return richText;
         }
     }
 

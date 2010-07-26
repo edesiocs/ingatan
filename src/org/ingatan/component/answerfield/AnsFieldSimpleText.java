@@ -431,6 +431,10 @@ public class AnsFieldSimpleText extends JPanel implements IAnswerField {
         return;
     }
 
+    public void resaveImagesAndResources(String lib) {
+        //not implemented as true/false does not use images or file resources
+    }
+
     @Override
     public void requestFocus() {
         txtField.requestFocus();

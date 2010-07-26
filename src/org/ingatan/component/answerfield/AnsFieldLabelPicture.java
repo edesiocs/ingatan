@@ -374,6 +374,10 @@ public class AnsFieldLabelPicture extends JPanel implements IAnswerField, MouseL
         parentLibraryID = id;
     }
 
+    public void resaveImagesAndResources(String newParentLibrary) {
+        imageID = IOManager.copyResource(parentLibraryID, imageID, newParentLibrary);
+    }
+
     //for picture panel
     public void mouseClicked(MouseEvent e) {
         //do not allow to add or remove points if not in edit context

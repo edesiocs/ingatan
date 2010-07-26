@@ -181,4 +181,22 @@ public interface IAnswerField {
      * @param listener the <code>ActionListener</code> set by the <code>QuizWindow</code> for this answer field instance.
      */
     public void setQuizContinueListener(ActionListener listener);
+
+    /**
+     * This method is called upon any event where the answer field may have changed ownership. Examples
+     * include copying the answer field and pasting it into another library's text field, or copying an
+     * entire question and pasting it into another library.<br>
+     * <br>
+     * This method should resave all images/files that are being used by the answer field. This method will be
+     * called <b>before</b> the <code>setParentLibraryID</code> method has been called, so you can be confident to
+     * use your value for parent library ID as the source libraryID. If your answer field does not use external resources such as images or
+     * other files, then you can ignore this method.<br><br>
+     * To save images, use: <code>IOManager.copyImage(sourceLibraryID, sourceImageID, destinationLibraryID)</code><br>
+     * To save files, use: <code>IOManager.saveResource(sourceLibraryID, sourceResourceID, destinationLibraryID)</code><br>
+     * <br>
+     * <b>NOTE:</b> Ensure that you use the new resource/imageID returned by these methods when seralising the answer field, as they may have changed. You
+     * do not need to store <code>newLibraryID</code>, as the <code>setParentLibraryID</code> method is called directly after the
+     * <code>resaveImagesAndResources</code> method. 
+     */
+    public void resaveImagesAndResources(String newLibraryID);
 }

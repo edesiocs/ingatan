@@ -49,13 +49,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.ListIterator;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.StyleConstants;
+import org.ingatan.component.answerfield.IAnswerField;
+import org.ingatan.component.text.EmbeddedImage;
 import org.jdom.DataConversionException;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -275,7 +277,7 @@ public class QuestionList extends JPanel {
         //remove all parameter array containers apart from the 'lowest' indexed one.
         for (int i = 1; i < containers.size(); i++) {
             this.removeQuestion(containers.get(i));
-            questionContainers.add(index+i,containers.get(i));
+            questionContainers.add(index + i, containers.get(i));
         }
 
         rebuildList();
@@ -504,59 +506,17 @@ public class QuestionList extends JPanel {
 
 
 
-            //THE FOLLOWING IS JUST TO RESOLVE IMAGE REFERENCES FOR FLEXI-QUESTIONS WHERE
-            //THE DESTINATION LIBRARY IS DIFFERENT
+            //resolve all references to the source library to become the destination library, if copying
+            //to a new library. Files/images are copied to the destination library where needed.
             if ((q instanceof FlexiQuestion) && (sourceLibrary.compareTo(destinationLibraryID) != 0)) {
                 //must resolve any image references
                 flexiQ = (FlexiQuestion) q;
-                Pattern p = Pattern.compile("\\[.*?\\]");
-                Matcher m = p.matcher(flexiQ.getQuestionText());
-                int postTagTextStartIndex = 0;
-                String imageID;
-                String newID;
-
-                while (m.find()) {
-                    if (m.group().equals("[!" + RichTextArea.TAG_IMAGE + "]")) {
-                        //we have found an imageID, so load it from the sourceLibrary and save it to the destination library using the IOManager
-                        imageID = flexiQ.getQuestionText().substring(postTagTextStartIndex, m.start()).replace("&osqb", "[").replace("&csqb", "]").split("<;>")[0];
-                        newID = IOManager.saveImage(destinationLibraryID, IOManager.loadImage(sourceLibrary, imageID), imageID);
-                        //replace the old ID with the new one (likely that the newID is the same as the old one, though).
-                        flexiQ.setQuestionText(flexiQ.getQuestionText().replace(imageID + "[!" + RichTextArea.TAG_IMAGE + "]", newID + "[!" + RichTextArea.TAG_IMAGE + "]"));
-                    }
-                    postTagTextStartIndex = m.end();
-                }
-
-                m = p.matcher(flexiQ.getAnswerText());
-                postTagTextStartIndex = 0;
-                while (m.find()) {
-                    if (m.group().equals("[!" + RichTextArea.TAG_IMAGE + "]")) {
-                        //we have found an imageID, so load it from the sourceLibrary and save it to the destination library using the IOManager
-                        imageID = flexiQ.getAnswerText().substring(postTagTextStartIndex, m.start()).replace("&osqb", "[").replace("&csqb", "]");
-                        newID = IOManager.saveImage(destinationLibraryID, IOManager.loadImage(sourceLibrary, imageID), imageID);
-                        //replace the old ID with the new one (likely that the newID is the same as the old one, though).
-                        flexiQ.setAnswerText(flexiQ.getAnswerText().replace(imageID + "[!" + RichTextArea.TAG_IMAGE + "]", newID + "[!" + RichTextArea.TAG_IMAGE + "]"));
-                    }
-                    postTagTextStartIndex = m.end();
-                }
-
-                m = p.matcher(flexiQ.getPostAnswerText());
-                postTagTextStartIndex = 0;
-                while (m.find()) {
-                    if (m.group().equals("[!" + RichTextArea.TAG_IMAGE + "]")) {
-                        //we have found an imageID, so load it from the sourceLibrary and save it to the destination library using the IOManager
-                        imageID = flexiQ.getPostAnswerText().substring(postTagTextStartIndex, m.start()).replace("&osqb", "[").replace("&csqb", "]");
-                        newID = IOManager.saveImage(destinationLibraryID, IOManager.loadImage(sourceLibrary, imageID), imageID);
-                        //replace the old ID with the new one (likely that the newID is the same as the old one, though).
-                        flexiQ.setPostAnswerText(flexiQ.getPostAnswerText().replace(imageID + "[!" + RichTextArea.TAG_IMAGE + "]", newID + "[!" + RichTextArea.TAG_IMAGE + "]"));
-                    }
-                    postTagTextStartIndex = m.end();
-                }
+                flexiQ.setQuestionText(resolveLibraryIDReferences(flexiQ.getQuestionText(), destinationLibraryID));
+                flexiQ.setAnswerText(resolveLibraryIDReferences(flexiQ.getAnswerText(), destinationLibraryID));
+                flexiQ.setPostAnswerText(resolveLibraryIDReferences(flexiQ.getPostAnswerText(), destinationLibraryID));
 
                 q = flexiQ;
             }
-
-            //THE ABOVE SIMPLY RESOLVES IMAGE REFERENCES FOR FLEXI TYPE QUESTIONS IF THE
-            //DESTINATION LIBRARY IS DIFFERENT TO THE SOURCE LIBRARY
 
 
             //add the question to the list
@@ -568,6 +528,55 @@ public class QuestionList extends JPanel {
         updateQuestionsWithContent();
         this.repaint();
 
+    }
+
+    /**
+     * Resolves library ID references of a copied question so that there are no problems
+     * when it is pasted into the destination library. This searches for all embedded images,
+     * and answer fields, and updates their references to any resources with the new libraryID
+     * and copies files to the new library.
+     * @param richText the rich text to have references resolved.
+     * @param newLibID the ID of the destination library.
+     * @return the new richText, with all references resolved.
+     */
+    private String resolveLibraryIDReferences(String richText, String newLibID) {
+        RichTextArea tempEditArea = new RichTextArea();
+        tempEditArea.setRichText(richText);
+
+        //traverse the rich text area for any components, and reset their parentLibrary values
+        int runCount;
+        int paragraphCount = tempEditArea.getDocument().getDefaultRootElement().getElementCount();
+        javax.swing.text.Element curEl = null;
+        AttributeSet curAttr = null;
+        AttributeSet prevAttr = null;
+
+        for (int i = 0; i < paragraphCount; i++) {
+            //each paragraph has 'runCount' runs
+            runCount = tempEditArea.getDocument().getDefaultRootElement().getElement(i).getElementCount();
+            for (int j = 0; j < runCount; j++) {
+                curEl = tempEditArea.getDocument().getDefaultRootElement().getElement(i).getElement(j);
+                curAttr = curEl.getAttributes();
+
+                if (curEl.getName().equals(StyleConstants.ComponentElementName)) //this is a component
+                {
+                    //this run is a component. May be an answer field, picture or math text component.
+                    Component o = (Component) curAttr.getAttribute(StyleConstants.ComponentAttribute);
+                    if (o instanceof IAnswerField) {
+                        ((IAnswerField) o).resaveImagesAndResources(newLibID);
+                        ((IAnswerField) o).setParentLibraryID(newLibID);
+                    } else if (o instanceof EmbeddedImage) {
+
+                        String id = IOManager.copyImage(((EmbeddedImage) o).getParentLibraryID(), ((EmbeddedImage) o).getImageID(), newLibID);
+                        ((EmbeddedImage) o).setParentLibraryID(newLibID);
+                        ((EmbeddedImage) o).setImageID(id);
+
+
+                    }
+                }
+            }
+        }
+        
+        return tempEditArea.getRichText();
     }
 
     /**
@@ -586,7 +595,7 @@ public class QuestionList extends JPanel {
      * @param selected whether or not the container should be selected
      */
     public void addQuestion(IQuestion question, boolean selected) {
-        addQuestion(question,selected,-1);
+        addQuestion(question, selected, -1);
     }
 
     /**
@@ -690,13 +699,13 @@ public class QuestionList extends JPanel {
         }
 
 
-        for (int i = containers.size()-1; i >= 0; i--) {
-             this.removeQuestion(containers.get(i));
-             questionContainers.add(index+containers.size(), containers.get(i));
-         }
+        for (int i = containers.size() - 1; i >= 0; i--) {
+            this.removeQuestion(containers.get(i));
+            questionContainers.add(index + containers.size(), containers.get(i));
+        }
 
         rebuildList();
-        
+
         minimiseAll();
     }
 
@@ -733,15 +742,15 @@ public class QuestionList extends JPanel {
         }
 
 
-         for (int i = 0; i < containers.size(); i++) {
-             this.removeQuestion(containers.get(i));
-             questionContainers.add(index-1, containers.get(i));
-         }
+        for (int i = 0; i < containers.size(); i++) {
+            this.removeQuestion(containers.get(i));
+            questionContainers.add(index - 1, containers.get(i));
+        }
 
         rebuildList();
 
         minimiseAll();
-        
+
     }
 
     /**

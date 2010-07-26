@@ -39,6 +39,7 @@ import org.ingatan.event.RichTextToolbarEvent;
 import org.ingatan.event.RichTextToolbarListener;
 import org.ingatan.io.IOManager;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Insets;
@@ -66,7 +67,6 @@ import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -76,6 +76,8 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.StyleConstants;
 import org.jdom.DataConversionException;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -426,6 +428,42 @@ public class AnsFieldMultiChoice extends JPanel implements IAnswerField {
 
     public void setQuizContinueListener(ActionListener listener) {
         actionListener = listener;
+    }
+
+    public void resaveImagesAndResources(String newLibraryID) {
+        Iterator<OptionEntry> iterate = optionEntries.iterator();
+        while (iterate.hasNext()) {
+            traverseTextArea(iterate.next().getRichTextArea(), newLibraryID);
+        }
+    }
+
+    private void traverseTextArea(RichTextArea txtArea, String newLibraryID) {
+        //traverse the rich text area for any embedded images, and reset their parentLibrary values
+        //as well as resaving resources to the new library
+        int runCount;
+        int paragraphCount = txtArea.getDocument().getDefaultRootElement().getElementCount();
+        javax.swing.text.Element curEl = null;
+        AttributeSet curAttr = null;
+
+        for (int i = 0; i < paragraphCount; i++) {
+            //each paragraph has 'runCount' runs
+            runCount = txtArea.getDocument().getDefaultRootElement().getElement(i).getElementCount();
+            for (int j = 0; j < runCount; j++) {
+                curEl = txtArea.getDocument().getDefaultRootElement().getElement(i).getElement(j);
+                curAttr = curEl.getAttributes();
+
+                if (curEl.getName().equals(StyleConstants.ComponentElementName)) //this is a component
+                {
+                    //this run is a component. May be an answer field, picture or math text component.
+                    Component o = (Component) curAttr.getAttribute(StyleConstants.ComponentAttribute);
+                    if (o instanceof EmbeddedImage) {
+                        IOManager.copyImage(((EmbeddedImage) o).getParentLibraryID(), ((EmbeddedImage) o).getImageID(), newLibraryID);
+                        ((EmbeddedImage) o).setParentLibraryID(newLibraryID);
+
+                    }
+                }
+            }
+        }
     }
 
     /**

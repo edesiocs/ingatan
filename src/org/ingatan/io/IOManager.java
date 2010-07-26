@@ -1774,6 +1774,61 @@ public abstract class IOManager {
     }
 
     /**
+     * Copies the specified resource to the specified destination library.
+     * @param sourceLibraryID The libraryID in which the resource currently exists.
+     * @param sourceID the ID of the resource as it exists within the source library.
+     * @param destLibraryID the ID of the library to which the resource should be copied.
+     * @return the new ID for the destination resource. This is likely to be the same as <code>sourceID</code>,
+     * unless <code>sourceID</code> was not unique in the destination library.
+     */
+    public static String copyResource(String sourceLibraryID, String sourceID, String destLibraryID) {
+        Library destLib = null;
+        Library sourceLib = null;
+        try {
+            destLib = loadLibrary(destLibraryID);
+            sourceLib = loadLibrary(sourceLibraryID);
+        } catch (IOException ex) {
+            Logger.getLogger(IOManager.class.getName()).log(Level.SEVERE, "While attempting to load the source and destination libraries in order to copy a resource.\n" +
+                    "sourceLibID=" + sourceLibraryID + " :: destLibID=" + destLibraryID, ex);
+        }
+
+        //ensure id has no illegal characters
+        String destID = getSafeID(sourceID);
+        //ensure that fileID is unique for this library
+        File newFile = new File(destLib.getPathTempLib() + "/" + destID);
+        int suffix = 0;
+        if (newFile.exists()) {
+            do {
+                destID = destID.substring(0, destID.length() - ("" + suffix).length());
+                destID += suffix;
+                newFile = new File(destLib.getPathTempLib() + "/" + destID);
+                suffix += 1; //increment the suffix
+            } while (newFile.exists());
+        }
+        try {
+            copy(sourceLib.getPathTempLib() + "/" + sourceID, destLib.getPathTempLib() + "/" + destID);
+        } catch (IOException ex) {
+            Logger.getLogger(IOManager.class.getName()).log(Level.SEVERE, "While attempting to copy a file between libraries.\n" +
+                    "sourceLibID=" + sourceLibraryID + " :: destLibID=" + destLibraryID + " :: derived destID=" + destID, ex);
+        }
+
+        return destID;
+    }
+
+    /**
+     * Copies the specified image to the specified destination library. This method is just included for
+     * consistency, and is actually the same as calling <code>copyResource</code>.
+     * @param sourceLibraryID The libraryID in which the image currently exists.
+     * @param sourceID the ID of the image as it exists within the source library.
+     * @param destLibraryID the ID of the library to which the image should be copied.
+     * @return the new ID for the destination image. This is likely to be the same as <code>sourceID</code>,
+     * unless <code>sourceID</code> was not unique in the destination library.
+     */
+    public static String copyImage(String sourceLibraryID, String sourceID, String destLibraryID) {
+        return copyResource(sourceLibraryID, sourceID, destLibraryID);
+    }
+
+    /**
      * Saves the file with the specified ID to the specified library without ensuring that the ID
      * is unique within that library. This means that if any resource exists with that ID, it will
      * be overwritten. This method still ensures that the ID is no larger than MAX_IMAGE_ID_LENGTH.

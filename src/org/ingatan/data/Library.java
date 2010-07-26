@@ -183,7 +183,8 @@ public class Library {
 
 
     /**
-     * The temporary path for library files (images and data).
+     * The temporary path for library files (images and data). Does not include
+     * trailing "/".
      * @return the temporary path for library files.
      */
     public File getPathTempLib() {

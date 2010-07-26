@@ -25,10 +25,10 @@
  * If you find this program useful, please tell me about it! I would be delighted
  * to hear from you at tom.ingatan@gmail.com.
  */
-
 package org.ingatan.component.answerfield;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -44,6 +44,8 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.StyleConstants;
 import org.ingatan.ThemeConstants;
 import org.ingatan.component.image.ImageAcquisitionDialog;
 import org.ingatan.component.text.EmbeddedGraphic;
@@ -65,6 +67,7 @@ import org.jdom.output.XMLOutputter;
  * @version 1.0
  */
 public class AnsFieldHint extends JButton implements IAnswerField {
+
     /**
      * Whether or not this answer field is currently in edit or quiz context. <code>
      * true</code> if in the edit context (i.e. library manager, answer field list editor).
@@ -92,11 +95,11 @@ public class AnsFieldHint extends JButton implements IAnswerField {
         this.setFont(ThemeConstants.niceFont);
         this.setAction(new HintAction());
 
-        txtArea.getScroller().setPreferredSize(new Dimension(350,150));
+        txtArea.getScroller().setPreferredSize(new Dimension(350, 150));
         txtArea.getToolbar().addRichTextToolbarListener(new TextToolbarListener());
 
         popup.add(txtArea.getScroller());
-        
+
         rebuild();
     }
 
@@ -201,6 +204,36 @@ public class AnsFieldHint extends JButton implements IAnswerField {
         //this is not implemented as there is no logical event that should trigger the QuizContinue action.
     }
 
+    public void resaveImagesAndResources(String newLibraryID) {
+        //traverse the rich text area for any embedded images, and reset their parentLibrary values
+        //as well as resaving resources to the new library
+        int runCount;
+        int paragraphCount = txtArea.getDocument().getDefaultRootElement().getElementCount();
+        javax.swing.text.Element curEl = null;
+        AttributeSet curAttr = null;
+        AttributeSet prevAttr = null;
+
+        for (int i = 0; i < paragraphCount; i++) {
+            //each paragraph has 'runCount' runs
+            runCount = txtArea.getDocument().getDefaultRootElement().getElement(i).getElementCount();
+            for (int j = 0; j < runCount; j++) {
+                curEl = txtArea.getDocument().getDefaultRootElement().getElement(i).getElement(j);
+                curAttr = curEl.getAttributes();
+
+                if (curEl.getName().equals(StyleConstants.ComponentElementName)) //this is a component
+                {
+                    //this run is a component. May be an answer field, picture or math text component.
+                    Component o = (Component) curAttr.getAttribute(StyleConstants.ComponentAttribute);
+                    if (o instanceof EmbeddedImage) {
+                        IOManager.copyImage(((EmbeddedImage) o).getParentLibraryID(), ((EmbeddedImage) o).getImageID(), newLibraryID);
+                        ((EmbeddedImage) o).setParentLibraryID(newLibraryID);
+
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * Action associated with the user pressing the 'hint' button.
      */
@@ -213,10 +246,7 @@ public class AnsFieldHint extends JButton implements IAnswerField {
         public void actionPerformed(ActionEvent e) {
             popup.show(AnsFieldHint.this, 20, 15);
         }
-
     }
-
-
 
     /**
      * This toolbar listener just listens for the RichTextToolbarEvent.INSERT_PICTURE event ID.

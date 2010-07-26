@@ -331,6 +331,10 @@ public class AnsFieldSimpleMultiChoice extends JPanel implements IAnswerField {
         actionListener = listener;
     }
 
+    public void resaveImagesAndResources(String lib) {
+        //not implemented as true/false does not use images or file resources
+    }
+
     public class AddAction extends AbstractAction {
 
         public AddAction() {
