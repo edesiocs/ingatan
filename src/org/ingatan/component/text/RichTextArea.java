@@ -320,8 +320,9 @@ public class RichTextArea extends JTextPane {
                 try {
                     Class ansField = IOManager.getAnswerFieldClass(ansFieldData[0]);
                     IAnswerField newField = null;
-                    if (ansField != null)
+                    if (ansField != null) {
                         newField = (IAnswerField) ansField.newInstance();
+                    }
                     if (newField != null) {
                         //tell the new field instance to read in the content text, and then insert it into the document.
                         newField.readInXML(ansFieldData[1].replace("[", CHARCODE_OPENING_SQUARE_BRACKET).replace("]", CHARCODE_CLOSING_SQUARE_BRACKET));
@@ -507,6 +508,307 @@ public class RichTextArea extends JTextPane {
     }
 
     /**
+     * Encodes the text that exists between <code>startIndex</code> and <code>endIndex</code>
+     * with formatting and contained answer fields/images
+     * to a single String. This string can then be used to reconstruct the content
+     * of the text field through use of the <code>setRichText</code> method. A
+     * HTML-like markup is used with special tags for answer fields and images.
+     *
+     * @param endIndex the end index of the text to encode.
+     * @param startIndex the start index of the text to encode.
+     * @return a string containing the markup description of the text field content specified
+     * including any answer fields and images that may be contained by it, and all rich text formatting.
+     */
+    public String getRichText(int startIndex, int endIndex) {
+        //return value string built up through traversal of document elements
+        String retVal = "";
+        //number of runs within a paragraph
+        int runCount;
+        //number of paragraphs in the entire document
+        int paragraphCount = this.getDocument().getDefaultRootElement().getElementCount();
+        //paragraph closest to the start index
+        int startPara = this.getDocument().getDefaultRootElement().getElementIndex(startIndex);
+        //paragraph closest to the end index
+        int endPara = this.getDocument().getDefaultRootElement().getElementIndex(endIndex);
+        //the index of the individual run that is closest to the start index
+        int startRun;
+        //the index of the individual run that is closes to the end index
+        int endRun;
+        //current element through iteration
+        Element curEl;
+        //attributes of the current element
+        AttributeSet curAttr;
+        //previous attributes, null if not applicable
+        AttributeSet prevAttr = null;
+
+
+        //traverse all runs in this document, and write each.
+
+        for (int i = startPara; i <= endPara; i++) {
+            //each paragraph has 'runCount' runs
+            runCount = this.getDocument().getDefaultRootElement().getElement(i).getElementCount();
+            startRun = this.getDocument().getDefaultRootElement().getElement(i).getElementIndex(startIndex);
+            endRun = this.getDocument().getDefaultRootElement().getElement(i).getElementIndex(endIndex);
+
+            for (int j = startRun; j <= endRun; j++) {
+                curEl = this.getDocument().getDefaultRootElement().getElement(i).getElement(j);
+                curAttr = curEl.getAttributes();
+
+                //FIRST WRITE THE ATTRIBUTES OF RUN
+                if ((i == startPara) && (j == startRun)) {
+                    //very first run, so don't compare back to the prevAttr object
+                    if (StyleConstants.isBold(curAttr)) {
+                        retVal += "[" + TAG_BOLD + "]";
+                    }
+                    if (StyleConstants.isItalic(curAttr)) {
+                        retVal += "[" + TAG_ITALIC + "]";
+                    }
+                    if (StyleConstants.isUnderline(curAttr)) {
+                        retVal += "[" + TAG_UNDERLINE + "]";
+                    }
+                    if (StyleConstants.isSuperscript(curAttr)) {
+                        retVal += "[" + TAG_SUPERSCRIPT + "]";
+                    }
+                    if (StyleConstants.isSubscript(curAttr)) {
+                        retVal += "[" + TAG_SUBSCRIPT + "]";
+                    }
+
+                    retVal += "[" + TAG_ALIGNMENT + "]" + StyleConstants.getAlignment(curAttr) + "[!" + TAG_ALIGNMENT + "]";
+
+                    retVal += "[" + TAG_FONT_FAMILY + "]" + StyleConstants.getFontFamily(curAttr) + "[!" + TAG_FONT_FAMILY + "]";
+                    retVal += "[" + TAG_FONT_SIZE + "]" + StyleConstants.getFontSize(curAttr) + "[!" + TAG_FONT_SIZE + "]";
+                    Color fontCol = StyleConstants.getForeground(curAttr);
+                    retVal += "[" + TAG_FONT_COLOUR + "]" + fontCol.getRed() + "," + fontCol.getGreen() + "," + fontCol.getBlue() + "[!" + TAG_FONT_COLOUR + "]";
+
+                } else {
+                    //the styles for the RichTextArea are set by toggling the current style. As a result, no end tags are
+                    //required.
+                    if (StyleConstants.isBold(curAttr) != StyleConstants.isBold(prevAttr)) {
+                        retVal += "[" + TAG_BOLD + "]";
+                    }
+                    if (StyleConstants.isItalic(curAttr) != StyleConstants.isItalic(prevAttr)) {
+                        retVal += "[" + TAG_ITALIC + "]";
+                    }
+                    if (StyleConstants.isUnderline(curAttr) != StyleConstants.isUnderline(prevAttr)) {
+                        retVal += "[" + TAG_UNDERLINE + "]";
+                    }
+                    if (StyleConstants.isSuperscript(curAttr) != StyleConstants.isSuperscript(prevAttr)) {
+                        retVal += "[" + TAG_SUPERSCRIPT + "]";
+                    }
+                    if (StyleConstants.isSubscript(curAttr) != StyleConstants.isSubscript(prevAttr)) {
+                        retVal += "[" + TAG_SUBSCRIPT + "]";
+                    }
+                    if (StyleConstants.getAlignment(curAttr) != StyleConstants.getAlignment(prevAttr)) {
+                        retVal += "[" + TAG_ALIGNMENT + "]" + StyleConstants.getAlignment(curAttr) + "[!" + TAG_ALIGNMENT + "]";
+                    }
+                    if (StyleConstants.getFontFamily(curAttr).equals(StyleConstants.getFontFamily(prevAttr)) == false) {
+                        retVal += "[" + TAG_FONT_FAMILY + "]" + StyleConstants.getFontFamily(curAttr) + "[!" + TAG_FONT_FAMILY + "]";
+                    }
+                    if (StyleConstants.getFontSize(curAttr) != StyleConstants.getFontSize(prevAttr)) {
+                        retVal += "[" + TAG_FONT_SIZE + "]" + StyleConstants.getFontSize(curAttr) + "[!" + TAG_FONT_SIZE + "]";
+                    }
+                    if (StyleConstants.getForeground(curAttr).equals(StyleConstants.getForeground(prevAttr)) == false) {
+                        Color fontCol = StyleConstants.getForeground(curAttr);
+                        retVal += "[" + TAG_FONT_COLOUR + "]" + fontCol.getRed() + "," + fontCol.getGreen() + "," + fontCol.getBlue() + "[!" + TAG_FONT_COLOUR + "]";
+                    }
+                }
+
+                prevAttr = curAttr;
+
+                //NOW WRITE CONTENT OF RUN
+
+                if (curEl.getName().equals(StyleConstants.ComponentElementName)) //this is a component
+                {
+                    //this run is a component. May be an answer field, picture or math text component.
+                    Component o = (Component) curAttr.getAttribute(StyleConstants.ComponentAttribute);
+                    if (o instanceof IAnswerField) {
+                        IAnswerField ansField = (IAnswerField) o;
+                        String ansFieldText = ansField.writeToXML().replace("[", CHARCODE_OPENING_SQUARE_BRACKET).replace("]", CHARCODE_CLOSING_SQUARE_BRACKET);
+                        if (ansFieldText.contains("<name;content>")) {
+                            System.out.println("\n---->Answer field has written reserved tags. Removing these.");
+                            ansFieldText = ansFieldText.replace("<name;content>", "");
+                        }
+                        retVal += "[" + TAG_ANSWER_FIELD + "]" + ansField.getClass().getName() + "<name;content>" + ansFieldText + "[!" + TAG_ANSWER_FIELD + "]";
+                    } else if (o instanceof EmbeddedImage) {
+                        EmbeddedImage embeddedImage = (EmbeddedImage) o;
+                        String imgID = embeddedImage.getImageID();
+                        imgID = imgID.replace("[", CHARCODE_OPENING_SQUARE_BRACKET).replace("]", CHARCODE_CLOSING_SQUARE_BRACKET);
+                        retVal += "[" + TAG_IMAGE + "]" + imgID + "<;>" + embeddedImage.libraryID + "[!" + TAG_IMAGE + "]";
+                    } else if (o instanceof EmbeddedMathTeX) {
+                        EmbeddedMathTeX embeddedMathTeX = (EmbeddedMathTeX) o;
+                        String mathText = embeddedMathTeX.getMathTeX();
+                        mathText = mathText.replace("[", CHARCODE_OPENING_SQUARE_BRACKET).replace("]", CHARCODE_CLOSING_SQUARE_BRACKET);
+                        retVal += "[" + TAG_MATH + "]" + mathText + "<;>" + embeddedMathTeX.getRenderSize() + "<;>" + embeddedMathTeX.getRenderColour().getRed() + "," + embeddedMathTeX.getRenderColour().getGreen() + "," + embeddedMathTeX.getRenderColour().getBlue() + "[!" + TAG_MATH + "]";
+                    }
+                } else //we do not have a component, we have styled text
+                {
+                    try {
+                        retVal += getRunElementText(curEl).replace("[", CHARCODE_OPENING_SQUARE_BRACKET).replace("]", CHARCODE_CLOSING_SQUARE_BRACKET).replace("\n", "[" + TAG_NEW_LINE + "]");
+                    } catch (BadLocationException ignore) {
+                        Logger.getLogger(RichTextArea.class.getName()).log(Level.WARNING, "While trying to get the text associated with a particular run in the getRichText method.", ignore);
+                    }
+                }
+
+            }
+        }
+        if (retVal.endsWith("[" + TAG_NEW_LINE + "]")) {
+            retVal = retVal.substring(0, retVal.length() - ("[" + TAG_NEW_LINE + "]").length());
+        }
+
+        //indicates the end of the document - this is required so that any text between this tag and the previous tag is added.
+        if (retVal.endsWith("[" + TAG_DOCUMENT_END + "]") == false) {
+            retVal += "[" + TAG_DOCUMENT_END + "]";
+        }
+
+        return retVal;
+    }
+
+    /**
+     * This method parses the raw text string that is passed to it and generates
+     * the formatted text. If answer field tags are encountered, then the
+     * corresponding classes will be instantiated and added to the text field.
+     *
+     * If image tags are encountered, the corresponding resources will be added
+     * to the text field.
+     *
+     * This method inserts the resulting rich text at the current caret position
+     * of the <code>RichTextArea</code>. If there is a selection, it will be replaced
+     * by the parsed rich text.
+     *
+     * @param rawText the text to parse into the field.
+     */
+    public void insertRichText(String rawText) {
+
+        //the attribute set generated by the latest parse
+        SimpleAttributeSet curAttr = new SimpleAttributeSet();
+        //use the previous attributes to insert string
+        SimpleAttributeSet prevAttr = new SimpleAttributeSet();
+
+        //start parsing the data in.
+        Pattern p = Pattern.compile("\\[.*?\\]");
+        Matcher m = p.matcher(rawText);
+        int postTagTextStartIndex = 0;
+        //gets appended to the string being inserted.
+        String strAppend = "";
+        //flag for text insertion; text between font family tags, for example, should not be inserted!
+        boolean insertIntraTagText = true;
+        //number of elements at a given point.
+        int elCount = 0;
+        //while we find any pattern that matches a tag "[tag_text]".
+        while (m.find()) {
+            insertIntraTagText = true;
+            strAppend = "";
+            if (m.group().equals("[" + TAG_BOLD + "]")) {
+                StyleConstants.setBold(curAttr, !StyleConstants.isBold(curAttr));
+            } else if (m.group().equals("[" + TAG_ITALIC + "]")) {
+                StyleConstants.setItalic(curAttr, !StyleConstants.isItalic(curAttr));
+            } else if (m.group().equals("[" + TAG_UNDERLINE + "]")) {
+                StyleConstants.setUnderline(curAttr, !StyleConstants.isUnderline(curAttr));
+            } else if (m.group().equals("[" + TAG_SUPERSCRIPT + "]")) {
+                StyleConstants.setSuperscript(curAttr, !StyleConstants.isSuperscript(curAttr));
+            } else if (m.group().equals("[" + TAG_SUBSCRIPT + "]")) {
+                StyleConstants.setSubscript(curAttr, !StyleConstants.isSubscript(curAttr));
+            } else if (m.group().equals("[!" + TAG_ALIGNMENT + "]")) {
+                insertIntraTagText = false;
+                int alignVal = Integer.valueOf(rawText.substring(postTagTextStartIndex, m.start()));
+                switch (alignVal) {
+                    case StyleConstants.ALIGN_LEFT:
+                        StyleConstants.setAlignment(curAttr, StyleConstants.ALIGN_LEFT);
+                        break;
+                    case StyleConstants.ALIGN_CENTER:
+                        //StyleConstants.setAlignment(curAttr, StyleConstants.ALIGN_CENTER);
+                        StyleConstants.ParagraphConstants.setAlignment(curAttr, StyleConstants.ParagraphConstants.ALIGN_CENTER);
+                        //curAttr.addAttribute(StyleConstants.ParagraphConstants.Alignment, StyleConstants);
+                        break;
+                    case StyleConstants.ALIGN_RIGHT:
+                        StyleConstants.setAlignment(curAttr, StyleConstants.ALIGN_RIGHT);
+                        break;
+                    case StyleConstants.ALIGN_JUSTIFIED:
+                        StyleConstants.setAlignment(curAttr, StyleConstants.ALIGN_JUSTIFIED);
+                        break;
+                }
+            } else if (m.group().equals("[!" + TAG_FONT_FAMILY + "]")) {
+                insertIntraTagText = false;
+                curAttr.addAttribute(StyleConstants.Family, rawText.substring(postTagTextStartIndex, m.start()));
+            } else if (m.group().equals("[!" + TAG_FONT_SIZE + "]")) {
+                insertIntraTagText = false;
+                curAttr.addAttribute(StyleConstants.Size, Integer.valueOf(rawText.substring(postTagTextStartIndex, m.start())));
+            } else if (m.group().equals("[!" + TAG_FONT_COLOUR + "]")) {
+                insertIntraTagText = false;
+                String[] colour = rawText.substring(postTagTextStartIndex, m.start()).split(",");
+                Color c = new Color(Integer.valueOf(colour[0]), Integer.valueOf(colour[1]), Integer.valueOf(colour[2]));
+                curAttr.addAttribute(StyleConstants.Foreground, c);
+            } else if (m.group().equals("[" + TAG_NEW_LINE + "]")) {
+                strAppend = "\n";
+            } else if (m.group().equals("[" + TAG_DOCUMENT_END + "]")) {
+                //do nothing
+            } else if (m.group().equals("[!" + TAG_ANSWER_FIELD + "]")) {
+                insertIntraTagText = false;
+                String[] ansFieldData = rawText.substring(postTagTextStartIndex, m.start()).split("<name;content>");
+
+                //if there was no content text, then the split method will return an array of lenght 1, but we need an empty string to pass as the content
+                if (ansFieldData.length == 1) {
+                    String[] temp = new String[2];
+                    temp[0] = ansFieldData[0];
+                    temp[1] = "";
+                    ansFieldData = temp;
+                }
+                //instantiate answer field using ansFieldData[0], and set its content to ansFieldData[1].
+                try {
+                    Class ansField = IOManager.getAnswerFieldClass(ansFieldData[0]);
+                    IAnswerField newField = null;
+                    if (ansField != null) {
+                        newField = (IAnswerField) ansField.newInstance();
+                    }
+                    if (newField != null) {
+                        //tell the new field instance to read in the content text, and then insert it into the document.
+                        newField.readInXML(ansFieldData[1].replace("[", CHARCODE_OPENING_SQUARE_BRACKET).replace("]", CHARCODE_CLOSING_SQUARE_BRACKET));
+                        this.insertComponent((JComponent) newField);
+                    } else {
+                        System.out.println("Answer field was null after instantiation attempt - could not insert. Originating from RichTextArea.setRichText()");
+                    }
+                } catch (InstantiationException ex) {
+                    Logger.getLogger(RichTextArea.class.getName()).log(Level.SEVERE, "Could not instantiate the answer field '" + ansFieldData[0] + " in setRichText method.", ex);
+                } catch (IllegalAccessException ex) {
+                    Logger.getLogger(RichTextArea.class.getName()).log(Level.SEVERE, "For the answer field '" + ansFieldData[0] + " in setRichText method.", ex);
+                }
+                //load class of name ansFieldData[0] and tell it to generate an instance using data in ansFieldData[1]
+                //don't forget to set any CHARCODE_OPENING_SQUARE_BRACKET and CHARCODE_CLOSING_SQUARE_BRACKET
+            } else if (m.group().equals("[!" + TAG_IMAGE + "]")) {
+                String[] data = rawText.substring(postTagTextStartIndex, m.start()).replace(CHARCODE_OPENING_SQUARE_BRACKET, "[").replace(CHARCODE_CLOSING_SQUARE_BRACKET, "]").split("<;>");
+                String imageID = data[0];
+                String libID = data[1];
+                insertIntraTagText = false;
+                try {
+                    this.insertComponent(new EmbeddedImage(IOManager.loadImage(libID, imageID), imageID, libID));
+                } catch (IOException ex) {
+                    Logger.getLogger(RichTextArea.class.getName()).log(Level.SEVERE, "While trying to insert an embedded image after creating it (setRichText)", ex);
+                }
+            } else if (m.group().equals("[!" + TAG_MATH + "]")) {
+                String mathText[] = rawText.substring(postTagTextStartIndex, m.start()).split("<;>");
+                String[] colVals = mathText[2].split(",");
+                insertIntraTagText = false;
+                this.insertComponent(new EmbeddedMathTeX(mathText[0].replace(CHARCODE_OPENING_SQUARE_BRACKET, "[").replace(CHARCODE_CLOSING_SQUARE_BRACKET, "]"), Integer.valueOf(mathText[1]), new Color(Integer.valueOf(colVals[0]), Integer.valueOf(colVals[1]), Integer.valueOf(colVals[2]))));
+            }
+
+
+            if (insertIntraTagText) {
+                elCount = this.getDocument().getDefaultRootElement().getElementCount();
+                try {
+                    this.getStyledDocument().setParagraphAttributes(this.getCaretPosition(), this.getCaretPosition(), prevAttr, true);
+                    this.getStyledDocument().insertString(this.getCaretPosition(), (rawText.substring(postTagTextStartIndex, m.start()) + strAppend).replace(CHARCODE_OPENING_SQUARE_BRACKET, "[").replace(CHARCODE_CLOSING_SQUARE_BRACKET, "]"), prevAttr);
+                } catch (BadLocationException ex) {
+                    Logger.getLogger(RichTextArea.class.getName()).log(Level.SEVERE, "While attempting to parse data into the text field, an invalid location was accessed.", ex);
+                }
+            }
+            prevAttr = new SimpleAttributeSet(curAttr);
+
+            postTagTextStartIndex = m.end();
+        }
+
+    }
+
+    /**
      * Gets the text from an element within a document.
      * @param e the element from which to get the text.
      * @return the text from the document corresponding to this element.
@@ -536,6 +838,7 @@ public class RichTextArea extends JTextPane {
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.CTRL_DOWN_MASK), DefaultEditorKit.copyAction);
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.CTRL_DOWN_MASK), DefaultEditorKit.pasteAction);
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, KeyEvent.CTRL_DOWN_MASK), DefaultEditorKit.cutAction);
+
 
         //Styled
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_B, KeyEvent.CTRL_DOWN_MASK), new StyledEditorKit.BoldAction());

@@ -27,6 +27,7 @@
  */
 package org.ingatan.component.librarymanager;
 
+import java.awt.datatransfer.DataFlavor;
 import org.ingatan.ThemeConstants;
 import org.ingatan.component.answerfield.IAnswerField;
 import org.ingatan.component.image.ImageAcquisitionDialog;
@@ -45,6 +46,8 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.KeyboardFocusManager;
 import java.awt.Rectangle;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
@@ -52,6 +55,7 @@ import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
@@ -60,18 +64,23 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.InputMap;
 import javax.swing.JCheckBox;
-import javax.swing.JFrame;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.TransferHandler;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.Element;
 import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledEditorKit;
+import org.ingatan.component.answerfield.AnsFieldHint;
 import org.ingatan.image.ImageUtils;
+import org.jdom.Document;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
+import org.jdom.output.XMLOutputter;
 
 /**
  * This question container type is used for freeform questions. It consists of three rich text
@@ -136,9 +145,7 @@ public class FlexiQuestionContainer extends AbstractQuestionContainer {
         super(ques);
         this.flexiQuestion = ques;
 
-        setUpInputMap(questionText);
-        setUpInputMap(answerText);
-        setUpInputMap(postAnswerText);
+        RichTextTransferHandler rtth = new RichTextTransferHandler();
 
         //set the maximum and minimum sizes for rich text area scrollers. These
         //sizes are used when resizing the areas to match their content so that
@@ -146,12 +153,15 @@ public class FlexiQuestionContainer extends AbstractQuestionContainer {
         questionText.getScroller().setMaximumSize(TEXT_AREA_MAX_SIZE);
         questionText.getScroller().setMinimumSize(TEXT_AREA_MIN_SIZE);
         questionText.getScroller().setPreferredSize(TEXT_AREA_PREF_SIZE);
+        questionText.setTransferHandler(rtth);
         answerText.getScroller().setMaximumSize(TEXT_AREA_MAX_SIZE);
         answerText.getScroller().setMinimumSize(TEXT_AREA_MIN_SIZE);
         answerText.getScroller().setPreferredSize(TEXT_AREA_PREF_SIZE);
+        answerText.setTransferHandler(rtth);
         postAnswerText.getScroller().setMaximumSize(TEXT_AREA_MAX_SIZE);
         postAnswerText.getScroller().setMinimumSize(TEXT_AREA_MIN_SIZE);
         postAnswerText.getScroller().setPreferredSize(TEXT_AREA_PREF_SIZE);
+        postAnswerText.setTransferHandler(rtth);
 
         //this following are set so that when we use the modelToView method, the area has positive size
         //otherwise the method returns false.
@@ -235,21 +245,6 @@ public class FlexiQuestionContainer extends AbstractQuestionContainer {
     }
 
     /**
-     * Set up the input and action maps for the specified rich text area.
-     * @param map the RichTextArea for which the input and action maps should be set up.
-     */
-    private void setUpInputMap(RichTextArea map) {
-        InputMap iMap = map.getInputMap(WHEN_FOCUSED);
-        ActionMap aMap = map.getActionMap();
-
-        iMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.CTRL_DOWN_MASK), "PasteAction");
-        aMap.put("PasteAction", new PasteAction());
-
-        map.setInputMap(WHEN_FOCUSED, iMap);
-        map.setActionMap(aMap);
-    }
-
-    /**
      * Traverses the elements of the answerText <code>RichTextArea</code> and tells
      * all IAnswerField components found that they exist in the library editor context.
      */
@@ -279,22 +274,14 @@ public class FlexiQuestionContainer extends AbstractQuestionContainer {
         }
     }
 
-    private class PasteAction extends AbstractAction {
-
-        public void actionPerformed(ActionEvent e) {
-            paste();
-            new StyledEditorKit.PasteAction().actionPerformed(e);
-        }
-    }
-
     /**
-     * Pastes the content of the clipboard into the flexi question container.
+     * Tries to paste image data from the clipboard (image or URL).
      */
-    private void paste() {
+    private boolean attemptImagePaste() {
         Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
         if ((focusOwner instanceof RichTextArea == false) || (FlexiQuestionContainer.this.isAncestorOf(focusOwner) == false)) {
             //in either of these cases, the focus owner should not be pasted into.
-            return;
+            return false;
         }
 
         BufferedImage imgFromClipboard = null;
@@ -303,14 +290,14 @@ public class FlexiQuestionContainer extends AbstractQuestionContainer {
         try {
             imgFromClipboard = ImageUtils.getImageFromClipboard(false, true);
         } catch (UnsupportedFlavorException ex) {
-            return;
+            return false;
         } catch (IOException ex) {
-            return;
+            return false;
         }
 
         //double check that an image was retreived from the clipboard
         if (imgFromClipboard == null) {
-            return;
+            return false;
         }
         try {
             imageID = IOManager.saveImage(FlexiQuestionContainer.this.getQuestion().getParentLibrary(), imgFromClipboard, "paste(" + imgFromClipboard.getWidth() + "x" + imgFromClipboard.getHeight() + ")");
@@ -320,7 +307,7 @@ public class FlexiQuestionContainer extends AbstractQuestionContainer {
 
         if (imageID.equals("")) {
             //IOManager did not successfully save the image.
-            return;
+            return false;
         }
 
         //otherwise, create the embedded image
@@ -344,6 +331,7 @@ public class FlexiQuestionContainer extends AbstractQuestionContainer {
         }
 
         ((RichTextArea) focusOwner).insertComponent(eg);
+        return true;
     }
 
     @Override
@@ -586,6 +574,108 @@ public class FlexiQuestionContainer extends AbstractQuestionContainer {
         }
 
         public void fontChanged(RichTextToolbarEvent e) {
+        }
+    }
+
+    public String createClipboardData() {
+        //if a RichTextArea is focussed:
+        if (KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner() instanceof RichTextArea) {
+            RichTextArea txtArea = (RichTextArea) KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+
+            //if there is no selection, return empty sting
+            if (txtArea.getSelectionStart() == txtArea.getSelectionEnd()) {
+                return "";
+            }
+
+            Document doc = new Document();
+
+            //lib metadata
+            org.jdom.Element e = new org.jdom.Element(this.getClass().getName());
+            e.setAttribute("parentLib", question.getParentLibrary());
+            e.setText(txtArea.getRichText(txtArea.getSelectionStart(), txtArea.getSelectionEnd()));
+            doc.setRootElement(e);
+
+            XMLOutputter fmt = new XMLOutputter();
+            return fmt.outputString(doc);
+        } else {
+            return "";
+        }
+    }
+
+    public class RichTextTransferHandler extends TransferHandler {
+
+        @Override
+        public int getSourceActions(JComponent c) {
+            return TransferHandler.COPY_OR_MOVE;
+        }
+
+        @Override
+        protected Transferable createTransferable(JComponent c) {
+            return new StringSelection(createClipboardData());
+        }
+
+        @Override
+        public boolean importData(TransferHandler.TransferSupport s) {
+            return importData((JComponent) s.getComponent(), s.getTransferable(), s.isDrop());
+        }
+
+        @Override
+        public boolean importData(JComponent c, Transferable t) {
+            return importData(c, t, false);
+        }
+
+        private boolean importData(JComponent c, Transferable t, boolean isDrop) {
+            //try to paste image data from the clipboard
+            if (attemptImagePaste()) {
+                return true;
+            }
+
+            if (t.isDataFlavorSupported(DataFlavor.stringFlavor) == false) {
+                return false;
+            }
+
+            try {
+                ((RichTextArea) c).replaceSelection("");
+                ((RichTextArea) c).insertRichText(parseData((String) t.getTransferData(DataFlavor.stringFlavor)));
+            } catch (UnsupportedFlavorException ex) {
+                Logger.getLogger(FlexiQuestionContainer.class.getName()).log(Level.SEVERE, "While trying to get transfer data from RichTextTransferable.", ex);
+            } catch (IOException ex) {
+                Logger.getLogger(FlexiQuestionContainer.class.getName()).log(Level.SEVERE, "While trying to get transfer data from RichTextTransferable.", ex);
+            }
+            return true;
+        }
+
+        @Override
+        protected void exportDone(JComponent source, Transferable data, int action) {
+            super.exportDone(source, data, action);
+        }
+
+        private String parseData(String xml) {
+            //nothing to parse, so leave
+            if (xml.trim().equals("") == true) {
+                return null;
+            }
+
+            //try to build document from input string, if this doesn't work, we have plain text
+            SAXBuilder sax = new SAXBuilder();
+            Document doc = null;
+            try {
+                doc = sax.build(new StringReader(xml));
+            } catch (JDOMException ex) {
+                return xml + "[end]";
+            } catch (IOException ex) {
+                return xml + "[end]";
+            }
+
+            //nothing to parse, so leave
+            if (doc == null) {
+                return null;
+            }
+
+            //need to ensure we are in the same library as the original library, if not, need to resolve images/files
+            String parentLibID = doc.getRootElement().getAttributeValue("parentLib");
+            //this will be challenging particularly for answer fields. Guess: load field, change parent library, save field? What triggers IOManager save of images?
+            return doc.getRootElement().getText().replace(RichTextArea.CHARCODE_OPENING_SQUARE_BRACKET, "[").replace(RichTextArea.CHARCODE_CLOSING_SQUARE_BRACKET, "]");
         }
     }
 
