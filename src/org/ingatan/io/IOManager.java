@@ -387,6 +387,7 @@ public abstract class IOManager {
 
             }
 
+
             File ansFieldsFile = new File(getAnswerFieldFile());
             if (ansFieldsFile.exists() == false) {
                 System.out.println("Answer fields file does not exist. Initialising defaults.");
@@ -421,8 +422,10 @@ public abstract class IOManager {
             }
         }
 
+        System.out.print("Initialising image acquisition...");
         //LOAD THE IMAGE ACQUISITION MENU
         imgAcquisition = new ImageAcquisitionDialog();
+        System.out.println("done");
 
         //LOAD THE WINDOW ICON AND THE SELECTOR TAB ICONS
         try {
