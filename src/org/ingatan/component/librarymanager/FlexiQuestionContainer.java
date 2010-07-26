@@ -648,6 +648,9 @@ public class FlexiQuestionContainer extends AbstractQuestionContainer {
         @Override
         protected void exportDone(JComponent source, Transferable data, int action) {
             super.exportDone(source, data, action);
+            if (action == TransferHandler.MOVE) {
+                ((RichTextArea) source).replaceSelection("");
+            }
         }
 
         private String parseData(String xml) {
