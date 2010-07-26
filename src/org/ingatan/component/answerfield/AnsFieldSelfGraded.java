@@ -60,6 +60,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.StyleConstants;
+import org.ingatan.component.text.GeneralRichTextTransferHandler;
 import org.ingatan.component.text.RichTextToolbar;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -85,7 +86,6 @@ public class AnsFieldSelfGraded extends JPanel implements IAnswerField {
      * Rich text area for answer entry.
      */
     private RichTextArea txtArea;
-
     /**
      * Label for the number of marks to award spinner.
      */
@@ -120,6 +120,7 @@ public class AnsFieldSelfGraded extends JPanel implements IAnswerField {
         txtArea.getScroller().setMinimumSize(new Dimension(200, 100));
         txtArea.getToolbar().addRichTextToolbarListener(new TextToolbarListener());
         txtArea.addFocusListener(new TextFocusListener());
+        txtArea.setTransferHandler(new GeneralRichTextTransferHandler());
 
         ((JSpinner.DefaultEditor) spinMarks.getEditor()).getTextField().setEditable(false);
 

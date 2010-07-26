@@ -78,6 +78,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.StyleConstants;
+import org.ingatan.component.text.GeneralRichTextTransferHandler;
 import org.jdom.DataConversionException;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -564,6 +565,7 @@ public class AnsFieldMultiChoice extends JPanel implements IAnswerField {
             txtArea.getDocument().addDocumentListener(new TextAreaListener(txtArea));
             txtArea.getScroller().setBorder(BorderFactory.createLineBorder(ThemeConstants.backgroundUnselected.darker()));
             txtArea.getToolbar().addRichTextToolbarListener(textToolbarListener);
+            txtArea.setTransferHandler(new GeneralRichTextTransferHandler());
 
             Box vert = Box.createVerticalBox();
             vert.add(radioButton);

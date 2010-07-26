@@ -637,6 +637,13 @@ public class FlexiQuestionContainer extends AbstractQuestionContainer {
             } catch (IOException ex) {
                 Logger.getLogger(FlexiQuestionContainer.class.getName()).log(Level.SEVERE, "While trying to get transfer data from RichTextTransferable.", ex);
             }
+
+            //remove any stray answer fields - these are fields that return true for isOnlyForAnswerArea
+            //but have been added to either the question text or post-answer text.
+            if (((RichTextArea) c).equals(answerText) == false) {
+                removeStrayAnswerFields((RichTextArea) c);
+            }
+
             return true;
         }
 
@@ -645,6 +652,44 @@ public class FlexiQuestionContainer extends AbstractQuestionContainer {
             super.exportDone(source, data, action);
             if (action == TransferHandler.MOVE) {
                 ((RichTextArea) source).replaceSelection("");
+            }
+        }
+
+        /**
+         * Removes any answer fields that return <code>true</code> to their <code>isOnlyForAnswerArea</code>
+         * method, but have been added to the specified <code>txtArea</code>.
+         * @param txtArea the text area to search for stray answer fields in.
+         */
+        private void removeStrayAnswerFields(RichTextArea txtArea) {
+            int runCount;
+            int paragraphCount = txtArea.getDocument().getDefaultRootElement().getElementCount();
+            Element curEl = null;
+            AttributeSet curAttr = null;
+            AttributeSet prevAttr = null;
+
+            for (int i = 0; i < paragraphCount; i++) {
+                //each paragraph has 'runCount' runs
+                runCount = txtArea.getDocument().getDefaultRootElement().getElement(i).getElementCount();
+                for (int j = 0; j < runCount; j++) {
+                    curEl = txtArea.getDocument().getDefaultRootElement().getElement(i).getElement(j);
+                    if (curEl != null) {
+                        curAttr = curEl.getAttributes();
+
+                        if (curEl.getName().equals(StyleConstants.ComponentElementName)) //this is a component
+                        {
+                            //this run is a component. May be an answer field, picture or math text component.
+                            Component o = (Component) curAttr.getAttribute(StyleConstants.ComponentAttribute);
+                            if (o instanceof IAnswerField) {
+                                if (((IAnswerField) o).isOnlyForAnswerArea()) {
+                                    //remove the answer field by selecting it and setting it to ""
+                                    txtArea.setSelectionStart(curEl.getStartOffset());
+                                    txtArea.setSelectionEnd(curEl.getEndOffset());
+                                    txtArea.replaceSelection("");
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -679,7 +724,7 @@ public class FlexiQuestionContainer extends AbstractQuestionContainer {
             }
 
             String parentLibID = doc.getRootElement().getAttributeValue("parentLib");
-            String richText = doc.getRootElement().getText().replace(RichTextArea.CHARCODE_OPENING_SQUARE_BRACKET, "[").replace(RichTextArea.CHARCODE_CLOSING_SQUARE_BRACKET, "]");
+            String richText = doc.getRootElement().getText();//.replace(RichTextArea.CHARCODE_OPENING_SQUARE_BRACKET, "[").replace(RichTextArea.CHARCODE_CLOSING_SQUARE_BRACKET, "]");
 
             //need to ensure we are in the same library as the original library, if not, need to resolve images/files
             if (parentLibID.equals(question.getParentLibrary()) == false) {
@@ -691,7 +736,6 @@ public class FlexiQuestionContainer extends AbstractQuestionContainer {
                 int paragraphCount = tempEditArea.getDocument().getDefaultRootElement().getElementCount();
                 Element curEl = null;
                 AttributeSet curAttr = null;
-                AttributeSet prevAttr = null;
 
                 for (int i = 0; i < paragraphCount; i++) {
                     //each paragraph has 'runCount' runs
@@ -708,12 +752,9 @@ public class FlexiQuestionContainer extends AbstractQuestionContainer {
                                 ((IAnswerField) o).resaveImagesAndResources(question.getParentLibrary());
                                 ((IAnswerField) o).setParentLibraryID(question.getParentLibrary());
                             } else if (o instanceof EmbeddedImage) {
-
-                                String id =IOManager.copyImage(((EmbeddedImage) o).getParentLibraryID(), ((EmbeddedImage) o).getImageID(), question.getParentLibrary());
+                                String id = IOManager.copyImage(((EmbeddedImage) o).getParentLibraryID(), ((EmbeddedImage) o).getImageID(), question.getParentLibrary());
                                 ((EmbeddedImage) o).setParentLibraryID(question.getParentLibrary());
                                 ((EmbeddedImage) o).setImageID(id);
-
-
                             }
                         }
                     }

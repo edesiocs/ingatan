@@ -1304,7 +1304,6 @@ public abstract class IOManager {
                 }
             }
         }
-        System.out.println("getLibraryFromID(libID).getPathTempLib() = " + getLibraryFromID(libID).getPathTempLib().toString());
         ZipTools.createZip(getLibraryFromID(libID).getPathTempLib().listFiles(), new File(getLibraryPath() + libID));
     }
 

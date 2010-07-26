@@ -647,7 +647,7 @@ public class RichTextArea extends JTextPane {
                         if (j == startRun) {
                             String run = "";
                             try {
-                                run = this.getText(startIndex, curEl.getEndOffset()-startIndex);
+                                run = this.getText(startIndex, curEl.getEndOffset() - startIndex);
                             } catch (BadLocationException ex) {
                                 throw new BadLocationException("RichTextArea.getRunElementText tried to access an invalid location within the document.\n" + ex.getMessage(), ex.offsetRequested());
                             }
@@ -655,7 +655,7 @@ public class RichTextArea extends JTextPane {
                         } else if (j == endRun) { //if this is the end run, we might not want to return all content of the run
                             String run = "";
                             try {
-                                run = this.getText(curEl.getStartOffset(), endIndex-curEl.getStartOffset());
+                                run = this.getText(curEl.getStartOffset(), endIndex - curEl.getStartOffset());
                             } catch (BadLocationException ex) {
                                 throw new BadLocationException("RichTextArea.getRunElementText tried to access an invalid location within the document.\n" + ex.getMessage(), ex.offsetRequested());
                             }

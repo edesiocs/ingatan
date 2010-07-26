@@ -51,6 +51,7 @@ import org.ingatan.component.image.ImageAcquisitionDialog;
 import org.ingatan.component.text.EmbeddedGraphic;
 import org.ingatan.component.text.EmbeddedImage;
 import org.ingatan.component.text.EmbeddedMathTeX;
+import org.ingatan.component.text.GeneralRichTextTransferHandler;
 import org.ingatan.component.text.RichTextArea;
 import org.ingatan.event.RichTextToolbarEvent;
 import org.ingatan.event.RichTextToolbarListener;
@@ -97,6 +98,7 @@ public class AnsFieldHint extends JButton implements IAnswerField {
 
         txtArea.getScroller().setPreferredSize(new Dimension(350, 150));
         txtArea.getToolbar().addRichTextToolbarListener(new TextToolbarListener());
+        txtArea.setTransferHandler(new GeneralRichTextTransferHandler());
 
         popup.add(txtArea.getScroller());
 
