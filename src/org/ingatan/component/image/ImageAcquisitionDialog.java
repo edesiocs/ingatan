@@ -214,8 +214,6 @@ public class ImageAcquisitionDialog extends JDialog implements WindowListener {
 
     /**
      * Create a new <code>ImageAcquisitionDialog</code>.
-     * @param owner The JFrame to which this dialog belongs. This is a modal dialog, and the owner will be disabled while this
-     * dialog is displayed.
      */
     public ImageAcquisitionDialog() {//Window owner) {
         super();
