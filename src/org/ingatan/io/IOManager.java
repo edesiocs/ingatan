@@ -214,6 +214,11 @@ public abstract class IOManager {
      */
     private static boolean useMichaelForSelectorTabs = false;
     /**
+     * Whether or not the library manager has been loaded before. If it hasn't, then a message will be displayed
+     * with some basic information on how to use Ingatan.
+     */
+    private static boolean firstTimeLoadingLibManager = true;
+    /**
      * Image acquisition dialog so that a new one does not need to be loaded every time.
      */
     private static ImageAcquisitionDialog imgAcquisition;
@@ -416,6 +421,7 @@ public abstract class IOManager {
                 //set up the default values and write the file
                 defaultSymbolMenuCharacterMap();
                 //default is to use mini michaels to indicate selection in the questionlist
+                //default is that the library manager has never been loaded for this installation.
                 ParserWriter.writePreferencesFile(symbolMenuCharMap);
             } else {
                 symbolMenuCharMap = ParserWriter.parsePreferencesFile();
@@ -488,6 +494,22 @@ public abstract class IOManager {
         } else {
             return selectorTabDot;
         }
+    }
+
+    /**
+     * Checks whether or not the library manager has been loaded before.
+     * @return if the library manager has ever been loaded before for this installation.
+     */
+    public static boolean isFirstTimeLoadingLibManager() {
+        return firstTimeLoadingLibManager;
+    }
+
+    /**
+     * Set whether the library manager has ever been loaded before for this installation.
+     * @param firstTimeLoadingLibManager whether or not the library manager has been loaded before for this installation.
+     */
+    public static void setFirstTimeLoadingLibManager(boolean firstTimeLoadingLibManager) {
+        IOManager.firstTimeLoadingLibManager = firstTimeLoadingLibManager;
     }
 
     /**

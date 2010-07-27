@@ -46,6 +46,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -53,7 +54,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
@@ -64,6 +67,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingConstants;
+import org.ingatan.component.text.EmbeddedImage;
 import org.jdom.DataConversionException;
 
 /**
@@ -143,7 +147,6 @@ public class LibraryManagerWindow extends JFrame implements WindowListener {
         this.addWindowListener(this);
 
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addPropertyChangeListener(new KeyboardFocusPropertyListener());
-
 
     }
 
@@ -283,6 +286,40 @@ public class LibraryManagerWindow extends JFrame implements WindowListener {
     }
 
     public void windowOpened(WindowEvent e) {
+        if (IOManager.isFirstTimeLoadingLibManager()) {
+            RichTextArea dispArea = new RichTextArea();
+
+            dispArea.setPreferredSize(new Dimension(400, 250));
+            dispArea.setSize(new Dimension(400, 250));
+            dispArea.setMinimumSize(new Dimension(400, 250));
+
+            dispArea.setBorder(BorderFactory.createEmptyBorder());
+            dispArea.setEditable(false);
+            dispArea.setOpaque(false);
+
+            dispArea.setRichText("[aln]0[!aln][fam]Dialog[!fam][sze]16[!sze][col]51,51,51[!col]Welcome to Ingatan[sze]12[!sze][br]"
+                    + "This message will only be shown once.[br][br]"
+                    + "The library manager [u]automatically saves your work as you go[u]. Simply close the library manager window when you are done.[br][br]"
+                    + "To get started, click the green + icon to the left to create a new library, and then the green + icon "
+                    + "up the top to create a new question, as shown below.[br][br][aln]1[!aln][end]");
+
+            BufferedImage img = null;
+            try {
+                img = ImageIO.read(Thread.currentThread().getContextClassLoader().getResource("resources/getStarted.png"));
+            } catch (Exception ex) {
+                Logger.getLogger(LibraryManagerWindow.class.getName()).log(Level.SEVERE, "While trying to load /resources/gettingStarted.png for the library manager's virgin load.", ex);
+            }
+
+            if (img != null) {
+                EmbeddedImage eImg = new EmbeddedImage(img, "", "");
+                dispArea.setCaretPosition(dispArea.getDocument().getLength());
+                dispArea.insertComponent(eImg);
+            }
+
+            JOptionPane.showMessageDialog(LibraryManagerWindow.this, dispArea, "Welcome to Ingatan", JOptionPane.INFORMATION_MESSAGE);
+            IOManager.setFirstTimeLoadingLibManager(false);
+            ParserWriter.writePreferencesFile(IOManager.getSymbolMenuCharacterMap());
+        }
     }
 
     /**
@@ -558,27 +595,26 @@ public class LibraryManagerWindow extends JFrame implements WindowListener {
                     if (flexiQ == null) {
                         throw new NullPointerException();
                     }
-                }
-                catch (Exception ex) {
-                    JOptionPane.showMessageDialog(LibraryManagerWindow.this, "Can only insert an answer field into a flexi question text area.\n" +
-                            "Detected due to exception thrown when casting RichTextArea's ancestor to FlexiQuestionContainer.", "Cannot Insert Answer Field", JOptionPane.INFORMATION_MESSAGE);
-                        return;
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(LibraryManagerWindow.this, "Can only insert an answer field into a flexi question text area.\n"
+                            + "Detected due to exception thrown when casting RichTextArea's ancestor to FlexiQuestionContainer.", "Cannot Insert Answer Field", JOptionPane.INFORMATION_MESSAGE);
+                    return;
                 }
                 //try to instantiate the answer field, and then add it to the text field
                 try {
                     IAnswerField ansField = (IAnswerField) IOManager.getAnswerFieldClass(e.getActionCommand()).newInstance();
                     if (ansField.isOnlyForAnswerArea() && (rta.equals(flexiQ.answerText) == false)) {
-                        JOptionPane.showMessageDialog(LibraryManagerWindow.this, "The '" + ansField.getDisplayName() + "' answer field\n" +
-                                "can only be inserted into the answer text area.", "Cannot Insert Answer Field", JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.showMessageDialog(LibraryManagerWindow.this, "The '" + ansField.getDisplayName() + "' answer field\n"
+                                + "can only be inserted into the answer text area.", "Cannot Insert Answer Field", JOptionPane.INFORMATION_MESSAGE);
                         return;
                     }
                     //ensure that the rich text area currently in focus is one of the three flexi question container rich text areas (and not, for instance
                     //the rich text area of a self-graded question answer field).
                     if (rta.equals(flexiQ.answerText) || rta.equals(flexiQ.questionText) || rta.equals(flexiQ.postAnswerText)) {
-                    ansField.readInXML((String) IOManager.getAnswerFieldsFile().getAnswerFieldDefaults().get(ansField.getClass().getName()));
-                    ansField.setParentLibraryID(libBrowser.getSelectedLibraryID());
-                    rta.insertComponent((JComponent) ansField);
-                    ansField.setContext(true);
+                        ansField.readInXML((String) IOManager.getAnswerFieldsFile().getAnswerFieldDefaults().get(ansField.getClass().getName()));
+                        ansField.setParentLibraryID(libBrowser.getSelectedLibraryID());
+                        rta.insertComponent((JComponent) ansField);
+                        ansField.setContext(true);
                     } else {
                         JOptionPane.showMessageDialog(LibraryManagerWindow.this, "Can only insert an answer field into a flexi question text area.", "Cannot Insert Answer Field", JOptionPane.INFORMATION_MESSAGE);
                         return;
