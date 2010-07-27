@@ -312,6 +312,7 @@ public class LibraryManagerWindow extends JFrame implements WindowListener {
 
             if (img != null) {
                 EmbeddedImage eImg = new EmbeddedImage(img, "", "");
+                eImg.setToolTipText("");
                 dispArea.setCaretPosition(dispArea.getDocument().getLength());
                 dispArea.insertComponent(eImg);
             }
