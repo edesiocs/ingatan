@@ -395,9 +395,9 @@ public class EditAnswerFieldsDialog extends JDialog {
                 checkboxSelector.setEnabled(false);
             }
 
-            this.setMinimumSize(new Dimension(400, 250));
-            this.setMaximumSize(new Dimension(1000, 250));
-            this.setPreferredSize(new Dimension(460, 250));
+            this.setMinimumSize(new Dimension(400, ((JComponent) ansField).getMinimumSize().height + 90));
+            this.setMaximumSize(new Dimension(1000, ((JComponent) ansField).getMinimumSize().height + 40));
+            this.setPreferredSize(new Dimension(460, ((JComponent) ansField).getMinimumSize().height + 80));
 
             btnSaveAsDefault.setMargin(new Insets(3, 1, 3, 1));
             btnSaveAsDefault.setFont(ThemeConstants.niceFont);
