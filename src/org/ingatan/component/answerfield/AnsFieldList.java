@@ -35,6 +35,7 @@ import org.ingatan.component.text.SimpleTextField;
 import org.ingatan.io.IOManager;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Insets;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -55,7 +56,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingConstants;
 import org.jdom.DataConversionException;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -104,17 +104,12 @@ public class AnsFieldList extends JPanel implements IAnswerField {
     /**
      * Label for the marks per entry spinner.
      */
-    private JLabel lblMarks = new JLabel("Marks per list entry: ");
+    private JLabel lblMarks = new JLabel("Marks per list item: ");
     /**
      * Text entry field. List items are separated in this text area at
      * edit time by putting each item on a new line.
      */
     private SimpleTextArea txtArea = new SimpleTextArea();
-    /**
-     * Instruction label indicating how to specify multiple correct answers and list items
-     */
-    private JLabel lblInstruct = new JLabel("<html>Separate acceptable answers using double comma ,,<br>"
-            + "Separate list items by putting each on a new line.");
     /**
      * Scroller for the txtArea used in the edit context.
      */
@@ -132,10 +127,7 @@ public class AnsFieldList extends JPanel implements IAnswerField {
         this.setOpaque(false);
         this.setMaximumSize(new Dimension(350, 700));
 
-        lblInstruct.setFont(ThemeConstants.niceFont.deriveFont(Font.ITALIC).deriveFont(9.5f));
         lblMarks.setFont(ThemeConstants.niceFont.deriveFont(Font.ITALIC));
-        lblInstruct.setHorizontalTextPosition(SwingConstants.LEFT);
-        lblInstruct.setAlignmentX(LEFT_ALIGNMENT);
 
         ((JSpinner.DefaultEditor) spinMarks.getEditor()).getTextField().setEditable(false);
 
@@ -148,9 +140,11 @@ public class AnsFieldList extends JPanel implements IAnswerField {
 
         btnGiveHint.setFont(ThemeConstants.niceFont);
         btnGiveHint.setAlignmentX(LEFT_ALIGNMENT);
+        btnGiveHint.setMargin(new Insets(1, 1, 1, 1));
         btnGiveHint.setToolTipText("Give one letter for a randomly selected item.");
 
         txtArea.setAlignmentX(LEFT_ALIGNMENT);
+        txtArea.setToolTipText("Put each list item on a new line, and separate possible answers for each item with double comma (,,)");
 
 
         rebuild();
@@ -163,29 +157,23 @@ public class AnsFieldList extends JPanel implements IAnswerField {
         this.removeAll();
 
         if (inLibManager) {
-            txtArea.setMaximumSize(new Dimension(400, 100));
+            txtArea.setMaximumSize(new Dimension(340, 100));
             txtArea.setFont(ThemeConstants.tableCellEditorFont);
             txtArea.setBorder(BorderFactory.createLineBorder(ThemeConstants.backgroundUnselected.darker()));
             txtArea.setAlignmentX(LEFT_ALIGNMENT);
 
-            this.add(lblInstruct);
-            lblInstruct.setAlignmentX(LEFT_ALIGNMENT);
             this.add(Box.createVerticalStrut(4));
             this.add(scroller);
             scroller.setAlignmentX(LEFT_ALIGNMENT);
             this.add(Box.createVerticalStrut(4));
 
             Box horiz = Box.createHorizontalBox();
-            horiz.setMaximumSize(new Dimension(160, 30));
+            horiz.setMaximumSize(new Dimension(340, 30));
             horiz.add(lblMarks);
             horiz.setAlignmentX(LEFT_ALIGNMENT);
             horiz.add(spinMarks);
-            this.add(horiz);
-
-            horiz = Box.createHorizontalBox();
-            horiz.setMaximumSize(new Dimension(200, 30));
+            horiz.add(Box.createHorizontalStrut(4));
             horiz.add(chkOrder);
-            horiz.setAlignmentX(LEFT_ALIGNMENT);
             horiz.add(Box.createHorizontalStrut(4));
             horiz.add(chkHints);
             this.add(horiz);
@@ -195,6 +183,11 @@ public class AnsFieldList extends JPanel implements IAnswerField {
                 cat += correctAnswers[i] + ((i == correctAnswers.length - 1) ? "" : "\n");
             }
             txtArea.setText(cat);
+
+            if (txtArea.getText().isEmpty()) {
+                txtArea.setText("Put each list item on a new line.\n"
+                        + "Separate answers using double comma ,,");
+            }
         } else {
             txtListItemFields = new QuizTimeEditor[correctAnswers.length];
             for (int i = 0; i < correctAnswers.length; i++) {
@@ -246,9 +239,12 @@ public class AnsFieldList extends JPanel implements IAnswerField {
      */
     private boolean isInAnswerArray(String[] possible, String query) {
         for (int i = 0; i < possible.length; i++) {
-            if (possible[i].trim().toLowerCase().equals(query.toLowerCase().trim())) {
-                //query was found, return true
-                return true;
+            String[] currentAnswers = possible[i].split(",,");
+            for (int j = 0; j < currentAnswers.length; j++) {
+                if (currentAnswers[j].trim().toLowerCase().equals(query.toLowerCase().trim())) {
+                    //query was found, return true
+                    return true;
+                }
             }
         }
 
@@ -284,16 +280,15 @@ public class AnsFieldList extends JPanel implements IAnswerField {
             curLabel.setVisible(true);
 
             //set up appropriately coloured correct answer labels
-            if ((chkOrder.isSelected() == false) && (isInAnswerArray(txtListStringArray, correctAnswers[i].trim().toLowerCase()))) {
+            if ((chkOrder.isSelected() == false) && (isInAnswerArray(correctAnswers,txtListStringArray[i].trim().toLowerCase()))) {
                 curLabel.setForeground(ThemeConstants.quizPassGreen);
-            } else if ((chkOrder.isSelected() == false) && (!isInAnswerArray(txtListStringArray, correctAnswers[i].trim().toLowerCase()))) {
+            } else if ((chkOrder.isSelected() == false) && (!isInAnswerArray(correctAnswers, txtListStringArray[i].trim().toLowerCase()))) {
                 curLabel.setForeground(ThemeConstants.quizFailRed);
-            } else if ((chkOrder.isSelected()) && (txtListItemFields[i].getText().trim().toLowerCase().equals(correctAnswers[i].trim().toLowerCase()))) {
+            } else if ((chkOrder.isSelected()) && (isInAnswerArray(new String[] {correctAnswers[i]}, txtListStringArray[i].trim().toLowerCase()))) {
                 curLabel.setForeground(ThemeConstants.quizPassGreen);
-            } else if ((chkOrder.isSelected()) && (!txtListItemFields[i].getText().trim().toLowerCase().equals(correctAnswers[i].trim().toLowerCase()))) {
+            } else if ((chkOrder.isSelected()) && (!isInAnswerArray(new String[] {correctAnswers[i]}, txtListStringArray[i].trim().toLowerCase()))) {
                 curLabel.setForeground(ThemeConstants.quizFailRed);
             }
-
         }
 
         this.validate();
@@ -426,12 +421,13 @@ public class AnsFieldList extends JPanel implements IAnswerField {
             HashSet<AWTKeyStroke> keyset = new HashSet<AWTKeyStroke>();
             keyset.add(AWTKeyStroke.getAWTKeyStroke(KeyEvent.VK_TAB, 0));
             txtField.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, keyset);
-            
+
             //the following key listener listens for the enter key, and if the symbol menu is not
             //showing, focusses the next component.
             txtField.addKeyListener(new KeyListener() {
 
-                public void keyTyped(KeyEvent e) {}
+                public void keyTyped(KeyEvent e) {
+                }
 
                 public void keyPressed(KeyEvent e) {
                     //if enter key and not on symbol menu, focus the next component
@@ -440,7 +436,8 @@ public class AnsFieldList extends JPanel implements IAnswerField {
                     }
                 }
 
-                public void keyReleased(KeyEvent e) {}
+                public void keyReleased(KeyEvent e) {
+                }
             });
         }
 
@@ -481,13 +478,13 @@ public class AnsFieldList extends JPanel implements IAnswerField {
          */
         public boolean isCorrect() {
             //order matters, and this entry is correct
-            if ((chkOrder.isSelected()) && (txtField.getText().toLowerCase().trim().equals(correctAnswers[arrayIndex].toLowerCase().trim()))) {
+            if ((chkOrder.isSelected()) && (isInAnswerArray(new String[] {correctAnswers[arrayIndex]}, txtField.getText()))) {
                 return true;
             } //order does not matter and this entry is correct
             else if ((chkOrder.isSelected() == false) && (isInAnswerArray(correctAnswers, txtField.getText()))) {
                 return true;
             } //order matters, and this entry is NOT correct
-            else if ((chkOrder.isSelected()) && (txtField.getText().toLowerCase().trim().equals(correctAnswers[arrayIndex].toLowerCase().trim()) == false)) {
+            else if ((chkOrder.isSelected()) && ((isInAnswerArray(new String[] {correctAnswers[arrayIndex]}, txtField.getText())) == false)) {
                 return false;
             } //order does not matter and this entry is NOT correct
             else if ((chkOrder.isSelected() == false) && (isInAnswerArray(correctAnswers, txtField.getText()) == false)) {

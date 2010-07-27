@@ -36,6 +36,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentListener;
@@ -53,6 +54,8 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import org.jdom.DataConversionException;
 import org.jdom.Document;
@@ -86,19 +89,11 @@ public class AnsFieldSimpleText extends JPanel implements IAnswerField {
     /**
      * Text entry field.
      */
-    private SimpleTextField txtField = new SimpleTextField(6);
+    private SimpleTextField txtField = new SimpleTextField(11);
     /**
      * Text field for setting how many marks to award for a correct answer
      */
-    private NumericJTextField numMarks = new NumericJTextField(1);
-    /**
-     * Label for the text field that allows the user to enter how many marks to award for a correct answer.
-     */
-    private JLabel lblNumMarks = new JLabel("Marks to Award: ");
-    /**
-     * Instruction label indicating how to specify multiple correct answers
-     */
-    private JLabel lblInstruct = new JLabel("Separate answers with double comma ,,");
+    private JSpinner spinMarks = new JSpinner(new SpinnerNumberModel(1, 0, 20, 1));
     /**
      * Button for the user at quiz time that provides a hint for the answer, letter by letter.
      */
@@ -114,7 +109,7 @@ public class AnsFieldSimpleText extends JPanel implements IAnswerField {
     /**
      * Check box for edit time that allows user to set whether or not hints are allowed.
      */
-    private JCheckBox chkHints = new JCheckBox("Allow Hints");
+    private JCheckBox chkHints = new JCheckBox("Hints");
     /**
      * Number of hints that have been given: an extra letter is given each time.
      */
@@ -129,15 +124,10 @@ public class AnsFieldSimpleText extends JPanel implements IAnswerField {
      * Create a new instance of <code>BasicTextField</code>.
      */
     public AnsFieldSimpleText() {
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         this.setOpaque(false);
         this.setMaximumSize(new Dimension(250, 100));
         this.setMinimumSize(new Dimension(50, 100));
-
-        lblInstruct.setFont(ThemeConstants.niceFont.deriveFont(Font.ITALIC).deriveFont(9.5f));
-        lblNumMarks.setFont(ThemeConstants.niceFont.deriveFont(Font.ITALIC));
-        lblInstruct.setHorizontalTextPosition(SwingConstants.LEFT);
-        lblInstruct.setAlignmentX(LEFT_ALIGNMENT);
 
         txtField.setAlignmentX(LEFT_ALIGNMENT);
         txtField.addKeyListener(new ContinueKeyListener());
@@ -145,17 +135,18 @@ public class AnsFieldSimpleText extends JPanel implements IAnswerField {
 
         btnGiveHint.setFont(ThemeConstants.niceFont);
         btnGiveHint.setAlignmentX(LEFT_ALIGNMENT);
+        btnGiveHint.setToolTipText("Gives one letter of a possible correct answer each time you click.");
+
+
         lblHint.setFont(ThemeConstants.niceFont);
         chkHints.setFont(ThemeConstants.niceFont);
         chkHints.setOpaque(false);
+        chkHints.setMinimumSize(new Dimension(40,20));
+        chkHints.setMaximumSize(new Dimension(40,20));
+        chkHints.setToolTipText("If selected, a hint button will appear at quiz time that gives one letter of a correct answer each time it is pressed.");
 
-
-        txtField.setToolTipText("Enter the correct answer here, specify multiple correct answers by separating them using two commas ,,");
-        numMarks.setToolTipText("The number of marks to award if the user types the correct answer.");
-        chkHints.setToolTipText("If checked, a 'hint' button will appear at quiz time allowing the user to be shown an extra letter of the correct answers with each click.");
-
-        numMarks.setMaximumSize(new Dimension(50, 25));
-        numMarks.setMinimumSize(new Dimension(30, 25));
+        spinMarks.setMaximumSize(new Dimension(28, 20));
+        spinMarks.setMinimumSize(new Dimension(28, 20));
 
         popupHint.add(lblHint);
 
@@ -171,32 +162,37 @@ public class AnsFieldSimpleText extends JPanel implements IAnswerField {
         this.removeAll();
 
         if (inLibManager) {
-            txtField.setMaximumSize(new Dimension(400, 35));
+            txtField.setMaximumSize(new Dimension(400, 25));
+            txtField.setMinimumSize(new Dimension(200,20));
             txtField.setFont(ThemeConstants.tableCellEditorFont);
             txtField.setBorder(BorderFactory.createLineBorder(ThemeConstants.backgroundUnselected.darker()));
-            numMarks.setBorder(BorderFactory.createLineBorder(ThemeConstants.backgroundUnselected.darker()));
+            txtField.setToolTipText("Separate possible answers using double comma (,,)");
 
-            this.add(lblInstruct);
-            this.add(Box.createVerticalStrut(4));
+            spinMarks.setBorder(BorderFactory.createLineBorder(ThemeConstants.backgroundUnselected.darker()));
+
             this.add(txtField);
-            this.add(Box.createVerticalStrut(4));
-
-            Box horiz = Box.createHorizontalBox();
-            horiz.setMaximumSize(new Dimension(200, 30));
-            horiz.add(lblNumMarks);
-            horiz.setAlignmentX(LEFT_ALIGNMENT);
-            horiz.add(numMarks);
-            horiz.add(chkHints);
-            this.add(horiz);
+            this.add(Box.createVerticalStrut(2));
+            this.add(spinMarks);
+            this.add(Box.createVerticalStrut(2));
+            this.add(chkHints);
             String cat = "";
             for (int i = 0; i < correctAnswers.length; i++) {
                 cat += correctAnswers[i] + ",,";
             }
             txtField.setText(cat);
-            numMarks.setText(String.valueOf(marksIfCorrect));
+
+            if (txtField.getText().isEmpty()) {
+                txtField.setText("ans1,,ans2");
+            }
+
+            spinMarks.setValue(marksIfCorrect);
+
+
         } else {
             txtField.setMaximumSize(new Dimension(getAverageAnswerWidth(txtField.getFontMetrics(txtField.getFont())), 30));
             txtField.setMinimumSize(new Dimension(getAverageAnswerWidth(txtField.getFontMetrics(txtField.getFont())), 30));
+            txtField.setToolTipText("Enter your answer here.");
+
             this.setMaximumSize(txtField.getMaximumSize());
             this.setMinimumSize(txtField.getMinimumSize());
 
@@ -207,6 +203,10 @@ public class AnsFieldSimpleText extends JPanel implements IAnswerField {
             txtField.setText("");
             if (chkHints.isSelected()) {
                 this.add(btnGiveHint);
+                btnGiveHint.setMargin(new Insets(0, 0, 0, 0));
+                //make room for the hints button
+                this.setMaximumSize(new Dimension(txtField.getMaximumSize().width + btnGiveHint.getMinimumSize().width, 23));
+                this.setMinimumSize(new Dimension(txtField.getMinimumSize().width + btnGiveHint.getMinimumSize().width,23));
             }
         }
     }
@@ -281,8 +281,11 @@ public class AnsFieldSimpleText extends JPanel implements IAnswerField {
         lblAnsDisplay.setFont(ThemeConstants.niceFont);
         btnGiveHint.setVisible(false);
 
-        this.add(lblCorrectOrNot);
-        this.add(lblAnsDisplay);
+        Box vert = Box.createVerticalBox();
+        vert.add(txtField);
+        vert.add(lblCorrectOrNot);
+        vert.add(lblAnsDisplay);
+        this.add(vert);
 
         this.setMaximumSize(new Dimension(Math.max(lblAnsDisplay.getMinimumSize().width,lblCorrectOrNot.getMinimumSize().width), lblAnsDisplay.getMinimumSize().height + lblCorrectOrNot.getMinimumSize().height + 30));
     }
@@ -303,7 +306,7 @@ public class AnsFieldSimpleText extends JPanel implements IAnswerField {
         Document doc = new Document();
         Element rootElement = new Element(this.getClass().getName());
         doc.setRootElement(rootElement);
-        rootElement.setAttribute("marks", String.valueOf(numMarks.getValue()));
+        rootElement.setAttribute("marks", String.valueOf(spinMarks.getValue()));
         rootElement.setAttribute("useHints", String.valueOf(chkHints.isSelected()));
         //version field allows future versions of this field to be back compatible.
         //especially important for default fields!
@@ -338,7 +341,7 @@ public class AnsFieldSimpleText extends JPanel implements IAnswerField {
         }
 
         try {
-            numMarks.setText(doc.getRootElement().getAttributeValue("marks"));
+            spinMarks.setValue(doc.getRootElement().getAttribute("marks").getIntValue());
             txtField.setText(doc.getRootElement().getText());
             correctAnswers = doc.getRootElement().getText().split(",,");
             marksIfCorrect = doc.getRootElement().getAttribute("marks").getIntValue();
