@@ -644,24 +644,28 @@ public class RichTextArea extends JTextPane {
                 {
                     try {
                         //if this is the start run, it is possible that we do not want to return all content of the run
-                        if (j == startRun) {
+                        if ((j == startRun) && (i == startPara)) {
                             String run = "";
                             try {
                                 run = this.getText(startIndex, curEl.getEndOffset() - startIndex);
+                                System.out.println("run1 = " + run);
+
                             } catch (BadLocationException ex) {
                                 throw new BadLocationException("RichTextArea.getRunElementText tried to access an invalid location within the document.\n" + ex.getMessage(), ex.offsetRequested());
                             }
                             retVal += run.replace("[", CHARCODE_OPENING_SQUARE_BRACKET).replace("]", CHARCODE_CLOSING_SQUARE_BRACKET).replace("\n", "[" + TAG_NEW_LINE + "]");
-                        } else if (j == endRun) { //if this is the end run, we might not want to return all content of the run
+                        } else if ((i == endPara) && (j == endRun)) { //if this is the end run, we might not want to return all content of the run
                             String run = "";
                             try {
                                 run = this.getText(curEl.getStartOffset(), endIndex - curEl.getStartOffset());
                             } catch (BadLocationException ex) {
                                 throw new BadLocationException("RichTextArea.getRunElementText tried to access an invalid location within the document.\n" + ex.getMessage(), ex.offsetRequested());
                             }
+                            System.out.println("run3 = " + run);
                             retVal += run.replace("[", CHARCODE_OPENING_SQUARE_BRACKET).replace("]", CHARCODE_CLOSING_SQUARE_BRACKET).replace("\n", "[" + TAG_NEW_LINE + "]");
                         } else { //otherwise this is a middle run, and we want all of it. om nom nom.
                             retVal += getRunElementText(curEl).replace("[", CHARCODE_OPENING_SQUARE_BRACKET).replace("]", CHARCODE_CLOSING_SQUARE_BRACKET).replace("\n", "[" + TAG_NEW_LINE + "]");
+                            System.out.println("retval mid el = " + retVal);
                         }
 
                     } catch (BadLocationException ignore) {
