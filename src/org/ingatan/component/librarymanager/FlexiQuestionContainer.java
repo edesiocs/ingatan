@@ -644,6 +644,10 @@ public class FlexiQuestionContainer extends AbstractQuestionContainer {
                 removeStrayAnswerFields((RichTextArea) c);
             }
 
+            //contextualise the answer fields now they have been pasted, otherwise they will
+            //have their default context values.
+            contextualiseAnswerFields((RichTextArea) c);
+
             return true;
         }
 
