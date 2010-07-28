@@ -158,6 +158,7 @@ public class TableQuestionOptionPane extends JPanel {
         lblTemplateInfo.setFont(ThemeConstants.niceFont);
 
         comboFonts = createCombo(GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames());
+        comboFonts.setSelectedItem(this.getFont().getFamily());
         
         JSpinner.NumberEditor numberEditor = new JSpinner.NumberEditor(spinnerFontSize);
         spinnerFontSize.setFont(ThemeConstants.niceFont);
