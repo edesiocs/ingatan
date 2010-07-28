@@ -672,7 +672,8 @@ public abstract class ParserWriter {
         }
 
         //set preferences
-        e.setAttribute("libManagerNeverLoaded", String.valueOf(IOManager.isFirstTimeLoadingLibManager()));
+        e.setAttribute("firstTimeLoadingLibManager", String.valueOf(IOManager.isFirstTimeLoadingLibManager()));
+        e.setAttribute("firstTimeLoadingIngatan", String.valueOf(IOManager.isFirstTimeLoadingIngatan()));
         e.setAttribute("useMichaelForSelection",String.valueOf(IOManager.isUsingMichaelAsSelectionIndicator()));
 
         //create array for symbol menu configuration
@@ -732,7 +733,8 @@ public abstract class ParserWriter {
         //set preferences
         try {
             IOManager.setUseMichaelAsSelectionIndicator(doc.getRootElement().getAttribute("useMichaelForSelection").getBooleanValue());
-            IOManager.setFirstTimeLoadingLibManager(doc.getRootElement().getAttribute("libManagerNeverLoaded").getBooleanValue());
+            IOManager.setFirstTimeLoadingLibManager(doc.getRootElement().getAttribute("firstTimeLoadingLibManager").getBooleanValue());
+            IOManager.setFirstTimeLoadingIngatan(doc.getRootElement().getAttribute("firstTimeLoadingIngatan").getBooleanValue());
         } catch (DataConversionException ex) {
             Logger.getLogger(ParserWriter.class.getName()).log(Level.SEVERE, "While reading the preferences from xml document.", ex);
         }

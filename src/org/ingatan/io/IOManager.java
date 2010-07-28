@@ -219,6 +219,10 @@ public abstract class IOManager {
      */
     private static boolean firstTimeLoadingLibManager = true;
     /**
+     * Whether or not this is the first time Ingatan has been loaded for this installation.
+     */
+    private static boolean firstTimeLoadingIngatan = true;
+    /**
      * Image acquisition dialog so that a new one does not need to be loaded every time.
      */
     private static ImageAcquisitionDialog imgAcquisition;
@@ -510,6 +514,22 @@ public abstract class IOManager {
      */
     public static void setFirstTimeLoadingLibManager(boolean firstTimeLoadingLibManager) {
         IOManager.firstTimeLoadingLibManager = firstTimeLoadingLibManager;
+    }
+
+    /**
+     * Checks whether or not Ingatan has been loaded before for this installation.
+     * @return <code>true</code> if Ingatan has never been loaded before for this installation.
+     */
+    public static boolean isFirstTimeLoadingIngatan() {
+        return firstTimeLoadingIngatan;
+    }
+
+    /**
+     * Set whether or not Ingatan has been loaded before for this installation.
+     * @param <code>true</code> if Ingatan has never been loaded before for this installation.
+     */
+    public static void setFirstTimeLoadingIngatan(boolean firstTimeLoadingIngatan) {
+        IOManager.firstTimeLoadingIngatan = firstTimeLoadingIngatan;
     }
 
     /**
@@ -1812,8 +1832,8 @@ public abstract class IOManager {
             destLib = loadLibrary(destLibraryID);
             sourceLib = loadLibrary(sourceLibraryID);
         } catch (IOException ex) {
-            Logger.getLogger(IOManager.class.getName()).log(Level.SEVERE, "While attempting to load the source and destination libraries in order to copy a resource.\n" +
-                    "sourceLibID=" + sourceLibraryID + " :: destLibID=" + destLibraryID, ex);
+            Logger.getLogger(IOManager.class.getName()).log(Level.SEVERE, "While attempting to load the source and destination libraries in order to copy a resource.\n"
+                    + "sourceLibID=" + sourceLibraryID + " :: destLibID=" + destLibraryID, ex);
         }
 
         //ensure id has no illegal characters
@@ -1832,8 +1852,8 @@ public abstract class IOManager {
         try {
             copy(sourceLib.getPathTempLib() + "/" + sourceID, destLib.getPathTempLib() + "/" + destID);
         } catch (IOException ex) {
-            Logger.getLogger(IOManager.class.getName()).log(Level.SEVERE, "While attempting to copy a file between libraries.\n" +
-                    "sourceLibID=" + sourceLibraryID + " :: destLibID=" + destLibraryID + " :: derived destID=" + destID, ex);
+            Logger.getLogger(IOManager.class.getName()).log(Level.SEVERE, "While attempting to copy a file between libraries.\n"
+                    + "sourceLibID=" + sourceLibraryID + " :: destLibID=" + destLibraryID + " :: derived destID=" + destID, ex);
         }
 
         return destID;

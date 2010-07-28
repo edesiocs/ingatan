@@ -45,9 +45,12 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.ingatan.ThemeConstants;
+import org.ingatan.component.text.RichTextArea;
 import org.ingatan.io.IOManager;
+import org.ingatan.io.ParserWriter;
 
 /**
  * The main menu for Ingatan. This is the first window to be shown, and provides
@@ -99,6 +102,30 @@ public class MainMenuWindow extends JFrame {
      */
     public MainMenuWindow(BufferedImage bgImage) {
         super();
+
+
+        if (IOManager.isFirstTimeLoadingIngatan()) {
+            RichTextArea dispArea = new RichTextArea();
+
+            dispArea.setPreferredSize(new Dimension(400, 140));
+            dispArea.setSize(new Dimension(400, 140));
+            dispArea.setMinimumSize(new Dimension(400, 140));
+
+            dispArea.setBorder(BorderFactory.createEmptyBorder());
+            dispArea.setEditable(false);
+            dispArea.setOpaque(false);
+
+            dispArea.setRichText("[aln]0[!aln][fam]Dialog[!fam][sze]16[!sze][col]51,51,51[!col]Welcome to Ingatan[sze]12[!sze][br]"
+                    + "This message will only be shown once. "
+                    + "To get started, click on the Library Manager main menu option.[br][br]"
+                    + "If running Ingatan under OpenJDK, it may run slowly. In this case, load Ingatan using the command:[br]"
+                    + "[fam]Monospace[!fam]java -Dsun.java2d.pmoffscreen=false -jar !osqb;path_to_ingatan.jar!csqb;[br][br][end]");
+
+            JOptionPane.showMessageDialog(MainMenuWindow.this, dispArea, "Using OpenJDK", JOptionPane.INFORMATION_MESSAGE);
+            IOManager.setFirstTimeLoadingIngatan(false);
+            ParserWriter.writePreferencesFile(IOManager.getSymbolMenuCharacterMap());
+        }
+
 
         this.bgImg = bgImage;
 
