@@ -434,6 +434,9 @@ public class LibraryManagerWindow extends JFrame implements WindowListener {
                         }
                     }
                     questionList.removeAll();
+                    libraryStats.clearStats();
+                    questionStats.setQuestion(null);
+                    questionStats.repaint();
                     questionList.repaint();
                     break;
                 case LibraryBrowser.LIBRARY_SELECTION_CHANGED:
@@ -478,6 +481,9 @@ public class LibraryManagerWindow extends JFrame implements WindowListener {
                     //set statistics
                     libraryStats.setLibrary(lib);
                     questionStats.setQuestion(null);
+                    libraryStats.clearStats();
+                    questionStats.repaint();
+                    questionList.repaint();
                     break;
                 default:
                     break;

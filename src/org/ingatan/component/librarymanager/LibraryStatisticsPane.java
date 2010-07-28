@@ -86,6 +86,16 @@ public class LibraryStatisticsPane extends JTextPane {
         this.buildStats();
     }
 
+    /**
+     * Clear statistics panel.
+     */
+    public void clearStats() {
+        this.setText("");
+    }
+
+    /**
+     * Build the statistics fromt he current library.
+     */
     public void buildStats() {
         String build = "";
         build += "Description: " + lib.getDescription();
