@@ -526,7 +526,7 @@ public abstract class IOManager {
 
     /**
      * Set whether or not Ingatan has been loaded before for this installation.
-     * @param <code>true</code> if Ingatan has never been loaded before for this installation.
+     * @param firstTimeLoadingIngatan <code>true</code> if Ingatan has never been loaded before for this installation.
      */
     public static void setFirstTimeLoadingIngatan(boolean firstTimeLoadingIngatan) {
         IOManager.firstTimeLoadingIngatan = firstTimeLoadingIngatan;
