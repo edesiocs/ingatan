@@ -479,9 +479,9 @@ public class LibraryManagerWindow extends JFrame implements WindowListener {
                     questionList.validate();
 
                     //set statistics
+                    libraryStats.clearStats();
                     libraryStats.setLibrary(lib);
                     questionStats.setQuestion(null);
-                    libraryStats.clearStats();
                     questionStats.repaint();
                     questionList.repaint();
                     break;
