@@ -192,6 +192,14 @@ public class QuizWindow extends JFrame implements WindowListener {
      * a new question is displayed.
      */
     private ArrayList<IAnswerField> currentAnswerFields = new ArrayList<IAnswerField>();
+    /**
+     * Used in the displayNextQuestion method. This is a workaround for resizing the question and
+     * answer areas properly, until a better solution can be found. The areas only truly resize
+     * nicely when the quiz window is resized. This variable is multiplied by -1 each time it is used,
+     * and each time a question is asked, the quiz window is resized by adding this value (1 or -1). This
+     * keeps the window at the same size, but also means the text fields are resized appropriately.
+     */
+    private int sizeStep = -1;
 
     /**
      * Creates a new instance of QuizWindow with the specified owner. The owner is the
@@ -387,11 +395,6 @@ public class QuizWindow extends JFrame implements WindowListener {
 
         }
 
-        resetSize(answerArea);
-        resetSize(questionArea);
-
-        //SwingUtilities.updateComponentTreeUI(this);
-
         //clear the currentAnswerFields array, this is repopulated in the setAnswerFieldListener method.
         currentAnswerFields = new ArrayList<IAnswerField>();
         /*
@@ -405,7 +408,17 @@ public class QuizWindow extends JFrame implements WindowListener {
         //request focus for the top-most answer field in the answer field area.
         focusFirstAnswerField();
 
-        QuizWindow.this.getRootPane().validate();
+        answerArea.setCaretPosition(0);
+        questionArea.setCaretPosition(0);
+
+        resetSize(answerArea);
+        resetSize(questionArea);
+
+        //resize the quiz window to ensure answer and question areas are a nice size. This
+        //is a workaround until a better solution is found. See stepSize variable's javadoc comment
+        //for more info.
+        sizeStep = sizeStep*(-1);
+        this.setSize(this.getWidth()+sizeStep, this.getHeight()+sizeStep);
     }
 
     /**
@@ -686,18 +699,21 @@ public class QuizWindow extends JFrame implements WindowListener {
      */
     public void resetSize(RichTextArea txtArea) {
         try {
+            //get the height of the 'document'
             javax.swing.text.Document doc = txtArea.getDocument();
             Dimension d = txtArea.getPreferredSize();
             Rectangle r = txtArea.modelToView(doc.getLength());
 
+            //create a new height
             d.height = r.y + r.height + txtArea.getToolbar().getHeight();
 
+            //ensure that we are not setting a smaller height than the scroller's minimum height
             if (d.getHeight() < txtArea.getScroller().getMaximumSize().getHeight()) {
                 if (d.getHeight() < txtArea.getScroller().getMinimumSize().getHeight()) {
                     d.height = (int) txtArea.getScroller().getMinimumSize().getHeight();
                 }
                 txtArea.getScroller().setPreferredSize(d);
-            } else {
+            } else { //and ensure not setting a larger size than the maximum scroller size.
                 txtArea.getScroller().setPreferredSize(txtArea.getScroller().getMaximumSize());
             }
 
