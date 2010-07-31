@@ -36,7 +36,6 @@ import org.ingatan.component.IconFileView;
 import org.ingatan.component.PaintedJPanel;
 import org.ingatan.io.IOManager;
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;

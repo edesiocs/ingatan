@@ -35,6 +35,7 @@ import org.ingatan.component.text.SimpleTextField;
 import org.ingatan.io.IOManager;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Insets;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
@@ -97,6 +98,12 @@ public class AnsFieldList extends JPanel implements IAnswerField {
      */
     private JCheckBox chkHints = new JCheckBox("Allow hints");
     /**
+     * Checkbox allowing the user to set whether or not this list should be used to accept answers, or
+     * display the correct answer values from the start. This option allows the user to set a list of
+     * headings. Consider mutliple list type answer fields side by side, for example.
+     */
+    private JCheckBox chkDipslayOnly = new JCheckBox("Display Only");
+    /**
      * Whether or not this component is currently being displayed in the library
      * manager (<code>true</code> value) or quiz time (<code>false</code> value).
      */
@@ -137,6 +144,10 @@ public class AnsFieldList extends JPanel implements IAnswerField {
         chkHints.setFont(ThemeConstants.niceFont);
         chkHints.setOpaque(false);
         chkHints.setToolTipText("If selected, a 'hint' button is shown at quiz time. Shows one letter per click.");
+        chkDipslayOnly.setFont(ThemeConstants.niceFont);
+        chkDipslayOnly.setOpaque(false);
+        chkDipslayOnly.setSelected(false);
+        chkDipslayOnly.setToolTipText("If selected, this field will be uneditable at quiz time and show the correct answers. Useful for headings.");
 
         btnGiveHint.setFont(ThemeConstants.niceFont);
         btnGiveHint.setAlignmentX(LEFT_ALIGNMENT);
@@ -168,7 +179,7 @@ public class AnsFieldList extends JPanel implements IAnswerField {
             this.add(Box.createVerticalStrut(4));
 
             Box horiz = Box.createHorizontalBox();
-            horiz.setMaximumSize(new Dimension(340, 30));
+            horiz.setMaximumSize(new Dimension(430, 30));
             horiz.add(lblMarks);
             horiz.setAlignmentX(LEFT_ALIGNMENT);
             horiz.add(spinMarks);
@@ -176,6 +187,8 @@ public class AnsFieldList extends JPanel implements IAnswerField {
             horiz.add(chkOrder);
             horiz.add(Box.createHorizontalStrut(4));
             horiz.add(chkHints);
+            horiz.add(Box.createHorizontalStrut(4));
+            horiz.add(chkDipslayOnly);
             this.add(horiz);
 
             String cat = "";
@@ -190,16 +203,58 @@ public class AnsFieldList extends JPanel implements IAnswerField {
             }
         } else {
             txtListItemFields = new QuizTimeEditor[correctAnswers.length];
+            Dimension fieldSize = new Dimension(getMaximumAverageAnswerWidth()+10,30);
             for (int i = 0; i < correctAnswers.length; i++) {
                 //add a text field for each item
                 txtListItemFields[i] = new QuizTimeEditor(i);
-                txtListItemFields[i].setMaximumSize(new Dimension(250, 30));
+                txtListItemFields[i].txtField.setMaximumSize(fieldSize);
                 txtListItemFields[i].setAlignmentX(LEFT_ALIGNMENT);
                 this.add(txtListItemFields[i]);
-                if (chkHints.isSelected()) {
-                    this.add(btnGiveHint);
-                }
             }
+
+            if (chkHints.isSelected()) {
+                this.add(btnGiveHint);
+            }
+            if (chkDipslayOnly.isSelected() == true) {
+                displayOnly();
+            }
+
+            this.setMaximumSize(new Dimension(fieldSize.width+14, correctAnswers.length * 32));
+        }
+    }
+
+    /**
+     * Gets the maximum average answer width by looking at the acceptable answers for each entry and finding the average length. If
+     * the maximum average answer width is 20 or less, 20 is returned. If 300 or more, 300 is returned.
+     * @return the meximum average answer width.
+     */
+    private int getMaximumAverageAnswerWidth() {
+        //if currently no correct answers, retVal will still be -1 at end, and 250 returned by default
+        int retVal = -1;
+        FontMetrics fm = this.getFontMetrics(this.getFont());
+        //array of all acceptable versions of 1 correct answer
+        String[] possibleAnswers;
+        //the sum of widths of all possible versions of 1 correct answer
+        int sum = 0;
+
+        for (int i = 0; i < correctAnswers.length; i++) {
+            possibleAnswers = correctAnswers[i].split(",,");
+            sum = 0;
+            for (int j = 0; j < possibleAnswers.length; j++) {
+                sum += fm.stringWidth(possibleAnswers[j]);
+            }
+            sum = sum / possibleAnswers.length;
+            if (retVal < sum) {
+                retVal = sum;
+            }
+        }
+
+        if (retVal <= 20) {
+            return 20;
+        } else if (retVal >= 300) {
+            return 300;
+        } else {
+            return retVal;
         }
     }
 
@@ -253,6 +308,10 @@ public class AnsFieldList extends JPanel implements IAnswerField {
     }
 
     public int getMaxMarks() {
+        //if display only, then this field should never be marked
+        if (chkDipslayOnly.isSelected()) {
+            return 0;
+        }
         return correctAnswers.length * ((SpinnerNumberModel) spinMarks.getModel()).getNumber().intValue();
     }
 
@@ -260,7 +319,30 @@ public class AnsFieldList extends JPanel implements IAnswerField {
         return (int) (getMaxMarks() * checkAnswer());
     }
 
+    /**
+     * At edit time, if the display only checkbox is selected, then at quiz time this list will
+     * appear as a text list, uneditable and with all answers showing. This method creates that
+     * list.
+     */
+    public void displayOnly() {
+        //get an array of the text field
+        String[] txtListStringArray = new String[txtListItemFields.length];
+        for (int i = 0; i < txtListItemFields.length; i++) {
+            txtListStringArray[i] = txtListItemFields[i].getText().trim().toLowerCase();
+            txtListItemFields[i].txtField.setEditable(false);
+            txtListItemFields[i].txtField.setOpaque(true);
+            txtListItemFields[i].txtField.setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
+            txtListItemFields[i].setText(correctAnswers[i].replace(",,", "|"));
+        }
+
+        this.repaint();
+    }
+
     public void displayCorrectAnswer() {
+        //don't need to check answers for this type.
+        if (chkDipslayOnly.isSelected()) {
+            return;
+        }
         //get an array of the text field 
         String[] txtListStringArray = new String[txtListItemFields.length];
         for (int i = 0; i < txtListItemFields.length; i++) {
@@ -269,6 +351,7 @@ public class AnsFieldList extends JPanel implements IAnswerField {
         }
 
         btnGiveHint.setVisible(false);
+        this.setMaximumSize(new Dimension(this.getMaximumSize().width*2, this.getMaximumSize().height));
 
         //temp variable for the label of the current quiz time editor; set the
         //correct answer to this label.
@@ -280,13 +363,13 @@ public class AnsFieldList extends JPanel implements IAnswerField {
             curLabel.setVisible(true);
 
             //set up appropriately coloured correct answer labels
-            if ((chkOrder.isSelected() == false) && (isInAnswerArray(correctAnswers,txtListStringArray[i].trim().toLowerCase()))) {
+            if ((chkOrder.isSelected() == false) && (isInAnswerArray(correctAnswers, txtListStringArray[i].trim().toLowerCase()))) {
                 curLabel.setForeground(ThemeConstants.quizPassGreen);
             } else if ((chkOrder.isSelected() == false) && (!isInAnswerArray(correctAnswers, txtListStringArray[i].trim().toLowerCase()))) {
                 curLabel.setForeground(ThemeConstants.quizFailRed);
-            } else if ((chkOrder.isSelected()) && (isInAnswerArray(new String[] {correctAnswers[i]}, txtListStringArray[i].trim().toLowerCase()))) {
+            } else if ((chkOrder.isSelected()) && (isInAnswerArray(new String[]{correctAnswers[i]}, txtListStringArray[i].trim().toLowerCase()))) {
                 curLabel.setForeground(ThemeConstants.quizPassGreen);
-            } else if ((chkOrder.isSelected()) && (!isInAnswerArray(new String[] {correctAnswers[i]}, txtListStringArray[i].trim().toLowerCase()))) {
+            } else if ((chkOrder.isSelected()) && (!isInAnswerArray(new String[]{correctAnswers[i]}, txtListStringArray[i].trim().toLowerCase()))) {
                 curLabel.setForeground(ThemeConstants.quizFailRed);
             }
         }
@@ -307,6 +390,7 @@ public class AnsFieldList extends JPanel implements IAnswerField {
         rootElement.setAttribute("marks", String.valueOf(((SpinnerNumberModel) spinMarks.getModel()).getNumber().intValue()));
         rootElement.setAttribute("allowHints", String.valueOf(chkHints.isSelected()));
         rootElement.setAttribute("orderMatters", String.valueOf(chkOrder.isSelected()));
+        rootElement.setAttribute("displayOnly", String.valueOf(chkDipslayOnly.isSelected()));
         //version field allows future versions of this field to be back compatible.
         //especially important for default fields!
         rootElement.setAttribute("version", "1.0");
@@ -347,6 +431,7 @@ public class AnsFieldList extends JPanel implements IAnswerField {
             ((SpinnerNumberModel) spinMarks.getModel()).setValue(Integer.valueOf(doc.getRootElement().getAttributeValue("marks")));
             chkHints.setSelected(doc.getRootElement().getAttribute("allowHints").getBooleanValue());
             chkOrder.setSelected(doc.getRootElement().getAttribute("orderMatters").getBooleanValue());
+            chkDipslayOnly.setSelected(doc.getRootElement().getAttribute("displayOnly").getBooleanValue());
 
             //read in the correct answers.
             Object[] elements = doc.getRootElement().getChildren("item").toArray();
@@ -478,13 +563,13 @@ public class AnsFieldList extends JPanel implements IAnswerField {
          */
         public boolean isCorrect() {
             //order matters, and this entry is correct
-            if ((chkOrder.isSelected()) && (isInAnswerArray(new String[] {correctAnswers[arrayIndex]}, txtField.getText()))) {
+            if ((chkOrder.isSelected()) && (isInAnswerArray(new String[]{correctAnswers[arrayIndex]}, txtField.getText()))) {
                 return true;
             } //order does not matter and this entry is correct
             else if ((chkOrder.isSelected() == false) && (isInAnswerArray(correctAnswers, txtField.getText()))) {
                 return true;
             } //order matters, and this entry is NOT correct
-            else if ((chkOrder.isSelected()) && ((isInAnswerArray(new String[] {correctAnswers[arrayIndex]}, txtField.getText())) == false)) {
+            else if ((chkOrder.isSelected()) && ((isInAnswerArray(new String[]{correctAnswers[arrayIndex]}, txtField.getText())) == false)) {
                 return false;
             } //order does not matter and this entry is NOT correct
             else if ((chkOrder.isSelected() == false) && (isInAnswerArray(correctAnswers, txtField.getText()) == false)) {
