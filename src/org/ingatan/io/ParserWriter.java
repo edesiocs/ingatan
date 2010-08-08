@@ -81,7 +81,7 @@ public abstract class ParserWriter {
         Document doc = new Document();
 
         //lib metadata
-        Element e = new Element("library").setAttribute("name", lib.getName()).setAttribute("id", lib.getId()).setAttribute("created", lib.getCreationDate().toString());
+        Element e = new Element("library").setAttribute("fileVersion","1.0").setAttribute("name", lib.getName()).setAttribute("id", lib.getId()).setAttribute("created", lib.getCreationDate().toString());
         e.addContent(new Element("libDesc").setText(lib.getDescription()));
         doc.addContent(e);
 
@@ -117,7 +117,7 @@ public abstract class ParserWriter {
         Document doc = new Document();
 
         //lib metadata
-        Element e = new Element("QuizHistory").setAttribute("totalScore", String.valueOf(history.getTotalScore()));
+        Element e = new Element("QuizHistory").setAttribute("fileVersion","1.0").setAttribute("totalScore", String.valueOf(history.getTotalScore()));
         doc.addContent(e);
 
         ArrayList<QuizHistoryEntry> entries = history.getEntries();
@@ -215,7 +215,7 @@ public abstract class ParserWriter {
         Document doc = new Document();
 
         //lib metadata
-        Element e = new Element("library").setAttribute("name", lib.getName()).setAttribute("id", lib.getId()).setAttribute("created", lib.getCreationDate().toString());
+        Element e = new Element("library").setAttribute("encodeVersion","1.0").setAttribute("name", lib.getName()).setAttribute("id", lib.getId()).setAttribute("created", lib.getCreationDate().toString());
         e.addContent(new Element("libDesc").setText(lib.getDescription()));
         doc.addContent(e);
 
@@ -363,6 +363,7 @@ public abstract class ParserWriter {
         //set up root element
         Element e = new Element("AnswerFields");
         doc.setRootElement(e);
+        e.setAttribute("fileVersion","1.0");
 
         //get the data from the answer field file class
         Hashtable defaultsTable = ansFields.getAnswerFieldDefaults();
@@ -595,7 +596,7 @@ public abstract class ParserWriter {
             temp += libIDs[i] + "<;>";
         }
 
-        doc.setRootElement(new Element("GroupFile"));
+        doc.setRootElement(new Element("GroupFile").setAttribute("fileVersion","1.0"));
         doc.getRootElement().addContent(new Element("allLibIDs").setText(temp));
 
         temp = "";
@@ -655,6 +656,7 @@ public abstract class ParserWriter {
         //set up root element
         Element e = new Element("Preferences");
         doc.setRootElement(e);
+        e.setAttribute("fileVersion","1.0");
 
         //get the data from the answer field file class
         Set<String> keys = characterMap.keySet();
