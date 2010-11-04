@@ -56,7 +56,7 @@ public class AboutWindow extends JDialog {
         this.setSize(400,500);
         this.setLocationRelativeTo(null);
 
-        txtAbout.setRichText("[b][aln]0[!aln][fam]Dialog[!fam][sze]14[!sze][col]51,51,51[!col]Ingatan v1.2.0 (ingatan.org)[br][b][sze]12[!sze]" +
+        txtAbout.setRichText("[b][aln]0[!aln][fam]Dialog[!fam][sze]14[!sze][col]51,51,51[!col]Ingatan v1.2.1 (ingatan.org)[br][b][sze]12[!sze]" +
                 "If you find this program useful, please let me know! Has it helped you to learn a language? Have you used it to help with your studies? I would be delighted to hear from you. You can contact me at [b]tom.ingatan@gmail.com.[b][br][br]" +
                 "If you find any bugs or have any suggestions, go to [b]ingatan.org[b] and sumbit a new Issue (you will need a google account), or alternatively, email me at the address above.[br][br]" +
                 "[u][sze]13[!sze]Copyright and Licensing Information[u][sze]12[!sze][br]" +
