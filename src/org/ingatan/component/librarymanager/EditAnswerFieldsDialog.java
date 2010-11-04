@@ -25,7 +25,6 @@
  * If you find this program useful, please tell me about it! I would be delighted
  * to hear from you at tom.ingatan@gmail.com.
  */
-
 package org.ingatan.component.librarymanager;
 
 import org.ingatan.ThemeConstants;
@@ -237,9 +236,9 @@ public class EditAnswerFieldsDialog extends JDialog {
                 } catch (IOException ex) {
                     JOptionPane.showMessageDialog(EditAnswerFieldsDialog.this, "There was an IOException while attempting to copy the \n"
                             + "class from '" + f.getAbsolutePath() + "'. Could not import the answer field.", "Error: Cannot Import", JOptionPane.ERROR_MESSAGE);
-                    Logger.getLogger(EditAnswerFieldsDialog.class.getName()).log(Level.SEVERE, "While trying copy an answer field class to the answer fields directory.\n" +
-                            "source = " + f.getAbsolutePath() + "\n" +
-                            "destination = " + IOManager.getAnswerFieldPath() + f.getName() + "\n", e);
+                    Logger.getLogger(EditAnswerFieldsDialog.class.getName()).log(Level.SEVERE, "While trying copy an answer field class to the answer fields directory.\n"
+                            + "source = " + f.getAbsolutePath() + "\n"
+                            + "destination = " + IOManager.getAnswerFieldPath() + f.getName() + "\n", e);
                     return;
                 }
 
@@ -255,13 +254,51 @@ public class EditAnswerFieldsDialog extends JDialog {
                 Class newClass;
                 try {
                     newClass = IOManager.getUrlClassLoader().loadClass(f.getName().replace(".class", ""));
-                } catch (ClassNotFoundException ex) {
+                } catch (Exception ex) {
                     JOptionPane.showMessageDialog(EditAnswerFieldsDialog.this, "Could not load the newly imported answer field. Answer fields must: \n"
                             + "    -Follow the IAnswerField interface\n    -Extend JComponent\n    -Not belong to any package\n    -Have an empty constructor available\n"
-                            + "\nThe answer field has been copied to the location: " + IOManager.getAnswerFieldPath() + f.getName() + ", but will"
-                            + " not be added to the list.",
+                            + "The answer field has not been added.",
+                            "Error: Cannot Load Answer Field Class", JOptionPane.ERROR_MESSAGE);
+
+                    int respCopyDel;
+                    if (deleteResponse == JOptionPane.YES_OPTION) { //original was deleted
+                        respCopyDel = JOptionPane.showConfirmDialog(EditAnswerFieldsDialog.this, "You chose to delete the original. "
+                                + "Would you like Ingatan to delete the copy as well, what with it causing this error? \n \n"
+                                + "If you choose no, it will be left in the Ingatan directory at: '" + IOManager.getAnswerFieldPath() + "'", "Delete original?", JOptionPane.YES_NO_OPTION);
+
+                    } else {
+                        respCopyDel = JOptionPane.YES_OPTION;
+                    }
+
+                    if (respCopyDel == JOptionPane.YES_OPTION) {
+                        File fdel = new File(IOManager.getAnswerFieldPath() + f.getName());
+                        fdel.delete();
+                    }
+
+                    Logger.getLogger(LibraryManagerWindow.class.getName()).log(Level.SEVERE, "Couldn't load the answer field class with name: " + f.getName(), e);
+                    return;
+                } catch (Error er) {
+                    JOptionPane.showMessageDialog(EditAnswerFieldsDialog.this, "Could not load the newly imported answer field. Answer fields must: \n"
+                            + "    -Follow the IAnswerField interface\n    -Extend JComponent\n    -Not belong to any package\n    -Have an empty constructor available\n"
+                            + "The answer field has not been added.",
                             "Error: Cannot Load Answer Field Class", JOptionPane.ERROR_MESSAGE);
                     Logger.getLogger(LibraryManagerWindow.class.getName()).log(Level.SEVERE, "Couldn't load the answer field class with name: " + f.getName(), e);
+
+                    int respCopyDel;
+                    if (deleteResponse == JOptionPane.YES_OPTION) { //original was deleted
+                        respCopyDel = JOptionPane.showConfirmDialog(EditAnswerFieldsDialog.this, "You chose to delete the original. "
+                                + "Would you like Ingatan to delete the copy as well, what with it causing this error? \n \n"
+                                + "If you choose no, it will be left in the Ingatan directory at: '" + IOManager.getAnswerFieldPath() + "'", "Delete original?", JOptionPane.YES_NO_OPTION);
+
+                    } else {
+                        respCopyDel = JOptionPane.YES_OPTION;
+                    }
+
+                    if (respCopyDel == JOptionPane.YES_OPTION) {
+                        File fdel = new File(IOManager.getAnswerFieldPath() + f.getName());
+                        fdel.delete();
+                    }
+
                     return;
                 }
 
@@ -421,7 +458,7 @@ public class EditAnswerFieldsDialog extends JDialog {
             this.add(Box.createHorizontalStrut(20));
             //this rigid area stops the scroller layout manager from crushing the AnswerFieldEntries,
             //as the scroller layout manager does not seem to respect the min/max/pref sizes
-            this.add(Box.createRigidArea(new Dimension(2,180)));
+            this.add(Box.createRigidArea(new Dimension(2, 180)));
             this.add(btnSaveAsDefault);
             JLabel lblName = new JLabel(ansField.getDisplayName());
             lblName.setForeground(ThemeConstants.borderSelected);
