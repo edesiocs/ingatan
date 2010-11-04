@@ -500,7 +500,7 @@ public class AnsFieldSelfGraded extends JPanel implements IAnswerField {
 
                         if (resp == JOptionPane.YES_OPTION) {
                             EmbeddedImage ei = (EmbeddedImage) eg;
-                            ei.resizeTo(ei.getMaxRecommendedSize());
+                            ei.resizeTo(ei.getMaxRecommendedSize(),true);
                             try {
                                 IOManager.saveImageWithOverWrite(ei.getImage(), ei.getParentLibraryID(), ei.getImageID());
                             } catch (IOException ex) {
