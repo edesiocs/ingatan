@@ -176,7 +176,7 @@ public class EmbeddedImage extends EmbeddedGraphic implements MouseListener {
                         + "like Ingatan to shrink the image to the largest recommended size?", "Large Image", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 
                 if (resp == JOptionPane.YES_OPTION) {
-                    resizeTo(getMaxRecommendedSize());
+                    resizeTo(getMaxRecommendedSize(), true);
                 }
             }
 
@@ -215,15 +215,36 @@ public class EmbeddedImage extends EmbeddedGraphic implements MouseListener {
     /**
      * Resizes both the component and content to the specified dimension.
      * @param d the new size of the image adn component.
+     * @param respectAspectRatio if <code>false</code> the image should be resized to the dimension d, if
+     * <code>true</code> the image will have its largest side resized to the corresponding dimension in d.
      */
-    public void resizeTo(Dimension d) {
-        BufferedImage newImg = new BufferedImage((int) d.getWidth(), (int) d.getHeight(), image.getType());
-        newImg.createGraphics().drawImage(image, 0, 0, (int) d.getWidth(), (int) d.getHeight(), this);
+    public void resizeTo(Dimension d, boolean respectAspectRatio) {
+        BufferedImage newImg;
+
+        if (respectAspectRatio) {
+            //get the aspect ratio of the image
+            double ratio = image.getWidth() / image.getHeight();
+            System.out.println("ratio = " + ratio);
+            if (image.getWidth() > image.getHeight()) {
+                if (ratio > 20) ratio = 20;
+                newImg = new BufferedImage((int) d.getWidth(), (int) (d.getWidth() / ratio), image.getType());
+            } else {
+                if (ratio < 0.05) ratio = 0.05;
+                newImg = new BufferedImage((int) (d.getHeight() * ratio), (int) d.getHeight(), image.getType());
+            }
+
+        } else {
+            newImg = new BufferedImage((int) d.getWidth(), (int) d.getHeight(), image.getType());
+        }
+
+
+        newImg.createGraphics().drawImage(image, 0, 0, (int) newImg.getWidth(), (int) newImg.getHeight(), this);
         image = newImg;
-        this.setSize((int) d.getWidth(), (int) d.getHeight());
-        this.setPreferredSize(d);
-        this.setMaximumSize(d);
-        this.setMinimumSize(d);
+        this.setSize((int) image.getWidth(), (int) image.getHeight());
+        Dimension newD = new Dimension(image.getWidth(), image.getHeight());
+        this.setPreferredSize(newD);
+        this.setMaximumSize(newD);
+        this.setMinimumSize(newD);
     }
 
     public void mousePressed(MouseEvent e) {
