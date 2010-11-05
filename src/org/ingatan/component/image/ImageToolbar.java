@@ -635,7 +635,11 @@ public class ImageToolbar extends JPanel {
         }
 
         public void mousePressed(MouseEvent e) {
-            mouseClicked(e);
+            //if the component is either of the flip buttons, calling mouseClicked(e) will result in a two click events
+            //for the buttons. Two flips has a net effect of no change to the image :-P
+            if (((e.getComponent().equals(btnFlipHorizontal)) || (e.getComponent().equals(btnFlipVertical))) == false) {
+                mouseClicked(e);
+            }
         }
 
         public void mouseReleased(MouseEvent e) {
