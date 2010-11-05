@@ -40,6 +40,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -65,6 +66,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.text.Document;
 
 /**
  * This class is the controller for the ImageEditor. It ties together the following components:
@@ -930,6 +932,23 @@ public class ImageEditorController {
                 RichTextArea txtPane = editorPane.getTextPaneForTextTool();
                 //turn the current text into a selection.
                 if (!txtPane.getText().isEmpty()) {
+
+                    //RESIZE THE TEXT AREA TO ITS CONTENT-----------------
+                    try {
+                        Document doc = txtPane.getDocument();
+                        Dimension d = txtPane.getSize();
+                        Rectangle r = txtPane.modelToView(txtPane.getDocument().getLength());
+                        d.height = r.y + r.height;
+
+                        if ((d.height + txtPane.getY()) > canvas.getCanvasBufferedImage().getHeight()) {
+                            d.height = canvas.getCanvasBufferedImage().getHeight() - txtPane.getY() - 3;
+                        }
+                        txtPane.setSize(d);
+
+                        canvas.validate();
+                    } catch (Exception e2) {
+                    } //------------------------------------------------
+
                     canvas.setUndoPoint();
                     txtPane.setBorder(BorderFactory.createEmptyBorder());
 
@@ -1395,7 +1414,7 @@ public class ImageEditorController {
                 g2d.draw(lineToDraw);
                 canvas.repaint();
                 //</editor-fold>
-            }  //<editor-fold defaultstate="collapsed" desc="arrow draw code">
+            } //<editor-fold defaultstate="collapsed" desc="arrow draw code">
             else if (toolbar.getCurrentTool() == ImageToolbar.DRAW_ARROW) {
                 //clear the glass pane of any other construction lines..
                 canvas.clearGlassPane();
