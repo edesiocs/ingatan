@@ -458,6 +458,13 @@ public class ImageEditorPane extends JPanel {
     }
 
     /**
+     * Clears the canvas' undo/redo history.
+     */
+    public void clearCanvasUndoHistory() {
+        canvas.clearUndoHistory();
+    }
+
+    /**
      * Gets a copy of the canvas image.
      * @return a copy of the canvas image.
      */

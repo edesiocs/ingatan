@@ -248,6 +248,14 @@ public class EditorCanvas extends JPanel {
         repaint();
     }
 
+    /**
+     * Clear the undo and redo history for this editor canvas.
+     */
+    public void clearUndoHistory() {
+        undos = new BufferedImage[undoHistoryLength];
+        redos = new BufferedImage[undoHistoryLength];
+    }
+
     @Override
     public void setPreferredSize(Dimension size)
     {

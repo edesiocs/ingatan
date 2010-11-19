@@ -355,6 +355,8 @@ public class ImageAcquisitionDialog extends JDialog implements WindowListener {
         acquiredImageSource = "";
         imageSource = ImageAcquisitionDialog.NONE;
 
+        ImageAcquisitionDialog.this.editorPane.clearCanvasUndoHistory();
+
         editorPane.setDocumentImage(new BufferedImage(150, 150, editorPane.getCanvasImage().getType()));
         Graphics2D g = (Graphics2D) editorPane.getCanvasImage().getGraphics();
         g.setPaint(Color.white);
