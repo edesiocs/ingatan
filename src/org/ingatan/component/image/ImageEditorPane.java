@@ -573,11 +573,13 @@ public class ImageEditorPane extends JPanel {
     public void updateEraserIcon() {
         Shape eraser = eraserOptionPane.getSelectedEraser();
         eraser = AffineTransform.getTranslateInstance(0 - eraser.getBounds().x, 0 - eraser.getBounds().y).createTransformedShape(eraser);
-        BufferedImage b = new BufferedImage(eraser.getBounds().width + 1, eraser.getBounds().height + 1, BufferedImage.TYPE_INT_RGB);
+        BufferedImage b = new BufferedImage(eraser.getBounds().width + 1, eraser.getBounds().height + 1, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = (Graphics2D) b.createGraphics();
-        g2d.setPaint(Color.white);
+        g2d.setPaint(new Color(0, 0, 0, 0));
         g2d.fillRect(0, 0, b.getWidth(), b.getHeight());
         g2d.setStroke(new BasicStroke(1.0f));
+        g2d.setPaint(new Color(255, 255, 255, 200));
+        g2d.fill(eraser);
         g2d.setPaint(Color.black);
         g2d.draw(eraser);
         canvas.setCursor(Toolkit.getDefaultToolkit().createCustomCursor(b, new Point((int) eraser.getBounds().getCenterX(), (int) eraser.getBounds().getCenterY()), "eraser"));
