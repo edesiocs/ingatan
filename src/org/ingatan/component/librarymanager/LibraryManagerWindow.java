@@ -27,6 +27,7 @@
  */
 package org.ingatan.component.librarymanager;
 
+import java.awt.event.MouseEvent;
 import org.ingatan.ThemeConstants;
 import org.ingatan.component.answerfield.IAnswerField;
 import org.ingatan.component.text.RichTextArea;
@@ -40,10 +41,12 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Insets;
 import java.awt.KeyboardFocusManager;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
@@ -59,6 +62,8 @@ import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -128,6 +133,10 @@ public class LibraryManagerWindow extends JFrame implements WindowListener {
      * When this window is closed, this JFrame is set to be visible.
      */
     JFrame returnToOnClose;
+    /**
+     * For peace of mind of users who feel odd about simply closing the window.
+     */
+    JButton btnSaveExit = new JButton("Save and Close");
 
     /**
      * Creates a new LibraryManager instance.
@@ -190,8 +199,10 @@ public class LibraryManagerWindow extends JFrame implements WindowListener {
         questionToolbar.setAlignmentX(LEFT_ALIGNMENT);
         questionToolbar.addActionListener(new ListToolbarListener());
 
-
-
+        btnSaveExit.setMargin(new Insets(3, 15, 3, 15));
+        btnSaveExit.setFont(ThemeConstants.niceFont);
+        btnSaveExit.setIcon(new ImageIcon(LibraryManagerWindow.class.getResource("/resources/icons/accept.png")));
+        btnSaveExit.addMouseListener(new SaveExitListener());
 
         //set all the sizes.............................................
 
@@ -255,6 +266,8 @@ public class LibraryManagerWindow extends JFrame implements WindowListener {
         vert.add(lblAnsFields);
         vert.add(Box.createVerticalStrut(3));
         vert.add(palette);
+        vert.add(Box.createVerticalStrut(10));
+        vert.add(btnSaveExit);
         vert.setAlignmentY(TOP_ALIGNMENT);
         vert.setMaximumSize(new Dimension(210, 400));
         vert.setPreferredSize(new Dimension(200, 300));
@@ -329,6 +342,7 @@ public class LibraryManagerWindow extends JFrame implements WindowListener {
      * @param e
      */
     public void windowClosing(WindowEvent e) {
+        System.out.println("Closing method");
         try {
             if (libBrowser.getSelectedLibraryID() != null) {
                 saveLibrary(libBrowser.getSelectedLibraryID());
@@ -635,6 +649,27 @@ public class LibraryManagerWindow extends JFrame implements WindowListener {
                 }
             }
         }
+    }
+
+    private class SaveExitListener implements MouseListener {
+
+        public void mouseClicked(MouseEvent e) {
+            LibraryManagerWindow.this.windowClosing(null);
+            LibraryManagerWindow.this.dispose();
+        }
+
+        public void mousePressed(MouseEvent e) {
+        }
+
+        public void mouseReleased(MouseEvent e) {
+        }
+
+        public void mouseEntered(MouseEvent e) {
+        }
+
+        public void mouseExited(MouseEvent e) {
+        }
+
     }
 
     private class KeyboardFocusPropertyListener implements PropertyChangeListener {
