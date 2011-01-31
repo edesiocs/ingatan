@@ -206,6 +206,10 @@ public class MultipleLibrarySelector extends JPanel {
         return selectedLibraryIDs;
     }
 
+    public void setSelectedGroup(String groupName) {
+        comboGroups.setSelectedItem(groupName);
+    }
+
     /**
      * Update the groups combo box with values from the IOManager
      */

@@ -90,6 +90,7 @@ public class QuizSettingsDialog extends JDialog {
         this.setTitle("Quiz Setup");
         this.setIconImage(IOManager.windowIcon);
         setUpGUI();
+        libSelector.setSelectedGroup(IOManager.getPreviouslySelectedGroup());
         this.setLocationRelativeTo(null);
     }
 
