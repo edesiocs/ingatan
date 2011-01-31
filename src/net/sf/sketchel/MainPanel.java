@@ -631,6 +631,9 @@ public class MainPanel extends JPanel implements ActionListener, MouseListener, 
         inMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_0, KeyEvent.CTRL_DOWN_MASK), IMAGE_TOOL[TOOL_ZERO]);
         inMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, 0), IMAGE_TOOL[TOOL_CHARGE]);
         inMap.put(KeyStroke.getKeyStroke('T', InputEvent.CTRL_MASK), IMAGE_TOOL[TOOL_TEMPLATE]);
+        inMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.CTRL_DOWN_MASK), "copy");
+        inMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, KeyEvent.CTRL_DOWN_MASK), "cut");
+        inMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.CTRL_DOWN_MASK), "paste");
 
         aMap.put(IMAGE_TOOL[TOOL_UNDO], new HotKeyAction(IMAGE_TOOL[TOOL_UNDO], this));
         aMap.put(IMAGE_TOOL[TOOL_REDO], new HotKeyAction(IMAGE_TOOL[TOOL_REDO], this));
@@ -645,8 +648,29 @@ public class MainPanel extends JPanel implements ActionListener, MouseListener, 
         aMap.put(IMAGE_TOOL[TOOL_ZERO], new HotKeyAction(IMAGE_TOOL[TOOL_ZERO], this));
         aMap.put(IMAGE_TOOL[TOOL_CHARGE], new HotKeyAction(IMAGE_TOOL[TOOL_CHARGE], this));
         aMap.put(IMAGE_TOOL[TOOL_TEMPLATE], new HotKeyAction(IMAGE_TOOL[TOOL_TEMPLATE], this));
+        aMap.put("copy", new CopyAction());
+        aMap.put("cut", new CutAction());
+        aMap.put("paste", new PasteAction());
 
         c.setInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT, inMap);
+    }
+
+    private class CopyAction extends AbstractAction {
+        public void actionPerformed(ActionEvent e) {
+            editCopy();
+        }
+    }
+
+    private class PasteAction extends AbstractAction {
+        public void actionPerformed(ActionEvent e) {
+            editPaste();
+        }
+    }
+
+    private class CutAction extends AbstractAction {
+        public void actionPerformed(ActionEvent e) {
+            editCut();
+        }
     }
 
     public Molecule molData() {
