@@ -132,6 +132,10 @@ public class QuizWindow extends JFrame implements WindowListener {
      */
     private JPanel contentPane = new JPanel();
     /**
+     * Label that displays where the currently displayed question is taken from.
+     */
+    private JLabel lblQuestionFrom;
+    /**
      * The quiz manager taking care of question loading, sorting, and saving, etc.
      */
     private QuizManager quizManager;
@@ -244,6 +248,11 @@ public class QuizWindow extends JFrame implements WindowListener {
         heading.setHorizontalAlignment(SwingConstants.LEFT);
         heading.setAlignmentX(LEFT_ALIGNMENT);
         heading.setForeground(new Color(70, 70, 70));
+        lblQuestionFrom = new JLabel("Question from library __ in group __.");
+        lblQuestionFrom.setFont(new Font(contentPane.getFont().getFamily(), Font.PLAIN, 10));
+        lblQuestionFrom.setHorizontalAlignment(SwingConstants.LEFT);
+        lblQuestionFrom.setAlignmentX(LEFT_ALIGNMENT);
+        lblQuestionFrom.setForeground(new Color(70, 70, 70));
 
         questionArea.getScroller().setAlignmentX(LEFT_ALIGNMENT);
         questionArea.setOpaque(false);
@@ -268,7 +277,9 @@ public class QuizWindow extends JFrame implements WindowListener {
         sideBar.setBorder(BorderFactory.createLineBorder(ThemeConstants.borderUnselected));
 
         contentPane.add(heading);
-        contentPane.add(Box.createVerticalStrut(40));
+        contentPane.add(Box.createVerticalStrut(30));
+        contentPane.add(lblQuestionFrom);
+        contentPane.add(Box.createVerticalStrut(5));
         contentPane.add(questionArea.getScroller());
         contentPane.add(Box.createVerticalStrut(25));
         contentPane.add(answerArea.getScroller());
@@ -311,9 +322,32 @@ public class QuizWindow extends JFrame implements WindowListener {
         //get the next question from the quiz manager
         currentQuestion = quizManager.getNextQuestion();
 
+        //build the string that states what library the question is from and what groups the library is contained by.
+        lblQuestionFrom.setText("Question from library '" + IOManager.getLibraryName(currentQuestion.getParentLibrary()) + "' in group");
+        String[] groups = IOManager.getGroupsThatContain(currentQuestion.getParentLibrary());
+        if (groups.length > 1)
+        {
+            String txtAppend = "s ";
+            for (int i = 0; i < groups.length; i++)
+            {
+                if (i == 0)
+                    txtAppend = txtAppend + " " + groups[i];
+                else if(i < groups.length - 1)
+                    txtAppend = txtAppend + ", " + groups[i];
+                else
+                    txtAppend = txtAppend + " and " + groups[i];
+            }
+            lblQuestionFrom.setText(lblQuestionFrom.getText() + txtAppend);
+        } else if (groups.length == 1) {
+            lblQuestionFrom.setText(lblQuestionFrom.getText() + " " + groups[0]);
+        } else {
+            lblQuestionFrom.setText("Question from library '" + IOManager.getLibraryName(currentQuestion.getParentLibrary()) + "' from the default 'all libraries' group.");
+        }
 
+        //the label is set invisible when showing post text or answer.
+        lblQuestionFrom.setVisible(true);
 
-        //the question is either a flexi question or table question unit. Table
+        //the question is either a flexi question or Table-Question-Unit. Table
         //questions themselves are not added to the quiz manager.
         if (currentQuestion instanceof FlexiQuestion) {
             questionArea.setRichText(((FlexiQuestion) currentQuestion).getQuestionText());
@@ -788,6 +822,7 @@ public class QuizWindow extends JFrame implements WindowListener {
             if (isShowingQuestion) {
                 btnSkip.setEnabled(false);
                 isShowingQuestion = false;
+                lblQuestionFrom.setVisible(false);
 
                 //------mark the question---------
                 //      -traverse the answer text area and look for answer fields
@@ -1029,6 +1064,7 @@ public class QuizWindow extends JFrame implements WindowListener {
 
     public void showEndScreen() {
         quizHasEnded = true;
+        lblQuestionFrom.setVisible(false);
         answerArea.getScroller().setVisible(false);
         btnSkip.setVisible(false);
         questionArea.setText("");
