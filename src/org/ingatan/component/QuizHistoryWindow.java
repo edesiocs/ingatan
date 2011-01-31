@@ -25,7 +25,6 @@
  * If you find this program useful, please tell me about it! I would be delighted
  * to hear from you at tom.ingatan@gmail.com.
  */
-
 package org.ingatan.component;
 
 import org.ingatan.ThemeConstants;
@@ -85,10 +84,10 @@ public class QuizHistoryWindow extends JFrame implements WindowListener {
 
         this.setTitle("Quiz Records");
         this.setIconImage(IOManager.windowIcon);
-        
-        this.setSize(new Dimension(420, 500));
+
+        this.setSize(new Dimension(500, 500));
         scroller.setViewportView(scrollerContent);
-        scroller.setPreferredSize(new Dimension(300, 300));
+        scroller.setPreferredSize(new Dimension(400, 300));
         this.setLocationRelativeTo(null);
         this.addWindowListener(this);
 
@@ -188,7 +187,34 @@ public class QuizHistoryWindow extends JFrame implements WindowListener {
             this.add(lblRecord);
             this.add(btnDelete);
 
-            String buildString = "<html><h4>" + record.getLibraries() + " - " + record.getPercentage() + "%</h4>";
+            //get the length of the libraries used in the quiz corresponding to this record.
+            int librariesCharLength = record.getLibraries().length();
+            //libs is the field we will edit for dispaly.
+            String libs = record.getLibraries();
+            //k is an offset that helps us place line breaks after commas if possible.
+            int k = 0;
+            //if the libraries record is too long (in characters), we must wrap it by inserting <br> tags.
+            if (librariesCharLength > 45) {
+                //from i = 0 to the number of 45 character runs in the string
+                for (int i = 0; i < (((int) (librariesCharLength / 45)) -1); i++) {
+                    //k allows us to iterate forward from position 50(i+1) until we find a character that is a comma.
+                    k = 0;
+                    //while the character with offset k is not a comma, increment k, unless out of bounds.
+                    while (libs.charAt(i * 50 + 50 + k) != ',') {
+                        k++;
+                        //if we go out of index bounds, break and leave k as 0.
+                        if (i * (50 + i) + k >= libs.length()) {
+                            k = 0;
+                            break;
+                        }
+                    }
+                    //put the line break after the comma
+                    k++;
+                    libs = libs.substring(0, 50 * (i + 1) + k) + "<br>" + libs.substring(50 * (i + 1) + k);
+                }
+            }
+
+            String buildString = "<html><h4>" + libs + " - " + record.getPercentage() + "%</h4>";
             buildString += "Taken on " + record.getDate() + ": " + record.getQuestionsAnswered() + " answered, " + record.getQuestionsSkipped() + " skipped. "
                     + "Score awarded: " + record.getScore();
             lblRecord.setText(buildString);
