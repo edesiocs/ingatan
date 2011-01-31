@@ -46,6 +46,11 @@ public class Templates {
         names.add("pyrrolidine.el");
         names.add("tetrahydrofuran.el");
         names.add("thiofuran.el");
+        names.add("arrow.el");
+        names.add("half_arrow.el");
+        names.add("half_arrow2.el");
+        names.add("equilibrium.el");
+        names.add("carbonyl.el");
 
         try {
             for (int n = 0; n < names.size(); n++) {
