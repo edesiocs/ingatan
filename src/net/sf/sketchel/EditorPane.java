@@ -1646,7 +1646,22 @@ public class EditorPane extends CanvasMolecule implements CaretListener {
         } else if (tool == TOOL_ATOM && toolAtomDrag && toolBondFrom > 0) // place a new atom-from
         {
             cacheUndo();
-            mol.addAtom(toolAtomType, toolBondToX, toolBondToY);
+            /* If the toolAtomType is null, then we are using the atom label edit tool.
+             * Otherwise, toolAtomLabel will contain something like "C", "N", etc.
+             * If a bond has been dragged using the label edit tool, a new atom is
+             * created with label "?". This can then be edited by the user clicking the
+             * atom. Having the edit text box automatically appear has its problems. The
+             * location of the new atom can't be easily determined - can't use the mouse
+             * location at end of drag (bonds snap to grid) and can't directly use mol.atomX() etc.
+             * Future implementation note: See pickAtom() and the declaration of px to see how location
+             * can be found.
+             */
+            if (toolAtomType != null) {
+                mol.addAtom(toolAtomType, toolBondToX, toolBondToY);
+            }
+            else {
+                mol.addAtom("?", toolBondToX, toolBondToY);
+            }
             mol.addBond(toolBondFrom, mol.numAtoms(), 1);
             clearTemporary();
             toolAtomDrag = false;
