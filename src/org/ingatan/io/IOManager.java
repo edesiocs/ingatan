@@ -122,6 +122,10 @@ public abstract class IOManager {
      */
     private static final String BASE_DIRECTORY = "/.ingatan/";
     /**
+     * Base directory for custom SketchEl templates.
+     */
+    private static final String CHEM_TEMPLATES_DIRECTORY = "/.ingatan/chem_templates/";
+    /**
      * Collections directory. Any folders in this directory are interpretted as categories,
      * and the images within those folders are read in as the images belonging to that category.
      * These images are used in the "From Collection" method in the ImageAcquisitionDialog, and
@@ -310,6 +314,17 @@ public abstract class IOManager {
                     System.out.println("    -collections path created at: " + getCollectionsPath());
                 } else {
                     System.out.println("    -could not create collections path, check permissions.\n\n");
+                }
+            }
+
+            //ensure that COLLECTIONS_PATH exists
+            File templatesPathFile = new File(getChemTemplatesPath());
+            if (templatesPathFile.exists() == false) {
+                System.out.println("Chem custom templates path does not exist. Attempting to make it.");
+                if (templatesPathFile.mkdir()) {
+                    System.out.println("    -chem custom templates path created at: " + getChemTemplatesPath());
+                } else {
+                    System.out.println("    -could not create custom templates path, check permissions.\n\n");
                 }
             }
 
@@ -740,8 +755,20 @@ public abstract class IOManager {
         return userHomePath + ANSWER_FIELD_PATH;
     }
 
+    /**
+     * Gets the path for the clip art collections relative to the user home directory path (or custom path). Has a trailing '/' attached.
+     * @return the path of the directory where the clip art collections are stored.
+     */
     public static String getCollectionsPath() {
         return userHomePath + COLLECTIONS_PATH;
+    }
+
+    /**
+     * Gets the path for custom SketchEl templates relative to the user home directory path (or custom path). Has a trailing '/' attached.
+     * @return the path of the directory where custom SketchEl templates are stored.
+     */
+    public static String getChemTemplatesPath() {
+        return userHomePath + CHEM_TEMPLATES_DIRECTORY;
     }
 
     /**

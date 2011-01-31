@@ -10,14 +10,15 @@ See www.gnu.org for details.
 package net.sf.sketchel;
 
 import java.io.*;
-import java.net.URL;
 import java.util.*;
+import org.ingatan.io.IOManager;
 
 // For obtaining the template list.
 public class Templates {
 
     ArrayList<Molecule> templ = new ArrayList<Molecule>();
     ArrayList<String> names = new ArrayList<String>(); // reference filenames in .jar
+    ArrayList<String> filenames = new ArrayList<String>(); // reference filenames in chem custom template folder
 
     public Templates(Class cls) {
         // read the list of molecules from the directory file, then create each one of them
@@ -52,20 +53,51 @@ public class Templates {
         names.add("equilibrium.el");
         names.add("carbonyl.el");
 
+        //check if there are any custom templates in the sketchel custom template director (default: .ingatan/chem_templates)
+        File templatePath = new File(IOManager.getChemTemplatesPath());
+        //if the collections path exists
+        if (templatePath.exists()) {
+            //list the files
+            File[] templates = templatePath.listFiles();
+            //add all non-directories as templates if they end with the .el extension
+            for (int i = 0; i < templates.length; i++) {
+                if ((templates[i].isFile()) && (templates[i].getName().endsWith(".el"))) {
+                    filenames.add(templates[i].getAbsolutePath());
+                }
+            }
+        } else {
+            System.out.println("Custom template path does not exist.");
+        }
+
+        //load the bundled templates from the names array.
         try {
+            InputStream istr;
             for (int n = 0; n < names.size(); n++) {
-                InputStream istr = cls.getResourceAsStream("templ/" + names.get(n));
+                istr = cls.getResourceAsStream("templ/" + names.get(n));
                 Molecule mol = MoleculeReader.readNative(istr);
                 templ.add(mol);
                 istr.close();
             }
         } catch (IOException e) {
-            System.out.println("Failed to obtain particular template:\n" + e.toString());
+            System.out.println("Failed to obtain a template from ingatan.jar.\n" + e.toString());
+            return;
+        }
+
+        //load the custom templates from the custom template directory
+        try {
+            InputStream istr;
+            for (int n = 0; n < filenames.size(); n++) {
+                istr = new FileInputStream(filenames.get(n));
+                Molecule mol = MoleculeReader.readNative(istr);
+                templ.add(mol);
+                istr.close();
+            }
+        } catch (IOException e) {
+            System.out.println("Failed to obtain a template from custom templates folder.\n" + e.toString());
             return;
         }
 
         // sort the molecules by an index of "complexity" (smaller molecules first, carbon-only favoured)
-
         int[] complex = new int[templ.size()];
         for (int n = 0; n < templ.size(); n++) {
             Molecule mol = templ.get(n);

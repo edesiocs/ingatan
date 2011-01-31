@@ -19,6 +19,7 @@ import java.awt.image.*;
 import java.awt.event.*;
 import java.awt.datatransfer.*;
 import javax.swing.*;
+import org.ingatan.io.IOManager;
 
 /*
 Encapsulates the editing panel, provides menus and toolbars, and responds to various types of events. An instance of the
@@ -170,6 +171,7 @@ public class MainPanel extends JPanel implements ActionListener, MouseListener, 
     private JMenuItem miFileOpen = null;
     private JMenuItem miFileSave = null;
     private JMenuItem miFileSaveAs = null;
+    private JMenuItem miSaveAsTemplate = null;
     private JMenuItem miExportMDLMOL = null;
     private JMenuItem miExportCMLXML = null;
     private JMenuItem miExportSVG = null;
@@ -274,6 +276,7 @@ public class MainPanel extends JPanel implements ActionListener, MouseListener, 
     private JMenuItem rmbRotateN90 = Util.menuItem(this, "Rotate -90\u00B0", 0);
     private JPopupMenu rightPopup = null;
     private int rightPopupAtom = 0, rightPopupBond = 0;
+    private boolean saveAsTemplate = false; //if true, the default path of the save dialog is the custom template folder.
     public final static int MODE_NORMAL = 0; // usual invocation, with a frame, and a current file
     public final static int MODE_STREAM = 1; // molecule flow-through editing, from stdin to stdout
     public final static int MODE_APPLET = 2; // embedded applet version, with no frame
@@ -425,6 +428,8 @@ public class MainPanel extends JPanel implements ActionListener, MouseListener, 
         }
         miFileSaveAs = Util.menuItem(this, "Save As", KeyEvent.VK_A);
         miFileSaveAs.setFont(ThemeConstants.niceFont);
+        miSaveAsTemplate = Util.menuItem(this, "Save as Template", KeyEvent.VK_T);
+        miSaveAsTemplate.setFont(ThemeConstants.niceFont);
         miExportMDLMOL = Util.menuItem(this, "as MDL MOL", KeyEvent.VK_M, null, KeyStroke.getKeyStroke('M', InputEvent.CTRL_MASK + InputEvent.SHIFT_MASK));
         miExportMDLMOL.setFont(ThemeConstants.niceFont);
         miExportCMLXML = Util.menuItem(this, "as CML XML", KeyEvent.VK_X, null, KeyStroke.getKeyStroke('X', InputEvent.CTRL_MASK + InputEvent.SHIFT_MASK));
@@ -562,6 +567,7 @@ public class MainPanel extends JPanel implements ActionListener, MouseListener, 
         menuPopup.add(miFileNew);
         menuPopup.add(miFileOpen);
         menuPopup.add(mnuSave);
+        menuPopup.add(miSaveAsTemplate);
         menuPopup.addSeparator();
 
 
@@ -814,7 +820,13 @@ public class MainPanel extends JPanel implements ActionListener, MouseListener, 
 
     private void fileSaveAs() {
         JFileChooser chooser = new JFileChooser(System.getenv().get("PWD"));
-        chooser.setCurrentDirectory(new File(curDir));
+        if (saveAsTemplate) {
+            JOptionPane.showMessageDialog(this, "Save this structure to the directory chosen:\n    ('" + IOManager.getChemTemplatesPath() + "')\nand it "
+                    + "will automatically be added as template next time Ingatan is loaded.", "Save a Template", JOptionPane.INFORMATION_MESSAGE);
+            chooser.setCurrentDirectory(new File(IOManager.getChemTemplatesPath()));
+        }
+        else
+            chooser.setCurrentDirectory(new File(curDir));
         chooser.setDragEnabled(false);
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         chooser.setFileFilter(new FileExtFilter("SketchEl Files", ".el"));
@@ -1409,6 +1421,10 @@ public class MainPanel extends JPanel implements ActionListener, MouseListener, 
         } else if (src == miFileSave) {
             fileSave();
         } else if (src == miFileSaveAs) {
+            saveAsTemplate = false;
+            fileSaveAs();
+        } else if (src == miSaveAsTemplate) {
+            saveAsTemplate = true;
             fileSaveAs();
         } else if (src == miExportMDLMOL) {
             fileExportMDLMOL();
