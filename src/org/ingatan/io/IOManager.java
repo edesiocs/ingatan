@@ -227,6 +227,11 @@ public abstract class IOManager {
      */
     private static boolean firstTimeLoadingIngatan = true;
     /**
+     * The group that was last selected in the Library Manager before it was closed. The library
+     * manager will show this group when it is opened.
+     */
+    private static String previouslySelectedGroup = "- All Libraries -";
+    /**
      * Image acquisition dialog so that a new one does not need to be loaded every time.
      */
     private static ImageAcquisitionDialog imgAcquisition;
@@ -529,6 +534,24 @@ public abstract class IOManager {
      */
     public static void setFirstTimeLoadingLibManager(boolean firstTimeLoadingLibManager) {
         IOManager.firstTimeLoadingLibManager = firstTimeLoadingLibManager;
+    }
+
+    /**
+     * Sets the Library Manager group that was last selected when the Manager was
+     * last closed. The Library Manager will show this group initially when next loaded.
+     * @param group
+     */
+    public static void setPreviouslySelectedGroup(String group) {
+        previouslySelectedGroup = group;
+    }
+
+    /**
+     * Gets the Library Manager group that was last selected when the Manager was
+     * last closed. The Library Manager will show this group initially when next loaded.
+     * @return The name of the previously selected group.
+     */
+    public static String getPreviouslySelectedGroup() {
+        return previouslySelectedGroup;
     }
 
     /**

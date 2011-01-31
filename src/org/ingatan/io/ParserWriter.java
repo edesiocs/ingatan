@@ -53,7 +53,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.jdom.Attribute;
 import org.jdom.DataConversionException;
+import org.jdom.JDOMException;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -81,7 +83,7 @@ public abstract class ParserWriter {
         Document doc = new Document();
 
         //lib metadata
-        Element e = new Element("library").setAttribute("fileVersion","1.0").setAttribute("name", lib.getName()).setAttribute("id", lib.getId()).setAttribute("created", lib.getCreationDate().toString());
+        Element e = new Element("library").setAttribute("fileVersion", "1.0").setAttribute("name", lib.getName()).setAttribute("id", lib.getId()).setAttribute("created", lib.getCreationDate().toString());
         e.addContent(new Element("libDesc").setText(lib.getDescription()));
         doc.addContent(e);
 
@@ -117,7 +119,7 @@ public abstract class ParserWriter {
         Document doc = new Document();
 
         //lib metadata
-        Element e = new Element("QuizHistory").setAttribute("fileVersion","1.0").setAttribute("totalScore", String.valueOf(history.getTotalScore()));
+        Element e = new Element("QuizHistory").setAttribute("fileVersion", "1.0").setAttribute("totalScore", String.valueOf(history.getTotalScore()));
         doc.addContent(e);
 
         ArrayList<QuizHistoryEntry> entries = history.getEntries();
@@ -215,7 +217,7 @@ public abstract class ParserWriter {
         Document doc = new Document();
 
         //lib metadata
-        Element e = new Element("library").setAttribute("encodeVersion","1.0").setAttribute("name", lib.getName()).setAttribute("id", lib.getId()).setAttribute("created", lib.getCreationDate().toString());
+        Element e = new Element("library").setAttribute("encodeVersion", "1.0").setAttribute("name", lib.getName()).setAttribute("id", lib.getId()).setAttribute("created", lib.getCreationDate().toString());
         e.addContent(new Element("libDesc").setText(lib.getDescription()));
         doc.addContent(e);
 
@@ -363,7 +365,7 @@ public abstract class ParserWriter {
         //set up root element
         Element e = new Element("AnswerFields");
         doc.setRootElement(e);
-        e.setAttribute("fileVersion","1.0");
+        e.setAttribute("fileVersion", "1.0");
 
         //get the data from the answer field file class
         Hashtable defaultsTable = ansFields.getAnswerFieldDefaults();
@@ -438,8 +440,8 @@ public abstract class ParserWriter {
             metaData.setAttribute("marksPerAns", "" + ques.getMarksPerCorrectAnswer());
             metaData.setAttribute("quizMethod", "" + ques.getQuizMethod());
             metaData.setAttribute("askInReverse", "" + ques.isAskInReverse());
-            metaData.setAttribute("font",ques.getFontFamilyName());
-            metaData.setAttribute("quizFontSize",String.valueOf(ques.getFontSize()));
+            metaData.setAttribute("font", ques.getFontFamilyName());
+            metaData.setAttribute("quizFontSize", String.valueOf(ques.getFontSize()));
 
             //marks awarded
             String strTemp = "";
@@ -596,7 +598,7 @@ public abstract class ParserWriter {
             temp += libIDs[i] + "<;>";
         }
 
-        doc.setRootElement(new Element("GroupFile").setAttribute("fileVersion","1.0"));
+        doc.setRootElement(new Element("GroupFile").setAttribute("fileVersion", "1.0"));
         doc.getRootElement().addContent(new Element("allLibIDs").setText(temp));
 
         temp = "";
@@ -656,7 +658,7 @@ public abstract class ParserWriter {
         //set up root element
         Element e = new Element("Preferences");
         doc.setRootElement(e);
-        e.setAttribute("fileVersion","1.0");
+        e.setAttribute("fileVersion", "1.0");
 
         //get the data from the answer field file class
         Set<String> keys = characterMap.keySet();
@@ -676,7 +678,8 @@ public abstract class ParserWriter {
         //set preferences
         e.setAttribute("firstTimeLoadingLibManager", String.valueOf(IOManager.isFirstTimeLoadingLibManager()));
         e.setAttribute("firstTimeLoadingIngatan", String.valueOf(IOManager.isFirstTimeLoadingIngatan()));
-        e.setAttribute("useMichaelForSelection",String.valueOf(IOManager.isUsingMichaelAsSelectionIndicator()));
+        e.setAttribute("useMichaelForSelection", String.valueOf(IOManager.isUsingMichaelAsSelectionIndicator()));
+        e.setAttribute("previousLibManagerGroup", IOManager.getPreviouslySelectedGroup());
 
         //create array for symbol menu configuration
         String[] symbolMenuConfig = data.split("\n");
@@ -741,20 +744,31 @@ public abstract class ParserWriter {
             Logger.getLogger(ParserWriter.class.getName()).log(Level.SEVERE, "While reading the preferences from xml document.", ex);
         }
 
-
-        //set the symbol menu configuration (build hashmap)
-        List<Element> symbolMenuData = doc.getRootElement().getChild("SymbolMenuConfiguration").getChildren("entry");
-        Iterator<Element> iterate = symbolMenuData.iterator();
-
-        String datum = "";
-        HashMap<String, String> characterMap = new HashMap<String, String>();
-
-        while (iterate.hasNext()) {
-            datum = iterate.next().getText();
-            characterMap.put(String.valueOf(datum.charAt(0)), datum.substring(1));
+        //the following record was added to this file version 1.0 after it was written
+        Attribute prevGroup = doc.getRootElement().getAttribute("previousLibManagerGroup");
+        if (prevGroup == null) {
+            //old version of the preferences file, so set it to "- All Libraries -" as this is sure to exist.
+            IOManager.setPreviouslySelectedGroup("- All Libraries -");
+            System.out.println(" :: old preferences file fixed.");
+        } else {
+            IOManager.setPreviouslySelectedGroup(prevGroup.getValue());
         }
         
 
-        return characterMap;
+
+            //set the symbol menu configuration (build hashmap)
+            List<Element> symbolMenuData = doc.getRootElement().getChild("SymbolMenuConfiguration").getChildren("entry");
+            Iterator<Element> iterate = symbolMenuData.iterator();
+
+            String datum = "";
+            HashMap<String, String> characterMap = new HashMap<String, String>();
+
+            while (iterate.hasNext()) {
+                datum = iterate.next().getText();
+                characterMap.put(String.valueOf(datum.charAt(0)), datum.substring(1));
+            }
+
+
+            return characterMap;
+        }
     }
-}

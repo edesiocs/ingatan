@@ -155,6 +155,8 @@ public class LibraryManagerWindow extends JFrame implements WindowListener {
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.addWindowListener(this);
 
+        libBrowser.setSelectedGroup(IOManager.getPreviouslySelectedGroup());
+
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addPropertyChangeListener(new KeyboardFocusPropertyListener());
 
     }
@@ -342,7 +344,7 @@ public class LibraryManagerWindow extends JFrame implements WindowListener {
      * @param e
      */
     public void windowClosing(WindowEvent e) {
-        System.out.println("Closing method");
+        IOManager.setPreviouslySelectedGroup(libBrowser.getSelectedGroupName());
         try {
             if (libBrowser.getSelectedLibraryID() != null) {
                 saveLibrary(libBrowser.getSelectedLibraryID());

@@ -261,7 +261,7 @@ public class LibraryBrowser extends JPanel {
      */
     public String getSelectedGroupName() {
         if (comboGroups.getSelectedIndex() == ALL_LIBRARIES_GROUP_INDEX) {
-            return null;
+            return "- All Libraries -";
         }
         return (String) comboGroups.getSelectedItem();
     }

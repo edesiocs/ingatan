@@ -28,6 +28,7 @@
 package org.ingatan.component;
 
 import java.awt.Color;
+import java.awt.event.WindowEvent;
 import org.ingatan.component.librarymanager.LibraryManagerWindow;
 import org.ingatan.component.quiztime.QuizSettingsDialog;
 import org.ingatan.component.quiztime.QuizWindow;
@@ -37,6 +38,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowListener;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import javax.swing.AbstractAction;
@@ -66,7 +68,7 @@ import org.ingatan.io.ParserWriter;
  * @author Thomas Everingham
  * @version 1.0
  */
-public class MainMenuWindow extends JFrame {
+public class MainMenuWindow extends JFrame implements WindowListener {
 
     /**
      * Content pane for the MainMenuWindow.
@@ -137,11 +139,12 @@ public class MainMenuWindow extends JFrame {
 
         setUpGUI();
 
-        this.setSize(bgImage.getWidth()+8, bgImage.getHeight()+20);
+        this.setSize(bgImage.getWidth() + 8, bgImage.getHeight() + 20);
         this.setLocationRelativeTo(this.getParent());
     }
 
     private void setUpGUI() {
+        addWindowListener(this);
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
         Dimension buttonSize = new Dimension(160, 25);
 
@@ -198,6 +201,28 @@ public class MainMenuWindow extends JFrame {
         this.setVisible(true);
 
 
+    }
+
+    public void windowOpened(WindowEvent e) {
+    }
+
+    public void windowClosing(WindowEvent e) {
+        ParserWriter.writePreferencesFile(IOManager.getSymbolMenuCharacterMap());
+    }
+
+    public void windowClosed(WindowEvent e) {
+    }
+
+    public void windowIconified(WindowEvent e) {
+    }
+
+    public void windowDeiconified(WindowEvent e) {
+    }
+
+    public void windowActivated(WindowEvent e) {
+    }
+
+    public void windowDeactivated(WindowEvent e) {
     }
 
     private class LibraryManagerAction extends AbstractAction {
@@ -294,16 +319,16 @@ public class MainMenuWindow extends JFrame {
             Graphics2D g = (Graphics2D) gn;
 
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-           
+
             g.drawImage(bgImg, 0, 0, null);
-            
+
             g.setFont(ThemeConstants.hugeFont);
             String renderString = "Ingatan";
-            
+
             g.setPaint(new GradientPaint(5, 0, new Color(255, 255, 255, 0), 5, 13, new Color(255, 255, 255, 255)));
-            g.fill(new Rectangle2D.Double(8,0,g.getFontMetrics().stringWidth(renderString),15));
+            g.fill(new Rectangle2D.Double(8, 0, g.getFontMetrics().stringWidth(renderString), 15));
             g.setPaint(new GradientPaint(5, 18, new Color(255, 255, 255, 255), 5, 35, new Color(255, 255, 255, 0)));
-            g.fill(new Rectangle2D.Double(8,15,g.getFontMetrics().stringWidth(renderString),30));
+            g.fill(new Rectangle2D.Double(8, 15, g.getFontMetrics().stringWidth(renderString), 30));
 
             g.setPaint(Color.black);
             g.drawString(renderString, 8, 26);
