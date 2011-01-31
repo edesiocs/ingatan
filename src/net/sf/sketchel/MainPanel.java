@@ -619,10 +619,10 @@ public class MainPanel extends JPanel implements ActionListener, MouseListener, 
         inMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_DOWN_MASK), IMAGE_TOOL[TOOL_ROTATOR]);
         inMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), IMAGE_TOOL[TOOL_ERASOR]);
         inMap.put(KeyStroke.getKeyStroke(',', InputEvent.CTRL_MASK), IMAGE_TOOL[TOOL_EDIT]);
-        inMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_1, 0), IMAGE_TOOL[TOOL_SINGLE]);
-        inMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_2, 0), IMAGE_TOOL[TOOL_DOUBLE]);
-        inMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_3, 0), IMAGE_TOOL[TOOL_TRIPLE]);
-        inMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_0, 0), IMAGE_TOOL[TOOL_ZERO]);
+        inMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_1, KeyEvent.CTRL_DOWN_MASK), IMAGE_TOOL[TOOL_SINGLE]);
+        inMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_2, KeyEvent.CTRL_DOWN_MASK), IMAGE_TOOL[TOOL_DOUBLE]);
+        inMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_3, KeyEvent.CTRL_DOWN_MASK), IMAGE_TOOL[TOOL_TRIPLE]);
+        inMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_0, KeyEvent.CTRL_DOWN_MASK), IMAGE_TOOL[TOOL_ZERO]);
         inMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, 0), IMAGE_TOOL[TOOL_CHARGE]);
         inMap.put(KeyStroke.getKeyStroke('T', InputEvent.CTRL_MASK), IMAGE_TOOL[TOOL_TEMPLATE]);
 
