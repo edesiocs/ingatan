@@ -25,9 +25,11 @@
  * If you find this program useful, please tell me about it! I would be delighted
  * to hear from you at tom.ingatan@gmail.com.
  */
-
 package org.ingatan.component.quiztime;
 
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.ingatan.ThemeConstants;
 import org.ingatan.component.librarymanager.MultipleLibrarySelector;
 import org.ingatan.io.QuizManager;
@@ -35,6 +37,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -58,6 +61,7 @@ import org.ingatan.io.IOManager;
  * @version 1.0
  */
 public class QuizSettingsDialog extends JDialog {
+
     /**
      * Content of the answer fields scroller.
      */
@@ -75,6 +79,10 @@ public class QuizSettingsDialog extends JDialog {
      */
     protected JCheckBox chkRandom = new JCheckBox("Randomise question order");
     /**
+     * Displays a description of the currently selected library.
+     */
+    private JLabel lblDescription = new JLabel("Library Description");
+    /**
      * The quiz manager generated from the selected libraries
      */
     private QuizManager generatedManager = null;
@@ -90,7 +98,9 @@ public class QuizSettingsDialog extends JDialog {
         this.setTitle("Quiz Setup");
         this.setIconImage(IOManager.windowIcon);
         setUpGUI();
+        this.setSize(680, 370);
         libSelector.setSelectedGroup(IOManager.getPreviouslySelectedGroup());
+        libSelector.addActionListener(new LibSelectActionListener());
         this.setLocationRelativeTo(null);
     }
 
@@ -102,14 +112,21 @@ public class QuizSettingsDialog extends JDialog {
         heading.setAlignmentX(LEFT_ALIGNMENT);
         heading.setForeground(new Color(70, 70, 70));
 
+        lblDescription.setFont(new Font(contentPane.getFont().getFamily(), Font.PLAIN, 10));
+        lblDescription.setForeground(new Color(70, 70, 70));
+        lblDescription.setMinimumSize(new Dimension(200, 200));
+        lblDescription.setMaximumSize(new Dimension(200, 200));
+        lblDescription.setPreferredSize(new Dimension(200, 200));
+        lblDescription.setVerticalTextPosition(SwingConstants.TOP);
+
         //create brief instructions
-        JLabel lblInfo = new JLabel("<html>Select the libraries of questions to include. If you choose, questions will be<br>asked " +
-                "at random, with bias toward questions that have been answered<br>incorrectly or that have never been asked.");
+        JLabel lblInfo = new JLabel("<html>Select the libraries of questions to include. If you choose, questions will be asked "
+                + "at random, with bias toward questions that have been answered incorrectly or that have never been asked.");
         lblInfo.setFont(ThemeConstants.niceFont);
         lblInfo.setHorizontalAlignment(SwingConstants.LEFT);
         lblInfo.setAlignmentX(LEFT_ALIGNMENT);
-        lblInfo.setMaximumSize(new Dimension(500,100));
-        lblInfo.setForeground(new Color(70,70,70));
+        lblInfo.setMaximumSize(new Dimension(600, 100));
+        lblInfo.setForeground(new Color(70, 70, 70));
 
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
         contentPane.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
@@ -118,12 +135,18 @@ public class QuizSettingsDialog extends JDialog {
         contentPane.add(lblInfo);
         contentPane.add(Box.createVerticalStrut(10));
         libSelector.setAlignmentX(LEFT_ALIGNMENT);
-        contentPane.add(libSelector);
+        Box horiz = new Box(BoxLayout.X_AXIS);
+        horiz.add(libSelector);
+        horiz.add(Box.createHorizontalStrut(10));
+        horiz.add(lblDescription);
+        horiz.setAlignmentX(LEFT_ALIGNMENT);
+        horiz.setMaximumSize(new Dimension(700, 400));
+        contentPane.add(horiz);
         contentPane.add(Box.createVerticalStrut(5));
         chkRandom.setAlignmentX(LEFT_ALIGNMENT);
         contentPane.add(chkRandom);
 
-        Box horiz = Box.createHorizontalBox();
+        horiz = Box.createHorizontalBox();
         horiz.setAlignmentX(LEFT_ALIGNMENT);
         horiz.add(btnBeginQuiz);
         horiz.add(Box.createHorizontalStrut(3));
@@ -149,6 +172,7 @@ public class QuizSettingsDialog extends JDialog {
      * Begin button action
      */
     private class BeginQuizAction extends AbstractAction {
+
         public BeginQuizAction() {
             super("Begin Quiz");
         }
@@ -162,12 +186,35 @@ public class QuizSettingsDialog extends JDialog {
             QuizSettingsDialog.this.setVisible(false);
         }
     }
-    
-    
+
+    /**
+     * Added to the multiple library selector to listen for library change events so
+     * That the library description label can be updated.
+     */
+    private class LibSelectActionListener implements ActionListener {
+
+        public void actionPerformed(ActionEvent e) {
+            if (e.getID() != MultipleLibrarySelector.LIBRARY_SELECTION_CHANGED)
+                return;
+            
+            String[] ids = libSelector.getHighlightedLibraryIDs();
+            if (ids.length > 0) {
+                try {
+                    lblDescription.setText("<html><u>Library: " + IOManager.getLibraryName(ids[0]) + "</u><br><br>" + IOManager.getLibraryFromID(ids[0]).getDescription() + "<html>");
+                } catch (IOException ex) {
+                    Logger.getLogger(QuizSettingsDialog.class.getName()).log(Level.SEVERE, "Trying to display the description of the library with ID: " + ids[0] + " in quiz settings dialog.", ex);
+                }
+            } else {
+                lblDescription.setText("No library selected.");
+            }
+        }
+    }
+
     /**
      * Cancel action; dispose of the dialog
      */
     private class CancelAction extends AbstractAction {
+
         public CancelAction() {
             super("Cancel");
         }
@@ -176,6 +223,4 @@ public class QuizSettingsDialog extends JDialog {
             QuizSettingsDialog.this.dispose();
         }
     }
-
-
 }

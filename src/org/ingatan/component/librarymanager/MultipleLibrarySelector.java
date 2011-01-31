@@ -68,27 +68,27 @@ public class MultipleLibrarySelector extends JPanel {
     /**
      * The new library button was pressed.
      */
-    protected static final int DESELECT_LIBRARIES = 0;
+    public static final int DESELECT_LIBRARIES = 0;
     /**
      * The delete library button was pressed.
      */
-    protected static final int SELECT_LIBRARIES = 1;
+    public static final int SELECT_LIBRARIES = 1;
     /**
      * The selected group has changed.
      */
-    protected static final int GROUP_SELECTION_CHANGED = 5;
+    public static final int GROUP_SELECTION_CHANGED = 5;
     /**
      * The selected library has changed.
      */
-    protected static final int LIBRARY_SELECTION_CHANGED = 6;
+    public static final int LIBRARY_SELECTION_CHANGED = 6;
     /**
      * Name of the default group that contains all libraries.
      */
-    protected static final String ALL_LIBRARIES_GROUP_NAME = "- All libraries -";
+    public static final String ALL_LIBRARIES_GROUP_NAME = "- All libraries -";
     /**
      * Index of the default group that contains all libraries.
      */
-    protected static final int ALL_LIBRARIES_GROUP_INDEX = 0;
+    public static final int ALL_LIBRARIES_GROUP_INDEX = 0;
     /**
      * Combo box loaded with all library groups that have been created.
      */
@@ -157,7 +157,9 @@ public class MultipleLibrarySelector extends JPanel {
         comboGroups.setAction(libraryBrowserAction);
 
         listLibraries.addMouseListener(new LibraryListMouseListener());
+        listLibraries.addListSelectionListener(new SelectionListener());
         selectedLibraries.addMouseListener(new LibraryListMouseListener());
+        selectedLibraries.addListSelectionListener(new SelectionListener());
 
         //sizes
         comboGroups.setMaximumSize(new Dimension(225, 20));
@@ -206,6 +208,39 @@ public class MultipleLibrarySelector extends JPanel {
         return selectedLibraryIDs;
     }
 
+    /**
+     * Returns the list of selected (highlighted) libraries in the JList that has focus, or
+     * the selected (highlighted) libraries in the unselected library list if neither list is focussed.
+     * @return the list of selected (highlighted) libraries in one of the JLists.
+     */
+    public String[] getHighlightedLibraryIDs() {
+        String[] retVal;
+        if (selectedLibraries.hasFocus())
+        {
+            int[] highlighted = selectedLibraries.getSelectedIndices();
+            retVal = new String[highlighted.length];
+            for (int i = 0; i < highlighted.length; i++)
+            {
+                retVal[i] = selectedLibraryIDs[highlighted[i]];
+            }
+        }
+        else
+        {
+            int[] highlighted = listLibraries.getSelectedIndices();
+            retVal = new String[highlighted.length];
+            for (int i = 0; i < highlighted.length; i++)
+            {
+                retVal[i] = libListLibIDs[highlighted[i]];
+            }
+        }
+        
+        return retVal;
+    }
+
+    /**
+     * Set the group to browse the libraries of.
+     * @param groupName the group name of the group to browse.
+     */
     public void setSelectedGroup(String groupName) {
         comboGroups.setSelectedItem(groupName);
     }
@@ -448,6 +483,17 @@ public class MultipleLibrarySelector extends JPanel {
         }
 
         public void mouseExited(MouseEvent e) {
+        }
+
+    }
+
+    private class SelectionListener implements ListSelectionListener {
+
+        public void valueChanged(ListSelectionEvent e) {
+            ActionEvent newEvent = new ActionEvent(MultipleLibrarySelector.this, MultipleLibrarySelector.LIBRARY_SELECTION_CHANGED, "LibrarySelectionChanged");
+            for (int i = 0; i < actionListeners.length; i++) {
+                actionListeners[i].actionPerformed(newEvent);
+            }
         }
 
     }
