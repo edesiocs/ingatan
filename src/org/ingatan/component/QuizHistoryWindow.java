@@ -119,7 +119,7 @@ public class QuizHistoryWindow extends JFrame implements WindowListener {
             this.validate();
         } else {
 
-            ArrayList<QuizHistoryEntry> recordList = IOManager.getQuizHistoryFile().getEntries();
+            ArrayList<QuizHistoryEntry> recordList = new ArrayList<QuizHistoryEntry>(IOManager.getQuizHistoryFile().getEntries());
             Collections.reverse(recordList);
             Iterator<QuizHistoryEntry> iterate = recordList.iterator();
 
