@@ -27,6 +27,7 @@
  */
 package org.ingatan.component;
 
+import java.awt.Color;
 import org.ingatan.ThemeConstants;
 import org.ingatan.data.QuizHistoryEntry;
 import org.ingatan.io.IOManager;
@@ -37,6 +38,8 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -116,7 +119,10 @@ public class QuizHistoryWindow extends JFrame implements WindowListener {
             this.validate();
         } else {
 
-            Iterator<QuizHistoryEntry> iterate = IOManager.getQuizHistoryFile().getEntries().iterator();
+            ArrayList<QuizHistoryEntry> recordList = IOManager.getQuizHistoryFile().getEntries();
+            Collections.reverse(recordList);
+            Iterator<QuizHistoryEntry> iterate = recordList.iterator();
+
             while (iterate.hasNext()) {
                 scrollerContent.add(new QuizRecord(iterate.next()));
                 scrollerContent.add(Box.createVerticalStrut(10));
@@ -196,7 +202,7 @@ public class QuizHistoryWindow extends JFrame implements WindowListener {
             //if the libraries record is too long (in characters), we must wrap it by inserting <br> tags.
             if (librariesCharLength > 45) {
                 //from i = 0 to the number of 45 character runs in the string
-                for (int i = 0; i < (((int) (librariesCharLength / 45)) -1); i++) {
+                for (int i = 0; i < (((int) (librariesCharLength / 45)) - 1); i++) {
                     //k allows us to iterate forward from position 50(i+1) until we find a character that is a comma.
                     k = 0;
                     //while the character with offset k is not a comma, increment k, unless out of bounds.
@@ -218,6 +224,17 @@ public class QuizHistoryWindow extends JFrame implements WindowListener {
             buildString += "Taken on " + record.getDate() + ": " + record.getQuestionsAnswered() + " answered, " + record.getQuestionsSkipped() + " skipped. "
                     + "Score awarded: " + record.getScore();
             lblRecord.setText(buildString);
+
+            //set colour of the record to indicate score
+            if (record.getPercentage() <= 35) {
+                this.setBackgroundColour(new Color(243, 180, 180));
+            } else if ((record.getPercentage() <= 70) && (record.getPercentage() > 35)) {
+                this.setBackgroundColour(new Color(243, 235, 195));
+            } else if ((record.getPercentage() > 70) && (record.getPercentage() < 100)) {
+                this.setBackgroundColour(new Color(226, 243, 195));
+            } else if (record.getPercentage() == 100) {
+                this.setBackgroundColour(new Color(226, 255, 195));
+            }
         }
 
         /**

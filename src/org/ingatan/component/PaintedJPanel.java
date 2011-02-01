@@ -25,9 +25,9 @@
  * If you find this program useful, please tell me about it! I would be delighted
  * to hear from you at tom.ingatan@gmail.com.
  */
-
 package org.ingatan.component;
 
+import java.awt.Color;
 import org.ingatan.ThemeConstants;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -45,6 +45,17 @@ import javax.swing.JPanel;
  */
 public class PaintedJPanel extends JPanel {
 
+    Color border = ThemeConstants.borderUnselected;
+    Color bg = ThemeConstants.backgroundUnselected;
+
+    public PaintedJPanel() {
+    }
+
+    public PaintedJPanel(Color border, Color bg) {
+        this.border = border;
+        this.bg = bg;
+    }
+
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -57,21 +68,27 @@ public class PaintedJPanel extends JPanel {
 
 
         //fill the backgroundUnselected of the pane
-        g2d.setPaint(ThemeConstants.backgroundUnselected);
+        g2d.setPaint(bg);
         g2d.fill(shapeBorder);
 
         //draw the border
-        g2d.setPaint(ThemeConstants.borderUnselected);
+        g2d.setPaint(border);
         g2d.draw(shapeBorder);
 
         paintExtension(g);
+    }
+
+    public void setBackgroundColour(Color newBg) {
+        bg = newBg;
+    }
+
+    public void setBorderColour(Color newBorder) {
+        border = newBorder;
     }
 
     /**
      * override me to continue painting in extension classes
      */
     public void paintExtension(Graphics g) {
-
     }
-
 }
