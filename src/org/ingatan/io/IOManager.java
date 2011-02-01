@@ -1,7 +1,7 @@
 /*
  * IOManager.java
  *
- * Copyright (C) 2010 Thomas Everingham
+ * Copyright (C) 2011 Thomas Everingham
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@
  */
 package org.ingatan.io;
 
+import java.awt.Graphics2D;
 import java.awt.Image;
 import org.ingatan.component.answerfield.AnsFieldLabelPicture;
 import org.ingatan.component.answerfield.AnsFieldList;
@@ -488,7 +489,25 @@ public abstract class IOManager {
         //load a random image from the above
         BufferedImage img = null;
         try {
-            img = ImageIO.read(Thread.currentThread().getContextClassLoader().getResource(images[random.nextInt(images.length)]));
+            //dictates which background will be loaded.
+            int imgIndex = random.nextInt(images.length);
+            //dictates whether or not the 'go to ingatan.org' speech bubble will be overlaid if the michael.png image is loaded.
+            int imgSpeech = random.nextInt(10);
+
+            //if this is the first load, show the micahel.png image with a speech bubble.
+            if (isFirstTimeLoadingIngatan())
+            {
+                imgIndex = 4;
+                imgSpeech = 10;
+            }
+
+            img = ImageIO.read(Thread.currentThread().getContextClassLoader().getResource(images[imgIndex]));
+            if ((imgSpeech > 4) && (imgIndex == 4))
+            {
+                BufferedImage imgSpeechBubble = ImageIO.read(Thread.currentThread().getContextClassLoader().getResource("resources/hello.png"));
+                Graphics2D g = (Graphics2D) img.getGraphics();
+                g.drawImage(imgSpeechBubble, null, 150, 220);
+            }
         } catch (Exception e) {
             Logger.getLogger(IOManager.class.getName()).log(Level.SEVERE, "while trying to load one of the background images for the main menu", e);
         }

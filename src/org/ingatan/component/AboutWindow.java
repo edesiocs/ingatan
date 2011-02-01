@@ -1,7 +1,7 @@
 /*
  * AboutWindow.java
  *
- * Copyright (C) 2010 Thomas Everingham
+ * Copyright (C) 2011 Thomas Everingham
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -56,11 +56,13 @@ public class AboutWindow extends JDialog {
         this.setSize(400,500);
         this.setLocationRelativeTo(null);
 
-        txtAbout.setRichText("[b][aln]0[!aln][fam]Dialog[!fam][sze]14[!sze][col]51,51,51[!col]Ingatan v1.2.1 (ingatan.org)[br][b][sze]12[!sze]" +
+        txtAbout.setRichText("[b][aln]0[!aln][fam]Dialog[!fam][sze]14[!sze][col]51,51,51[!col]Ingatan v1.3.0 (ingatan.org)[br][b][sze]12[!sze]" +
                 "If you find this program useful, please let me know! Has it helped you to learn a language? Have you used it to help with your studies? I would be delighted to hear from you. You can contact me at [b]tom.ingatan@gmail.com.[b][br][br]" +
                 "If you find any bugs or have any suggestions, go to [b]ingatan.org[b] and sumbit a new Issue (you will need a google account), or alternatively, email me at the address above.[br][br]" +
+                "[u][sze]13[!sze]A Note for OpenJDK Users[u][br][sze]12[!sze]If running Ingatan under OpenJDK, it may run slowly. In this case, load Ingatan using the command:[br]" +
+                "[fam]Monospace[!fam]java -Dsun.java2d.pmoffscreen=false -jar !osqb;path_to_ingatan.jar!csqb;[br][br][fam]Dialog[!fam]" +
                 "[u][sze]13[!sze]Copyright and Licensing Information[u][sze]12[!sze][br]" +
-                "A versatile memory quiz generator (c) Thomas Everingham, 2010. This is free software, released under the GNU General Public License (version 3 of the License). " +
+                "A versatile memory quiz generator (c) Thomas Everingham, 2011. This is free software, released under the GNU General Public License (version 3 of the License). " +
                 "A full copy of the GNU General Public License v3 must always be included with this software when distributed; if you did not receive a copy of the GNU General Public License with this software, please write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA. " +
                 "A copy of the GNU GPL can also be found at: [b]http://www.gnu.org/licenses/gpl.html.[b][br][br]" +
                 "[u][sze]13[!sze]Disclaimer[u][sze]12[!sze][br]" +

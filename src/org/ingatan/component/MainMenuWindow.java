@@ -1,7 +1,7 @@
 /*
  * MainMenuWindow.java
  *
- * Copyright (C) 2010 Thomas Everingham
+ * Copyright (C) 2011 Thomas Everingham
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -119,9 +119,10 @@ public class MainMenuWindow extends JFrame implements WindowListener {
 
             dispArea.setRichText("[aln]0[!aln][fam]Dialog[!fam][sze]16[!sze][col]51,51,51[!col]Welcome to Ingatan[sze]12[!sze][br]"
                     + "This message will only be shown once. "
-                    + "To get started, click on the Library Manager main menu option.[br][br]"
+                    + "For a first user's tutorial, please go to ingatan.org/wiki/Tutorial.[br][br]"
                     + "If running Ingatan under OpenJDK, it may run slowly. In this case, load Ingatan using the command:[br]"
-                    + "[fam]Monospace[!fam]java -Dsun.java2d.pmoffscreen=false -jar !osqb;path_to_ingatan.jar!csqb;[br][br][end]");
+                    + "[fam]Monospace[!fam]java -Dsun.java2d.pmoffscreen=false -jar !osqb;path_to_ingatan.jar!csqb;[br][br]"
+                    + "[fam]Dialog[!fam]You can view this information again in the About menu.[end]");
 
             JOptionPane.showMessageDialog(MainMenuWindow.this, dispArea, "Using OpenJDK", JOptionPane.INFORMATION_MESSAGE);
             IOManager.setFirstTimeLoadingIngatan(false);
