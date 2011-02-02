@@ -25,7 +25,6 @@
  * If you find this program useful, please tell me about it! I would be delighted
  * to hear from you at tom.ingatan@gmail.com.
  */
-
 package org.ingatan.component.librarymanager;
 
 import org.ingatan.ThemeConstants;
@@ -120,7 +119,7 @@ public class TableQuestionContainer extends AbstractQuestionContainer {
         this.addToContentPane(optionPane, false);
         optionPane.setAlignmentX(LEFT_ALIGNMENT);
         optionPane.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
-        optionPane.setMaximumSize(new Dimension(500,120));
+        optionPane.setMaximumSize(new Dimension(500, 120));
 
         //set data
         String[] col1Data = tblQuestion.getCol1Data();
@@ -160,7 +159,7 @@ public class TableQuestionContainer extends AbstractQuestionContainer {
         //AbstractQuestionContainer, so that extra
         if (minimised) {
             contentPanel.setBorder(BorderFactory.createEmptyBorder(50, 1, 1, 1));
-            
+
             //construct a string containing the first 5 rows of data, if that much
             //data exists
             String strPrint = "";
@@ -239,18 +238,30 @@ public class TableQuestionContainer extends AbstractQuestionContainer {
         return optionPane;
     }
 
-
     private class TableListener implements TableModelListener {
 
         public void tableChanged(TableModelEvent e) {
             table.setSize(table.getWidth(), table.getModel().getRowCount()*table.getRowHeight() + 20);
             scroller.setPreferredSize(new Dimension((table.getWidth() > 30) ? table.getWidth() : 100, (table.getHeight() >= 40) ? table.getHeight() : 40));
-            scroller.setMaximumSize(new Dimension(500, 500));
-            Dimension d = TableQuestionContainer.this.getLayout().minimumLayoutSize(TableQuestionContainer.this);
-            TableQuestionContainer.this.setPreferredSize(new Dimension((int) d.getWidth(), (int) (d.getHeight() + scroller.getPreferredSize().getHeight())));
-            
-        }
 
+            //the following if-else structure allows the content panel to grow and shrink with the table,
+            //but stops it from exceding the maximum height. If it exceeds the maximum height, it grows past
+            //the boundary of the question container and pushes the containers below it down the question list
+            //with empty space appearing between the two containers.
+            if (contentPanel.getPreferredSize().height > 350)
+                contentPanel.setPreferredSize(new Dimension(contentPanel.getPreferredSize().width, 350));
+            else
+            {
+                contentPanel.setPreferredSize(null);
+                if (contentPanel.getPreferredSize().height > 350)
+                    contentPanel.setPreferredSize(new Dimension(contentPanel.getPreferredSize().width, 350));
+            }
+
+            //if this is not done, the container does not auto-resize. Todo: find out why and
+            //change the following.
+            TableQuestionContainer.this.minimise();
+            TableQuestionContainer.this.maximise();
+        }
     }
 
     private class FontChangeListener implements ActionListener {
@@ -260,6 +271,5 @@ public class TableQuestionContainer extends AbstractQuestionContainer {
             table.repaint();
             table.mtce.getComponent().setFont(optionPane.getSelectedFont());
         }
-
     }
 }

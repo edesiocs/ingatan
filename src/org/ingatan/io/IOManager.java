@@ -987,7 +987,7 @@ public abstract class IOManager {
 
 
         //add the library to a group, if needed
-        if (groupName != null) {
+        if (groupName.compareTo("- All Libraries -") != 0) {
             String[] groupLibIDs = getGroup(groupName).getLibraryIDs();
             strTemp = new String[groupLibIDs.length + 1];
             System.arraycopy(groupLibIDs, 0, strTemp, 0, groupLibIDs.length);
