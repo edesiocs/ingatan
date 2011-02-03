@@ -54,6 +54,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SpinnerListModel;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.StyleConstants;
 import org.ingatan.component.answerfield.IAnswerField;
@@ -788,7 +789,9 @@ public class QuestionList extends JPanel {
                 tquestion.setMarksPerCorrectAnswer(tcontainer.getOptionPane().getMarksPerAnswer().getValue());
                 tquestion.setQuestionTemplateFwd(tcontainer.getOptionPane().getFwdQuestionTemplate().getText());
                 tquestion.setQuestionTemplateBwd(tcontainer.getOptionPane().getBwdQuestionTemplate().getText());
-                tquestion.setQuizMethod(tcontainer.getOptionPane().getAskStyle().getSelectedIndex());
+                //get the ask style model, and the index of the selected ask style
+                SpinnerListModel askStyleModel = ((SpinnerListModel) tcontainer.getOptionPane().getAskStyle().getModel());
+                tquestion.setQuizMethod(askStyleModel.getList().indexOf(askStyleModel.getValue()));
                 tquestion.setFontFamilyName(tcontainer.getOptionPane().getSelectedFont().getFamily());
                 tquestion.setFontSize(tcontainer.getOptionPane().getSelectedFontSize());
 

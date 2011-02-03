@@ -113,8 +113,8 @@ public class DataTable extends JTable {
         this.setOpaque(false);
 
         //set up the table
-        tblModel.addColumn("Questions");
-        tblModel.addColumn("Answers");
+        tblModel.addColumn("Side 1");
+        tblModel.addColumn("Side 2");
 
         String[] strRow = new String[tblModel.getColumnCount()];
         for (int i = 0; i < strRow.length; i++) {

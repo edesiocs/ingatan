@@ -32,7 +32,6 @@ import org.ingatan.event.ColourChooserPaneEvent;
 import org.ingatan.event.ColourChooserPaneListener;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Insets;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.beans.PropertyChangeListener;
@@ -73,7 +72,9 @@ public class ColourSwatchPane extends JPanel {
      * Holds the <code>TransparencyOptionPane</code> used.
      */
     private JPopupMenu transparencyPopup = new JPopupMenu();
-
+    /**
+     * Transparency options pane.
+     */
     private TransparencyOptionPane transparencyOptions = new TransparencyOptionPane();
     /**
      * The <code>ColourChooserPane</code> allows further specification of colour.
