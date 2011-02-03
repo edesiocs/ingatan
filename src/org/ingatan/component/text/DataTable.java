@@ -39,9 +39,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
+import java.io.CharArrayReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.EventObject;
+import java.util.Iterator;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
@@ -56,6 +62,12 @@ import javax.swing.ListSelectionModel;
 import javax.swing.TransferHandler;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
+import org.ingatan.io.ParserWriter;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
+import org.jdom.output.XMLOutputter;
 
 /**
  * A <code>JTable</code> based table supporting dynamic resizing, swapping of
@@ -69,9 +81,16 @@ import javax.swing.table.TableColumn;
 public class DataTable extends JTable {
 
     /**
+     * The synchronised data array will be altered accordingly as changes are made to
+     * the data table. For example, if the user deletes row 5 of the table, then element 5
+     * of all the synchronised data ArrayLists will be deleted too. Copy, paste and cut ops are
+     * also taken into account. Each ArrayList you add is treated as a column.
+     */
+    private ArrayList[] synchronisedData = new ArrayList[0];
+    /**
      * Table cell editor.
      */
-    protected SimpleTextField editor = new SimpleTextField("");
+    private SimpleTextField editor = new SimpleTextField("");
     /**
      * Custom table cell editor allowing for automatic selection upon edit mode,
      * and other custom behaviour.
@@ -81,7 +100,7 @@ public class DataTable extends JTable {
      * Table model for this table. The override simply adds the custom cell editor
      * whenever the setDataVector method is called.
      */
-    protected DefaultTableModel tblModel = new DefaultTableModel() {
+    private DefaultTableModel tblModel = new DefaultTableModel() {
 
         @Override
         public void setDataVector(Object[][] dataVector, Object[] columnTitles) {
@@ -214,6 +233,57 @@ public class DataTable extends JTable {
         editor.setActionMap(aMap);
     }
 
+    /**
+     * Adds the specified ArrayList as a synchronised data array. This means that
+     * all changes made to the Data table are also made to this array (treated
+     * as a column). If the data ArrayList is longer or shorter than the table
+     * then values are truncated/added as required. If the ArrayList must be filled to make it longer,
+     * the value at (data.size()-1) is used and repeated. If the ArrayList or this table is empty, no
+     * data is stored.
+     * @param data the ArrayList to store.
+     * @return the index at which this ArrayList was stored, or -1 if no data was stored.
+     */
+    public int setSynchronisedData(ArrayList data) {
+        //don't allow empty ArrayList
+        if ((data.isEmpty()) || (this.getRowCount() == 0)) {
+            return -1;
+        }
+        //truncate ArrayList if too long
+        if (data.size() > this.getRowCount()) {
+            data = new ArrayList(data.subList(0, this.getRowCount() - 1));
+        }
+        //expand ArrayList if too short
+        if (data.size() < this.getRowCount()) {
+            for (int i = 0; i < this.getRowCount() - data.size(); i++) {
+                data.add(data.get(data.size() - 1));
+            }
+        }
+        if (synchronisedData.length == 0) {
+            synchronisedData = new ArrayList[]{data};
+        } else {
+            ArrayList[] temp = new ArrayList[synchronisedData.length + 1];
+            System.arraycopy(synchronisedData, 0, temp, 0, synchronisedData.length);
+            temp[synchronisedData.length] = data;
+            synchronisedData = temp;
+        }
+        return synchronisedData.length - 1;
+    }
+
+    /**
+     * Gets the synchronised data added using addSynchronisedData().
+     * @param index the index of the data, as returned by addSynchronisedData().
+     * @return the ArrayList at the specified index, or the last data in the array if index is out of bounds,
+     * or the first data in the array if index is negative.
+     */
+    public ArrayList getSynchronisedData(int index) {
+        if (index >= synchronisedData.length) {
+            return synchronisedData[synchronisedData.length - 1];
+        } else if (index < 0) {
+            return synchronisedData[0];
+        }
+        return synchronisedData[index];
+    }
+
     //This action will select the next column cell, or create a new one if at the
     //bottom of the table.
     private class selectNextColumnCell extends AbstractAction {
@@ -238,7 +308,7 @@ public class DataTable extends JTable {
         }
     }
 
-    //Do nothing. This is necessary so that an ancestor's action doesn't take over.
+    //Do nothing. This is necessary so that an ancestor's action doesn't take over (added to an input map)
     private class NullAction extends AbstractAction {
 
         public void actionPerformed(ActionEvent e) {
@@ -255,7 +325,8 @@ public class DataTable extends JTable {
     /**
      * Deletes a row if it is empty, or otherwise clears the current cell and moves
      * the selection back by one position. If there is only one row left in the table,
-     * then it will be cleared, but not deleted.
+     * then it will be cleared, but not deleted. Deletes the row from the synchronised data
+     * arrays as well.
      */
     private class DeleteRowAction extends AbstractAction {
 
@@ -269,9 +340,13 @@ public class DataTable extends JTable {
                 }
             }
 
+            //if the row is empty, and there is more than 1 row left, delete the row
             if ((textFound == false) && (DataTable.this.getRowCount() > 1)) {
                 //delete this row, as it is empty
                 tblModel.removeRow(DataTable.this.getSelectedRow());
+                for (int i = 0; i < synchronisedData.length; i++) {
+                    synchronisedData[i].remove(DataTable.this.getSelectedRow());
+                }
                 //move to the bottom right hand corner of the table
                 DataTable.this.setColumnSelectionInterval(DataTable.this.getColumnCount() - 1, DataTable.this.getColumnCount() - 1);
                 DataTable.this.setRowSelectionInterval(DataTable.this.getRowCount() - 1, DataTable.this.getRowCount() - 1);
@@ -446,7 +521,7 @@ public class DataTable extends JTable {
     }
 
     /*
-     * Table Transfer Handler
+     * Table Transfer Handler.
      */
     private class TableTransferHandler extends StringTransferHandler {
 
@@ -455,27 +530,39 @@ public class DataTable extends JTable {
         private int addCount = 0; //Number of items added.
 
         protected String exportString(JComponent c) {
+            //get reference to the table, get number of rows,cols
             JTable table = (JTable) c;
             rows = table.getSelectedRows();
             int colCount = table.getColumnCount();
 
-            StringBuffer buff = new StringBuffer();
 
+            //set up element for holding the table (no document needed as only want string XML)
+            Element e = new Element("IngatanTable");
+            e.setAttribute("formatVersion", "1.0");
+
+            Element rowData = new Element("rowData");
+            Element row;
+            String temp;
             for (int i = 0; i < rows.length; i++) {
+                row = new Element("row");
+                temp = "";
                 for (int j = 0; j < colCount; j++) {
+                    //get the table object at cell rows[i],j
                     Object val = table.getValueAt(rows[i], j);
-                    buff.append(val == null ? "" : val.toString());
+                    temp += (val == null ? "" : val.toString());
+                    //only add <;> if not the last element
                     if (j != colCount - 1) {
-                        buff.append("<;>");
+                        temp += "<;>";
                     }
                 }
-                if (i != rows.length - 1) { //delimit rows from one another with new line
-                    buff.append("\n");
-                }
+                //set the String representation of the row to the row element
+                row.setText(temp);
+                //add the row child-element to the rowData element
+                rowData.addContent(row);
             }
 
-
-            return buff.toString();
+            e.addContent(rowData);
+            return new XMLOutputter().outputString(e);
         }
 
         protected void importString(JComponent c, String str) {
@@ -506,11 +593,30 @@ public class DataTable extends JTable {
                 index = max;
             }
             addIndex = index;
-            String[] values = str.split("\n");
-            addCount = values.length;
-            for (int i = 0; i < values.length; i++) {
-                model.insertRow(index, values[i].split("<;>"));
+
+            //Build XML from string
+            SAXBuilder sax = new SAXBuilder();
+            Document doc = null;
+            try {
+                doc = sax.build(new CharArrayReader(str.toCharArray()));
+            } catch (JDOMException ex) {
+                Logger.getLogger(ParserWriter.class.getName()).log(Level.SEVERE, "While trying to build preferences from file to xml", ex);
+            } catch (IOException ex) {
+                Logger.getLogger(ParserWriter.class.getName()).log(Level.SEVERE, "While trying to build preferences from file to xml", ex);
+            }
+
+            //counts the number of rows added
+            addCount = 0;
+
+            List<Element> tblRows = doc.getRootElement().getChild("rowData").getChildren("row");
+            Iterator<Element> it = tblRows.iterator();
+            while (it.hasNext())
+            {
+                model.insertRow(index, it.next().getText().split("<;>"));
+                for (int i = 0; i < synchronisedData.length; i++)
+                    synchronisedData[i].add(index, 0);
                 index++;
+                addCount++;
             }
         }
 
@@ -522,26 +628,45 @@ public class DataTable extends JTable {
                 //If we are moving items around in the same table, we
                 //need to adjust the rows accordingly, since those
                 //after the insertion point have moved.
+
+                //if we have added at least 1 row
                 if (addCount > 0) {
+                    //alter the selected rows array to their new values, offset by
+                    //the number of rows added (if the selected rows are after the addIndex.
                     for (int i = 0; i < rows.length; i++) {
                         if (rows[i] > addIndex) {
                             rows[i] += addCount;
                         }
                     }
                 }
+
+                //for the number of selected rows (in reverse order)
                 for (int i = rows.length - 1; i >= 0; i--) {
+                    //if the selected row's index is less than the row count
                     if (rows[i] < model.getRowCount()) {
+                        //remove the row
                         model.removeRow(rows[i]);
+                        //and the synchronised data
+                        for (int j = 0; j < synchronisedData.length; j++)
+                            synchronisedData[i].remove(rows[i]);
                     }
                 }
-                if (model.getRowCount() == 0) // if this operation has removed all rows
+
+                //if this operation has removed all rows (no rows left)
+                if (model.getRowCount() == 0)
                 {
+                    //then generate a new, empty row to ensure that the table never has
+                    //less than 1 row
                     String[] strRow = new String[model.getColumnCount()];
+                    double[] strRow2 = new double[model.getColumnCount()];
                     for (int i = 0; i < strRow.length; i++) {
                         strRow[i] = "";
+                        strRow2[i] = 0;
                     }
 
                     model.addRow(strRow);
+                    for (int j = 0; j < synchronisedData.length; j++)
+                            synchronisedData[j].add(strRow2);
                 }
 
             }

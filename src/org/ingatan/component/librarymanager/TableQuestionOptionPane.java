@@ -27,7 +27,6 @@
  */
 package org.ingatan.component.librarymanager;
 
-import java.awt.event.ActionEvent;
 import javax.swing.event.ChangeEvent;
 import org.ingatan.ThemeConstants;
 import org.ingatan.component.text.NumericJTextField;
@@ -38,11 +37,9 @@ import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
-import javax.swing.AbstractAction;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;

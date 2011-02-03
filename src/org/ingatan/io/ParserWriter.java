@@ -55,7 +55,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.jdom.Attribute;
 import org.jdom.DataConversionException;
-import org.jdom.JDOMException;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
