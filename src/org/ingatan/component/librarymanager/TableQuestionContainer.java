@@ -125,13 +125,18 @@ public class TableQuestionContainer extends AbstractQuestionContainer {
         optionPane.getAskInReverse().setSelected(tblQuestion.isAskInReverse());
         SpinnerListModel askStyleModel = ((SpinnerListModel) optionPane.getAskStyle().getModel());
         askStyleModel.setValue(askStyleModel.getList().get(tblQuestion.getQuizMethod()));
-        
+
         optionPane.getMarksPerAnswer().setText("" + tblQuestion.getMarksPerCorrectAnswer());
         optionPane.getFwdQuestionTemplate().setText(tblQuestion.getQuestionTemplateFwd());
         optionPane.getBwdQuestionTemplate().setText(tblQuestion.getQuestionTemplateBwd());
-        
+
         SpinnerListModel fontModel = ((SpinnerListModel) optionPane.getFontSpinner().getModel());
-        fontModel.setValue(ques.getFontFamilyName());
+        try {
+            fontModel.setValue(ques.getFontFamilyName());
+
+        } catch (IllegalArgumentException e) {
+            fontModel.setValue(this.getFont().getFamily());
+        }
         ((SpinnerNumberModel) optionPane.getFontSizeSpinner().getModel()).setValue(ques.getFontSize());
 
         btnHelp.setFont(ThemeConstants.niceFont);
