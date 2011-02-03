@@ -152,7 +152,7 @@ public class DataTable extends JTable {
 
         this.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         //this.setCellSelectionEnabled(true);
-        this.setDragEnabled(true);
+        this.setDragEnabled(false);
         this.setTransferHandler(new TableTransferHandler());
         this.setDropMode(DropMode.INSERT_ROWS);
 
@@ -238,12 +238,12 @@ public class DataTable extends JTable {
      * all changes made to the Data table are also made to this array (treated
      * as a column). If the data ArrayList is longer or shorter than the table
      * then values are truncated/added as required. If the ArrayList must be filled to make it longer,
-     * the value at (data.size()-1) is used and repeated. If the ArrayList or this table is empty, no
+     * the value 0 is used. If the ArrayList or this table is empty, no
      * data is stored.
      * @param data the ArrayList to store.
      * @return the index at which this ArrayList was stored, or -1 if no data was stored.
      */
-    public int setSynchronisedData(ArrayList data) {
+    public int addSynchronisedData(ArrayList data) {
         //don't allow empty ArrayList
         if ((data.isEmpty()) || (this.getRowCount() == 0)) {
             return -1;
@@ -255,7 +255,7 @@ public class DataTable extends JTable {
         //expand ArrayList if too short
         if (data.size() < this.getRowCount()) {
             for (int i = 0; i < this.getRowCount() - data.size(); i++) {
-                data.add(data.get(data.size() - 1));
+                data.add(0);
             }
         }
         if (synchronisedData.length == 0) {
@@ -284,11 +284,13 @@ public class DataTable extends JTable {
         return synchronisedData[index];
     }
 
-    //This action will select the next column cell, or create a new one if at the
-    //bottom of the table.
+    /**This action will select the next column cell, or create a new one if at the
+     *bottom of the table.
+     */
     private class selectNextColumnCell extends AbstractAction {
 
         public void actionPerformed(ActionEvent e) {
+            //if editing a cell, then stop
             if (DataTable.this.isEditing()) {
                 DataTable.this.getCellEditor().stopCellEditing();
             }
@@ -298,6 +300,9 @@ public class DataTable extends JTable {
                 if (DataTable.this.getSelectedRow() == DataTable.this.getRowCount() - 1) {
                     //create a new row and move to the first cell of that row.
                     tblModel.addRow(new String[]{"", ""});
+                    //add a new element to the end of each synchronised data array
+                    for (int i = 0; i < synchronisedData.length; i++)
+                        synchronisedData[i].add(0);
                 }
             }
             if (enterMovesLeftToRight) {
@@ -342,10 +347,11 @@ public class DataTable extends JTable {
 
             //if the row is empty, and there is more than 1 row left, delete the row
             if ((textFound == false) && (DataTable.this.getRowCount() > 1)) {
+                int selectedRow = DataTable.this.getSelectedRow();
                 //delete this row, as it is empty
-                tblModel.removeRow(DataTable.this.getSelectedRow());
+                tblModel.removeRow(selectedRow);
                 for (int i = 0; i < synchronisedData.length; i++) {
-                    synchronisedData[i].remove(DataTable.this.getSelectedRow());
+                    synchronisedData[i].remove(selectedRow);
                 }
                 //move to the bottom right hand corner of the table
                 DataTable.this.setColumnSelectionInterval(DataTable.this.getColumnCount() - 1, DataTable.this.getColumnCount() - 1);
@@ -648,7 +654,7 @@ public class DataTable extends JTable {
                         model.removeRow(rows[i]);
                         //and the synchronised data
                         for (int j = 0; j < synchronisedData.length; j++)
-                            synchronisedData[i].remove(rows[i]);
+                            synchronisedData[j].remove(rows[i]);
                     }
                 }
 

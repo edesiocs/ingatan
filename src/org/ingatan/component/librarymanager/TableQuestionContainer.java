@@ -36,6 +36,8 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -185,7 +187,9 @@ public class TableQuestionContainer extends AbstractQuestionContainer {
         }
 
         ((DefaultTableModel) table.getModel()).setDataVector(newData, new String[]{"Side 1", "Side 2"});
-
+        table.addSynchronisedData(new ArrayList(Arrays.asList(ques.getTimesAsked())));
+        table.addSynchronisedData(new ArrayList(Arrays.asList(ques.getMarksAwarded())));
+        table.addSynchronisedData(new ArrayList(Arrays.asList(ques.getMarksAvailable())));
     }
 
     /**
