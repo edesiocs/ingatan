@@ -571,7 +571,7 @@ public class LibraryManagerWindow extends JFrame implements WindowListener {
     private class FlexiQuestionTypeAction extends AbstractAction {
 
         public FlexiQuestionTypeAction() {
-            super("Flexi-question type");
+            super("Flexi-question type", new ImageIcon(LibraryManagerWindow.class.getResource("/resources/icons/flexi.png")));
         }
 
         public void actionPerformed(ActionEvent e) {
@@ -586,7 +586,7 @@ public class LibraryManagerWindow extends JFrame implements WindowListener {
     private class TableQuestionTypeAction extends AbstractAction {
 
         public TableQuestionTypeAction() {
-            super("Table-question type");
+            super("Flash card type",new ImageIcon(LibraryManagerWindow.class.getResource("/resources/icons/flashcard.png")));
         }
 
         public void actionPerformed(ActionEvent e) {
