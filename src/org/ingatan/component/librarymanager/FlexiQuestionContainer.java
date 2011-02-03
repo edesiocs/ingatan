@@ -87,9 +87,10 @@ import org.jdom.output.XMLOutputter;
  */
 public class FlexiQuestionContainer extends AbstractQuestionContainer {
 
-    private static Dimension TEXT_AREA_MAX_SIZE = new Dimension(1000, 600);
-    private static Dimension TEXT_AREA_MIN_SIZE = new Dimension(200, 80);
+    private static Dimension TEXT_AREA_MAX_SIZE = new Dimension(1000, 550);
+    private static Dimension TEXT_AREA_MIN_SIZE = new Dimension(200, 120);
     private static Dimension TEXT_AREA_PREF_SIZE = new Dimension(400, 300);
+    private static int MAX_CONTAINER_HEIGHT = 450;
     /**
      * Static text focus listener is added to every <code>RichTextArea</code> contained
      * within a flexi question container. This allows the rich text toolbar to
@@ -141,6 +142,7 @@ public class FlexiQuestionContainer extends AbstractQuestionContainer {
         this.flexiQuestion = ques;
 
         RichTextTransferHandler rtth = new RichTextTransferHandler();
+        contentPanel.setPreferredSize(null);
 
         //set the maximum and minimum sizes for rich text area scrollers. These
         //sizes are used when resizing the areas to match their content so that
@@ -237,6 +239,7 @@ public class FlexiQuestionContainer extends AbstractQuestionContainer {
         resetSize(questionText);
         resetSize(answerText);
         resetSize(postAnswerText);
+
     }
 
     /**
@@ -314,7 +317,7 @@ public class FlexiQuestionContainer extends AbstractQuestionContainer {
 
             if (resp == JOptionPane.YES_OPTION) {
                 EmbeddedImage ei = (EmbeddedImage) eg;
-                ei.resizeTo(ei.getMaxRecommendedSize(),true);
+                ei.resizeTo(ei.getMaxRecommendedSize(), true);
                 try {
                     IOManager.saveImageWithOverWrite(ei.getImage(), ei.getParentLibraryID(), ei.getImageID());
                 } catch (IOException ex) {
@@ -332,12 +335,15 @@ public class FlexiQuestionContainer extends AbstractQuestionContainer {
     @Override
     public void maximise() {
         super.maximise();
-        int prefHeight = questionText.getSize().height + answerText.getSize().height + 50;
+        int prefHeight = questionText.getSize().height + answerText.getSize().height + 80;
         if (usePostAnswerText.isSelected()) {
             prefHeight += postAnswerText.getSize().height + 30;
         }
+        if (prefHeight > MAX_CONTAINER_HEIGHT) {
+            prefHeight = MAX_CONTAINER_HEIGHT;
+        }
         this.setPreferredSize(new Dimension(this.getPreferredSize().width, prefHeight));
-        this.setMaximumSize(new Dimension((int) 1000, 500));
+        this.setMaximumSize(new Dimension((int) 1000, MAX_CONTAINER_HEIGHT));
     }
 
     @Override
@@ -421,6 +427,7 @@ public class FlexiQuestionContainer extends AbstractQuestionContainer {
             d.height = r.y + r.height + txtArea.getToolbar().getHeight();
 
             if (d.getHeight() < txtArea.getScroller().getMaximumSize().getHeight()) {
+                //if the height needed for content is less than the minimum size of the scroller, then set to min size of scroller
                 if (d.getHeight() < txtArea.getScroller().getMinimumSize().getHeight()) {
                     d.height = (int) txtArea.getScroller().getMinimumSize().getHeight();
                 }
@@ -428,6 +435,22 @@ public class FlexiQuestionContainer extends AbstractQuestionContainer {
             } else {
                 txtArea.getScroller().setPreferredSize(txtArea.getScroller().getMaximumSize());
             }
+
+            //the following if-else structure allows the content panel to grow and shrink
+            //but stops it from exceding the maximum height. If it exceeds the maximum height, it grows past
+            //the boundary of the question container and pushes the containers below it down the question list
+            //with empty space appearing between the two containers.
+            if (contentPanel.getPreferredSize().height > MAX_CONTAINER_HEIGHT) {
+                contentPanel.setPreferredSize(new Dimension(contentPanel.getPreferredSize().width, MAX_CONTAINER_HEIGHT));
+            } else {
+                contentPanel.setPreferredSize(null);
+                if (contentPanel.getPreferredSize().height > MAX_CONTAINER_HEIGHT) {
+                    contentPanel.setPreferredSize(new Dimension(contentPanel.getPreferredSize().width, MAX_CONTAINER_HEIGHT));
+                }
+            }
+
+            minimise();
+            maximise();
 
             txtArea.getScroller().validate();
             FlexiQuestionContainer.this.validate();
@@ -452,6 +475,17 @@ public class FlexiQuestionContainer extends AbstractQuestionContainer {
                 flexiQuestion.setUsePostAnswerText(true);
                 postAnswerText.getScroller().setVisible(true);
                 lblPostAnswer.setVisible(true);
+
+                //resize to fit it
+                int prefHeight = questionText.getSize().height + answerText.getSize().height + 80;
+                if (usePostAnswerText.isSelected()) {
+                    prefHeight += postAnswerText.getSize().height + 80;
+                }
+                if (prefHeight > MAX_CONTAINER_HEIGHT) {
+                    prefHeight = MAX_CONTAINER_HEIGHT;
+                }
+                FlexiQuestionContainer.this.setPreferredSize(new Dimension(FlexiQuestionContainer.this.getPreferredSize().width, prefHeight));
+                FlexiQuestionContainer.this.setMaximumSize(new Dimension((int) 1000, MAX_CONTAINER_HEIGHT));
             } else {
                 flexiQuestion.setUsePostAnswerText(false);
                 postAnswerText.getScroller().setVisible(false);
@@ -542,7 +576,7 @@ public class FlexiQuestionContainer extends AbstractQuestionContainer {
 
                         if (resp == JOptionPane.YES_OPTION) {
                             EmbeddedImage ei = (EmbeddedImage) eg;
-                            ei.resizeTo(ei.getMaxRecommendedSize(),true);
+                            ei.resizeTo(ei.getMaxRecommendedSize(), true);
                             try {
                                 IOManager.saveImageWithOverWrite(ei.getImage(), ei.getParentLibraryID(), ei.getImageID());
                             } catch (IOException ex) {
