@@ -224,7 +224,7 @@ public class EmbeddedImage extends EmbeddedGraphic implements MouseListener {
         if (respectAspectRatio) {
             //get the aspect ratio of the image
             double ratio = image.getWidth() / image.getHeight();
-            System.out.println("ratio = " + ratio);
+
             if (image.getWidth() > image.getHeight()) {
                 if (ratio > 20) ratio = 20;
                 newImg = new BufferedImage((int) d.getWidth(), (int) (d.getWidth() / ratio), image.getType());

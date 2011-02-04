@@ -291,7 +291,6 @@ public class AnsFieldEmbeddedAudio extends JPanel implements IAnswerField, Focus
      * @param e the <code>ActionEvent</code> - will be <code>null</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        System.out.println("end action occurred");
         if (audioClip != null) {
             btnPlay.getAction().putValue(PlayAction.LARGE_ICON_KEY, new ImageIcon(AnsFieldEmbeddedAudio.class.getResource("/resources/icons/play.png")));
             playing = false;

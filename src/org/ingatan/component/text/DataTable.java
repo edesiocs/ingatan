@@ -282,7 +282,6 @@ public class DataTable extends JTable {
             }
             //expand ArrayList if too short
             if (data.size() < DataTable.this.getRowCount()) {
-                System.out.println("expanding array for registration, data.size() = " + data.size());
                 for (int i = 0; i < DataTable.this.getRowCount() - data.size() + 1; i++) {
                     data.add(0);
                 }
@@ -452,7 +451,9 @@ public class DataTable extends JTable {
                     }
 
                     if ((textFound == false) && (DataTable.this.getRowCount() > 1)) {
-                        tblModel.removeRow(DataTable.this.getSelectedRow());
+                        int selectedRow = DataTable.this.getSelectedRow();
+                        tblModel.removeRow(selectedRow);
+                        synchronisedData.remove(selectedRow);
                         //move to the bottom right hand corner of the table
                         DataTable.this.setColumnSelectionInterval(DataTable.this.getColumnCount() - 1, DataTable.this.getColumnCount() - 1);
                         DataTable.this.setRowSelectionInterval(DataTable.this.getRowCount() - 1, DataTable.this.getRowCount() - 1);
@@ -702,14 +703,9 @@ public class DataTable extends JTable {
             while (it.hasNext()) {
                 model.insertRow(index, it.next().getText().split("<;>"));
                 synchronisedData.add(index, 0);
-                System.out.println("\nAdding an entry at index: " + index);
-                synchronisedData.printMe();
                 index++;
                 addCount++;
             }
-
-            System.out.println("\n-----After import data----");
-            synchronisedData.printMe();
         }
 
         protected void cleanup(JComponent c, boolean remove) {
@@ -739,9 +735,7 @@ public class DataTable extends JTable {
                         //remove the row
                         model.removeRow(rows[i]);
                         //and the synchronised data
-                        System.out.println("\n----------\nSynchronisedData.remove(" + rows[i] + ");");
                         synchronisedData.remove(rows[i]);
-                        synchronisedData.printMe();
                     }
                 }
 
