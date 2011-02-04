@@ -562,16 +562,16 @@ public class AnsFieldList extends JPanel implements IAnswerField {
          * @return <code>true</code> if the answer provided in this field is correct.
          */
         public boolean isCorrect() {
-            //order matters, and this entry is correct
+            //if order matters, and this entry is correct
             if ((chkOrder.isSelected()) && (isInAnswerArray(new String[]{correctAnswers[arrayIndex]}, txtField.getText()))) {
                 return true;
-            } //order does not matter and this entry is correct
+            } //if order does not matter and this entry is correct
             else if ((chkOrder.isSelected() == false) && (isInAnswerArray(correctAnswers, txtField.getText()))) {
                 return true;
-            } //order matters, and this entry is NOT correct
+            } //if order matters, and this entry is NOT correct
             else if ((chkOrder.isSelected()) && ((isInAnswerArray(new String[]{correctAnswers[arrayIndex]}, txtField.getText())) == false)) {
                 return false;
-            } //order does not matter and this entry is NOT correct
+            } //if order does not matter and this entry is NOT correct
             else if ((chkOrder.isSelected() == false) && (isInAnswerArray(correctAnswers, txtField.getText()) == false)) {
                 return false;
             }

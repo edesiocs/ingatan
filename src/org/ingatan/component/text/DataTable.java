@@ -352,6 +352,9 @@ public class DataTable extends JTable {
             }
         }
 
+        /**
+         * For debugging.
+         */
         public void printMe() {
             for (int i = 0; i < synchronisedData.length; i++) {
                 Iterator it = synchronisedData[i].iterator();
