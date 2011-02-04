@@ -86,7 +86,7 @@ public class DataTable extends JTable {
      * of all the synchronised data ArrayLists will be deleted too. Copy, paste and cut ops are
      * also taken into account. Each ArrayList you add is treated as a column.
      */
-    private ArrayList[] synchronisedData = new ArrayList[0];
+    private SynchronisedData synchronisedData = new SynchronisedData();
     /**
      * Table cell editor.
      */
@@ -243,30 +243,8 @@ public class DataTable extends JTable {
      * @param data the ArrayList to store.
      * @return the index at which this ArrayList was stored, or -1 if no data was stored.
      */
-    public int addSynchronisedData(ArrayList data) {
-        //don't allow empty ArrayList
-        if ((data.isEmpty()) || (this.getRowCount() == 0)) {
-            return -1;
-        }
-        //truncate ArrayList if too long
-        if (data.size() > this.getRowCount()) {
-            data = new ArrayList(data.subList(0, this.getRowCount() - 1));
-        }
-        //expand ArrayList if too short
-        if (data.size() < this.getRowCount()) {
-            for (int i = 0; i < this.getRowCount() - data.size(); i++) {
-                data.add(0);
-            }
-        }
-        if (synchronisedData.length == 0) {
-            synchronisedData = new ArrayList[]{data};
-        } else {
-            ArrayList[] temp = new ArrayList[synchronisedData.length + 1];
-            System.arraycopy(synchronisedData, 0, temp, 0, synchronisedData.length);
-            temp[synchronisedData.length] = data;
-            synchronisedData = temp;
-        }
-        return synchronisedData.length - 1;
+    public int registerSynchronisedData(ArrayList data) {
+        return synchronisedData.registerSynchronisedData(data);
     }
 
     /**
@@ -276,12 +254,115 @@ public class DataTable extends JTable {
      * or the first data in the array if index is negative.
      */
     public ArrayList getSynchronisedData(int index) {
-        if (index >= synchronisedData.length) {
-            return synchronisedData[synchronisedData.length - 1];
-        } else if (index < 0) {
-            return synchronisedData[0];
+        return synchronisedData.getSynchronisedData(index);
+    }
+
+    /**
+     * Encapsulates synchronised data arrays and provides an interface to mutating
+     * them all as if simply mutating one array.
+     */
+    private class SynchronisedData {
+
+        ArrayList[] synchronisedData = new ArrayList[0];
+
+        /**
+         * Add a synchronised data array. If too long, the array is truncated,
+         * if too short, it is padded with zeros. If empty, it is not added.
+         * @param data the data array to add.
+         * @return the index of the added data array so it can be accessed again.
+         */
+        public int registerSynchronisedData(ArrayList data) {
+            //don't allow empty ArrayList
+            if ((data.isEmpty()) || (DataTable.this.getRowCount() == 0)) {
+                return -1;
+            }
+            //truncate ArrayList if too long
+            if (data.size() > DataTable.this.getRowCount()) {
+                data = new ArrayList(data.subList(0, DataTable.this.getRowCount() - 1));
+            }
+            //expand ArrayList if too short
+            if (data.size() < DataTable.this.getRowCount()) {
+                System.out.println("expanding array for registration, data.size() = " + data.size());
+                for (int i = 0; i < DataTable.this.getRowCount() - data.size() + 1; i++) {
+                    data.add(0);
+                }
+            }
+            //if this is the first ArrayList to be added, just create a new array with it as element 0
+            if (synchronisedData.length == 0) {
+                synchronisedData = new ArrayList[]{data};
+            } else { //otherwise, copy current arrays over
+                ArrayList[] temp = new ArrayList[synchronisedData.length + 1];
+                System.arraycopy(synchronisedData, 0, temp, 0, synchronisedData.length);
+                temp[synchronisedData.length] = data;
+                synchronisedData = temp;
+            }
+            return synchronisedData.length - 1;
         }
-        return synchronisedData[index];
+
+        /**
+         * Gets the synchronised data at the specified index.
+         * @param index
+         * @return the data arraylist at the specified index, or the last data ArrayList
+         * if the index is out of bounds to the right, or the first data ArrayList if the
+         * index is negative. Returns null if there are no ArrayLists registered.
+         */
+        public ArrayList getSynchronisedData(int index) {
+            if (index >= synchronisedData.length) {
+                return synchronisedData[synchronisedData.length - 1];
+            } else if (index < 0) {
+                return synchronisedData[0];
+            }
+            return synchronisedData[index];
+        }
+
+        /**
+         * Add the specified element to the end of all data ArrayLists encapsulated
+         * by this SynchronisedData object.
+         * @param element the element to add.
+         */
+        public void add(Object element) {
+            for (int i = 0; i < synchronisedData.length; i++) {
+                synchronisedData[i].add(element);
+            }
+        }
+
+        /**
+         * Add the specified element at the specified index for all data ArrayLists encapsulated
+         * by this SynchronisedData object. If the specified index is larger than (size()-1) then
+         * the element is added to the end of the data array.
+         * @param index the index at which to add the element.
+         * @param element the element to add.
+         */
+        public void add(int index, Object element) {
+            for (int i = 0; i < synchronisedData.length; i++) {
+                if (index > synchronisedData[i].size()-1)
+                    synchronisedData[i].add(element);
+                else
+                    synchronisedData[i].add(index, element);
+            }
+        }
+
+        /**
+         * Removes the element at the specified index.
+         * @param index the element to remove.
+         * @throws IndexOutOfBoundsException if the index is out of bounds.
+         */
+        public void remove(int index) {
+            for (int i = 0; i < synchronisedData.length; i++) {
+                synchronisedData[i].remove(index);
+            }
+        }
+
+        public void printMe() {
+            for (int i = 0; i < synchronisedData.length; i++) {
+                Iterator it = synchronisedData[i].iterator();
+                System.out.print("entry (" + i + ") [");
+                while (it.hasNext()) {
+                    System.out.print(" " + it.next());
+                }
+                System.out.println(" ]");
+            }
+        }
     }
 
     /**This action will select the next column cell, or create a new one if at the
@@ -301,8 +382,7 @@ public class DataTable extends JTable {
                     //create a new row and move to the first cell of that row.
                     tblModel.addRow(new String[]{"", ""});
                     //add a new element to the end of each synchronised data array
-                    for (int i = 0; i < synchronisedData.length; i++)
-                        synchronisedData[i].add(0);
+                    synchronisedData.add(0);
                 }
             }
             if (enterMovesLeftToRight) {
@@ -350,9 +430,8 @@ public class DataTable extends JTable {
                 int selectedRow = DataTable.this.getSelectedRow();
                 //delete this row, as it is empty
                 tblModel.removeRow(selectedRow);
-                for (int i = 0; i < synchronisedData.length; i++) {
-                    synchronisedData[i].remove(selectedRow);
-                }
+                //delete the row from the synchronisedData too.
+                synchronisedData.remove(selectedRow);
                 //move to the bottom right hand corner of the table
                 DataTable.this.setColumnSelectionInterval(DataTable.this.getColumnCount() - 1, DataTable.this.getColumnCount() - 1);
                 DataTable.this.setRowSelectionInterval(DataTable.this.getRowCount() - 1, DataTable.this.getRowCount() - 1);
@@ -616,14 +695,17 @@ public class DataTable extends JTable {
 
             List<Element> tblRows = doc.getRootElement().getChild("rowData").getChildren("row");
             Iterator<Element> it = tblRows.iterator();
-            while (it.hasNext())
-            {
+            while (it.hasNext()) {
                 model.insertRow(index, it.next().getText().split("<;>"));
-                for (int i = 0; i < synchronisedData.length; i++)
-                    synchronisedData[i].add(index, 0);
+                synchronisedData.add(index, 0);
+                System.out.println("\nAdding an entry at index: " + index);
+                synchronisedData.printMe();
                 index++;
                 addCount++;
             }
+
+            System.out.println("\n-----After import data----");
+            synchronisedData.printMe();
         }
 
         protected void cleanup(JComponent c, boolean remove) {
@@ -653,14 +735,14 @@ public class DataTable extends JTable {
                         //remove the row
                         model.removeRow(rows[i]);
                         //and the synchronised data
-                        for (int j = 0; j < synchronisedData.length; j++)
-                            synchronisedData[j].remove(rows[i]);
+                        System.out.println("\n----------\nSynchronisedData.remove(" + rows[i] + ");");
+                        synchronisedData.remove(rows[i]);
+                        synchronisedData.printMe();
                     }
                 }
 
                 //if this operation has removed all rows (no rows left)
-                if (model.getRowCount() == 0)
-                {
+                if (model.getRowCount() == 0) {
                     //then generate a new, empty row to ensure that the table never has
                     //less than 1 row
                     String[] strRow = new String[model.getColumnCount()];
@@ -671,8 +753,7 @@ public class DataTable extends JTable {
                     }
 
                     model.addRow(strRow);
-                    for (int j = 0; j < synchronisedData.length; j++)
-                            synchronisedData[j].add(strRow2);
+                    synchronisedData.add(strRow2);
                 }
 
             }

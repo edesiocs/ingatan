@@ -254,6 +254,18 @@ public class TableQuestion implements IQuestion {
     }
 
     /**
+     * Get the a copy of the marks available data in the form of an array list.
+     * @return ArrayList containing the marks available data.
+     */
+    public ArrayList getMarksAvailableArrayList() {
+        ArrayList retVal = new ArrayList();
+        for (int i = 0; i < marksAvailable.length; i++) {
+            retVal.add(marksAvailable[i]);
+        }
+        return retVal;
+    }
+
+    /**
      * Sets the marks available for all questions.
      * @param marksAvailable the array of marks available.
      */
@@ -279,6 +291,18 @@ public class TableQuestion implements IQuestion {
      */
     public int[] getMarksAwarded() {
         return marksAwarded;
+    }
+
+    /**
+     * Get the a copy of the marks awarded data in the form of an array list.
+     * @return ArrayList containing the marks awarded data.
+     */
+    public ArrayList getMarksAwardedArrayList() {
+        ArrayList retVal = new ArrayList();
+        for (int i = 0; i < marksAwarded.length; i++) {
+            retVal.add(marksAwarded[i]);
+        }
+        return retVal;
     }
 
     /**
@@ -335,7 +359,11 @@ public class TableQuestion implements IQuestion {
      * either column 1 or 2 are recorded appropriately.
      */
     public void validateArrays() {
-        
+        if (col1Data == null)
+            col1Data = new String[0];
+        if (col2Data == null)
+            col2Data = new String[0];
+
         //make the column data array length the size of the shorter array
         if (col1Data.length < col2Data.length)
             col2Data = Arrays.copyOf(col2Data, col1Data.length);
@@ -418,6 +446,18 @@ public class TableQuestion implements IQuestion {
      */
     public int[] getTimesAsked() {
         return timesAsked;
+    }
+
+    /**
+     * Get the a copy of the times asked data in the form of an array list.
+     * @return ArrayList containing the times asked data.
+     */
+    public ArrayList getTimesAskedArrayList() {
+        ArrayList retVal = new ArrayList();
+        for (int i = 0; i < timesAsked.length; i++) {
+            retVal.add(timesAsked[i]);
+        }
+        return retVal;
     }
 
     /**

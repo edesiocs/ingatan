@@ -187,9 +187,9 @@ public class TableQuestionContainer extends AbstractQuestionContainer {
         }
 
         ((DefaultTableModel) table.getModel()).setDataVector(newData, new String[]{"Side 1", "Side 2"});
-        table.addSynchronisedData(new ArrayList(Arrays.asList(ques.getTimesAsked())));
-        table.addSynchronisedData(new ArrayList(Arrays.asList(ques.getMarksAwarded())));
-        table.addSynchronisedData(new ArrayList(Arrays.asList(ques.getMarksAvailable())));
+        table.registerSynchronisedData(ques.getTimesAskedArrayList());
+        table.registerSynchronisedData(ques.getMarksAwardedArrayList());
+        table.registerSynchronisedData(ques.getMarksAvailableArrayList());
     }
 
     /**

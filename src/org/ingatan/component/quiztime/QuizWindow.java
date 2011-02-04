@@ -918,7 +918,7 @@ public class QuizWindow extends JFrame implements WindowListener {
                     Logger.getLogger(QuizWindow.class.getName()).log(Level.SEVERE, "While saving the current question with updates for times asked, score, etc. (quiz window)", ex);
                 }
 
-                //update class variables
+                //update class variables (these are the tallies shown to the user during the quiz and at the end)
                 totalMarksAvailable += marksAvailable;
                 totalMarksAwarded += marksAwarded;
                 totalQuestionsAnswered++;
