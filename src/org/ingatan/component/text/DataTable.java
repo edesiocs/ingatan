@@ -417,6 +417,10 @@ public class DataTable extends JTable {
 
         public void actionPerformed(ActionEvent e) {
             boolean textFound = false;
+            
+            //if no selection is made
+            if (DataTable.this.getSelectedRow() == -1)
+                return;
             //look for text anywhere in this row
             for (int i = 0; i < DataTable.this.getColumnCount(); i++) {
                 if (((String) DataTable.this.getValueAt(DataTable.this.getSelectedRow(), i)).equals("") == false) {
