@@ -57,7 +57,7 @@ public class AboutWindow extends JDialog {
         this.setLocationRelativeTo(null);
 
         txtAbout.setRichText("[b][aln]0[!aln][fam]Dialog[!fam][sze]14[!sze][col]51,51,51[!col]Ingatan v1.3.5 (ingatan.org)[br][b][sze]12[!sze]" +
-                "If you find this program useful, please let me know! Has it helped you to learn a language? Have you used it to help with your studies? I would be delighted to hear from you. You can contact me at [b]tom.ingatan@gmail.com.[b][br][br]" +
+                "Hi! If you find this program useful, please let me know! I would be delighted to hear from you. You can contact me at [b]tom.ingatan@gmail.com.[b][br][br]" +
                 "If you find any bugs or have any suggestions, go to [b]ingatan.org[b] and sumbit a new Issue (you will need a google account), or alternatively, email me at the address above.[br][br]" +
                 "[u][sze]13[!sze]A Note for OpenJDK Users[u][br][sze]12[!sze]If running Ingatan under OpenJDK, it may run slowly. In this case, load Ingatan using the command:[br]" +
                 "[fam]Monospace[!fam]java -Dsun.java2d.pmoffscreen=false -jar !osqb;path_to_ingatan.jar!csqb;[br][br][fam]Dialog[!fam]" +
@@ -74,7 +74,7 @@ public class AboutWindow extends JDialog {
                 "[u]Silk Icon Set[u][br]www.famfamfam.com: Creative Commons Attribution 2.5 License[br]A great set of icons by Mark James. Thank you![br][br]" +
                 "[u]JOgg and JOrbis[u] from www.jcraft.com under LGPL 3 - Great libraries made so much easier using the EasyOgg wrapper by Kevin from http://www.cokeandcode.com.[br][br][br]" +
                 "[u]Arrow2D.java[u] from www.geotools.org under LGPL 2.1 - Thankyou, I was so glad not to write my own.[br][br][br]" +
-                "Thankyou to Hugh for the time he spent bug-hunting for me.[end]");
+                "Thankyou to Hugh for being my bug hunter.[end]");
 
         txtAbout.setCaretPosition(0);
     }
