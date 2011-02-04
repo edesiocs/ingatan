@@ -325,17 +325,16 @@ public class QuizWindow extends JFrame implements WindowListener {
         //build the string that states what library the question is from and what groups the library is contained by.
         lblQuestionFrom.setText("Question from library '" + IOManager.getLibraryName(currentQuestion.getParentLibrary()) + "' in group");
         String[] groups = IOManager.getGroupsThatContain(currentQuestion.getParentLibrary());
-        if (groups.length > 1)
-        {
+        if (groups.length > 1) {
             String txtAppend = "s ";
-            for (int i = 0; i < groups.length; i++)
-            {
-                if (i == 0)
+            for (int i = 0; i < groups.length; i++) {
+                if (i == 0) {
                     txtAppend = txtAppend + " " + groups[i];
-                else if(i < groups.length - 1)
+                } else if (i < groups.length - 1) {
                     txtAppend = txtAppend + ", " + groups[i];
-                else
+                } else {
                     txtAppend = txtAppend + " and " + groups[i];
+                }
             }
             lblQuestionFrom.setText(lblQuestionFrom.getText() + txtAppend);
         } else if (groups.length == 1) {
@@ -451,8 +450,8 @@ public class QuizWindow extends JFrame implements WindowListener {
         //resize the quiz window to ensure answer and question areas are a nice size. This
         //is a workaround until a better solution is found. See stepSize variable's javadoc comment
         //for more info.
-        sizeStep = sizeStep*(-1);
-        this.setSize(this.getWidth()+sizeStep, this.getHeight()+sizeStep);
+        sizeStep = sizeStep * (-1);
+        this.setSize(this.getWidth() + sizeStep, this.getHeight() + sizeStep);
     }
 
     /**
@@ -621,6 +620,12 @@ public class QuizWindow extends JFrame implements WindowListener {
         //quiz has ended, so exit is cool
         if (quizHasEnded) {
             returnToOnClose.setVisible(true);
+            //repack libraries and flush temp directory.
+            try {
+                IOManager.cleanUpAndRepackage();
+            } catch (IOException ex) {
+                Logger.getLogger(QuizWindow.class.getName()).log(Level.SEVERE, "Quiz window closing event. Trying to cleanup+repack.", ex);
+            }
             QuizWindow.this.dispose();
             return;
         }
@@ -805,6 +810,12 @@ public class QuizWindow extends JFrame implements WindowListener {
                 //so exit
                 returnToOnClose.setVisible(true);
                 QuizWindow.this.setVisible(false);
+                //repack libraries and flush temp directory.
+                try {
+                    IOManager.cleanUpAndRepackage();
+                } catch (IOException ex) {
+                    Logger.getLogger(QuizWindow.class.getName()).log(Level.SEVERE, "User pressed Continue button at end of quiz. Trying to cleanup+repack.", ex);
+                }
                 QuizWindow.this.dispose();
                 return;
             }
