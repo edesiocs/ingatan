@@ -372,8 +372,8 @@ public class TableQuestion implements IQuestion {
 
         //ensure that any empty entries are recorded properly by setting them to " ".
         for (int i = 0; i < col1Data.length && i < col2Data.length; i++) {
-            if (col1Data[i].isEmpty()) col1Data[i] = " ";
-            if (col2Data[i].isEmpty()) col2Data[i] = " ";
+            if ((col1Data[i] == null) || (col1Data[i].isEmpty())) col1Data[i] = " ";
+            if ((col2Data[i] == null) || (col2Data[i].isEmpty())) col2Data[i] = " ";
         }
 
         //update marks arrays
