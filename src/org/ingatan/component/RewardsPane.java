@@ -27,14 +27,7 @@
  */
 package org.ingatan.component;
 
-import com.approximatrix.charting.coordsystem.ClassicCoordSystem;
-import com.approximatrix.charting.coordsystem.CoordSystem;
-import com.approximatrix.charting.model.ChartDataModel;
-import com.approximatrix.charting.model.ObjectChartDataModel;
-import com.approximatrix.charting.render.BarChartRenderer;
-import com.approximatrix.charting.swing.ExtendedChartPanel;
 import java.awt.Dimension;
-import java.awt.event.MouseEvent;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 

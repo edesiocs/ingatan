@@ -27,14 +27,7 @@
  */
 package org.ingatan.component;
 
-import com.approximatrix.charting.coordsystem.ClassicCoordSystem;
-import com.approximatrix.charting.coordsystem.CoordSystem;
-import com.approximatrix.charting.model.ChartDataModel;
-import com.approximatrix.charting.model.ObjectChartDataModel;
-import com.approximatrix.charting.render.BarChartRenderer;
-import com.approximatrix.charting.swing.ExtendedChartPanel;
 import java.awt.Dimension;
-import java.awt.event.MouseEvent;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
@@ -56,23 +49,9 @@ public class LibraryStatsGraphPane extends JPanel {
     public LibraryStatsGraphPane() {
         this.setSize(new Dimension(500, 500));
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        /** Our labels for each bar */
-        String[] names = {"Shea", "Flick", "Will"};
-        /** The value associated with each label */
-        double[] values = {10.0, 30.0, 60.0};
-        Double[][] data = new Double[1][values.length];
-        for (int i = 0; i < values.length; i++) {
-            data[0][i] = new Double(values[i]);
-        }
+
         String[] series_names = {"Ohmsfords"};
-        ChartDataModel model = new ObjectChartDataModel(data, names, series_names);
-        CoordSystem coord = new ClassicCoordSystem(model);
-        ExtendedChartPanel chart_panel = new ExtendedChartPanel(model, "Disapproval Rating");
-        chart_panel.setCoordSystem(coord);
-        chart_panel.addChartRenderer(new BarChartRenderer(coord, model), 0);
-        chart_panel.setPreferredSize(new Dimension(300, 300));
-        chart_panel.setZoomMouseButton(MouseEvent.BUTTON1);
-        chart_panel.enableZoom(true);
-        this.add(chart_panel);
+
+
     }
 }
