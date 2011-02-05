@@ -40,10 +40,10 @@
 package org.jCharts.chartData.processors;
 
 
-import org.jCharts.axisChart.AxisChart;
-import org.jCharts.chartData.interfaces.IScatterPlotDataSeries;
-import org.jCharts.chartData.interfaces.IScatterPlotDataSet;
-import org.jCharts.types.ChartType;
+import org.jCharts.AxisChart;
+import org.jCharts.chartData.IScatterPlotDataSeries;
+import org.jCharts.chartData.IScatterPlotDataSet;
+import org.jCharts.ChartType;
 
 import java.awt.font.FontRenderContext;
 import java.awt.geom.Point2D;

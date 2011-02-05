@@ -42,14 +42,7 @@ package org.jCharts.properties;
  ************************************************************************************************/
 
 
-import org.jCharts.test.HTMLGenerator;
-import org.jCharts.test.HTMLTestable;
-import org.jCharts.properties.util.ChartStroke;
-
-import java.awt.*;
-
-
-public class AreaProperties extends Properties implements HTMLTestable
+public class AreaProperties extends Properties
 {
 	//---padding on all edges of image
 	private float edgePadding = 5;
@@ -108,19 +101,6 @@ public class AreaProperties extends Properties implements HTMLTestable
 	public ChartStroke getBorderStroke()
 	{
 		return this.borderStroke;
-	}
-
-
-	/*********************************************************************************************
-	 * Enables the testing routines to display the contents of this Object.
-	 *
-	 * @param htmlGenerator
-	 **********************************************************************************************/
-	public void toHTML( HTMLGenerator htmlGenerator )
-	{
-		super.toHTML( htmlGenerator );
-		htmlGenerator.addTableRow( "AreaProperties->Edge Padding", Float.toString( this.getEdgePadding() ) );
-		htmlGenerator.addTableRow( "AreaProperties->Border Stroke", this.borderStroke );
 	}
 
 }

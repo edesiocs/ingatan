@@ -40,7 +40,7 @@
 package org.jCharts.properties;
 
 
-import org.jCharts.chartData.interfaces.IAxisPlotDataSet;
+import org.jCharts.chartData.IAxisPlotDataSet;
 
 
 public class AreaChartProperties extends AxisChartTypeProperties

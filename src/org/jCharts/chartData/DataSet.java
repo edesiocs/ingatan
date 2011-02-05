@@ -40,7 +40,6 @@
 package org.jCharts.chartData;
 
 
-import org.jCharts.chartData.interfaces.IDataSet;
 import org.jCharts.properties.ChartTypeProperties;
 
 import java.awt.*;

@@ -40,8 +40,7 @@
 package org.jCharts.properties;
 
 
-import org.jCharts.chartData.interfaces.IAxisPlotDataSet;
-import org.jCharts.test.HTMLGenerator;
+import org.jCharts.chartData.IAxisPlotDataSet;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
@@ -112,19 +111,6 @@ final public class PointChartProperties extends AxisChartTypeProperties
 	public Shape getShape( int index )
 	{
 		return this.shapes[ index ];
-	}
-
-
-	/*********************************************************************************************
-	 * Enables the testing routines to display the contents of this Object.
-	 *
-	 * @param htmlGenerator
-	 **********************************************************************************************/
-	public void toHTML( HTMLGenerator htmlGenerator )
-	{
-		htmlGenerator.propertiesTableStart( "PointChartProperties" );
-		//htmlGenerator.addTableRow( "Zero Degree Offset", Double.toString( this.getZeroDegreeOffset() ) );
-		htmlGenerator.propertiesTableEnd();
 	}
 
 

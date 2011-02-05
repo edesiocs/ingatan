@@ -49,7 +49,7 @@
 package org.jCharts.chartData.processors;
 
 
-import org.jCharts.chartData.interfaces.IAxisChartDataSet;
+import org.jCharts.chartData.IAxisChartDataSet;
 
 
 /*******************************************************************************************

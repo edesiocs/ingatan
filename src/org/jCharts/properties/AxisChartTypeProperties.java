@@ -40,9 +40,12 @@
 package org.jCharts.properties;
 
 
+import org.jCharts.renderers.AxisValueRenderEvent;
+import org.jCharts.renderers.PostAxisValueRenderListener;
+import org.jCharts.renderers.PreAxisValueRenderListener;
 import org.jCharts.test.HTMLTestable;
-import org.jCharts.chartData.interfaces.IAxisPlotDataSet;
-import org.jCharts.axisChart.customRenderers.axisValue.*;
+import org.jCharts.chartData.IAxisPlotDataSet;
+import org.jCharts.renderers.axisValue.*;
 
 
 import java.util.ArrayList;

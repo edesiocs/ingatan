@@ -40,10 +40,9 @@
 package org.jCharts.chartData;
 
 
-import org.jCharts.chartData.interfaces.IScatterPlotDataSet;
 import org.jCharts.properties.ChartTypeProperties;
 import org.jCharts.properties.ScatterPlotProperties;
-import org.jCharts.types.ChartType;
+import org.jCharts.ChartType;
 
 import java.awt.*;
 import java.awt.geom.Point2D;

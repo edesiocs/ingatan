@@ -40,9 +40,8 @@
 package org.jCharts.chartData;
 
 
-import org.jCharts.chartData.interfaces.IAxisChartDataSet;
 import org.jCharts.properties.*;
-import org.jCharts.types.ChartType;
+import org.jCharts.ChartType;
 
 import java.awt.*;
 

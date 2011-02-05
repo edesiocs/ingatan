@@ -36,12 +36,13 @@
 package org.jCharts;
 
 
+import org.jCharts.chartData.IAxisDataSeries;
+import org.jCharts.chartData.IData;
+import org.jCharts.chartData.IAxisPlotDataSet;
+import org.jCharts.chartData.IPieChartDataSet;
 import org.jCharts.chartData.interfaces.*;
 import org.jCharts.chartData.processors.TextProcessor;
 import org.jCharts.properties.*;
-import org.jCharts.test.HTMLGenerator;
-import org.jCharts.test.HTMLTestable;
-import org.jCharts.types.ChartType;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -56,7 +57,7 @@ import java.util.Iterator;
  * @author Nathaniel Auvil, Sandor Dornbush, Sundar Balasubramanian
  * @version $Id: Legend.java,v 1.17 2003/04/19 01:39:17 nathaniel_auvil Exp $
  ************************************************************************************/
-final public class Legend implements HTMLTestable, Serializable
+final public class Legend implements Serializable
 {
 	private Chart chart;
 	private LegendProperties legendProperties;
@@ -517,27 +518,6 @@ final public class Legend implements HTMLTestable, Serializable
 			fontY += yIncrement;
 			rectangle.y += yIncrement;
 		}
-	}
-
-
-	/*********************************************************************************************
-	 * Enables the testing routines to display the contents of this Object.
-	 *
-	 * @param htmlGenerator
-	 **********************************************************************************************/
-	public void toHTML( HTMLGenerator htmlGenerator )
-	{
-		htmlGenerator.legendTableStart();
-
-		htmlGenerator.addTableRow( "Width", Float.toString( this.width ) );
-		htmlGenerator.addTableRow( "Height", Float.toString( this.height ) );
-		htmlGenerator.addTableRow( "Icon Side", Float.toString( this.iconSide ) );
-
-		htmlGenerator.innerTableRowStart();
-		this.legendProperties.toHTML( htmlGenerator );
-		htmlGenerator.innerTableRowEnd();
-
-		htmlGenerator.legendTableEnd();
 	}
 
 }

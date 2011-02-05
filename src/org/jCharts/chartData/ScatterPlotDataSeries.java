@@ -40,9 +40,6 @@
 package org.jCharts.chartData;
 
 
-import org.jCharts.chartData.interfaces.*;
-
-
 
 /*********************************************************************************************
  * Collection of all IAxisPlotDataSets to display in an AxisChart

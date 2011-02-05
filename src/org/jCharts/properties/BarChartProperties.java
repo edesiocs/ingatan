@@ -40,8 +40,7 @@
 package org.jCharts.properties;
 
 
-import org.jCharts.chartData.interfaces.IAxisPlotDataSet;
-import org.jCharts.properties.util.ChartStroke;
+import org.jCharts.chartData.IAxisPlotDataSet;
 
 
 public class BarChartProperties extends AxisChartTypeProperties {

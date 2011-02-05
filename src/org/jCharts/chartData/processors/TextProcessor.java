@@ -40,7 +40,7 @@
 package org.jCharts.chartData.processors;
 
 
-import org.jCharts.chartText.TextTag;
+import org.jCharts.renderElements.TextTag;
 
 import java.awt.*;
 import java.awt.font.FontRenderContext;

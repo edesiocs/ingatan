@@ -43,7 +43,6 @@ package org.jCharts.properties;
 
 import org.jCharts.test.HTMLGenerator;
 import org.jCharts.test.HTMLTestable;
-import org.jCharts.properties.util.ChartFont;
 
 import java.awt.*;
 import java.lang.reflect.Field;

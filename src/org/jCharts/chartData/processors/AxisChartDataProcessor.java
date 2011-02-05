@@ -44,204 +44,160 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  ************************************************************************************************/
-
 package org.jCharts.chartData.processors;
 
-
-import org.jCharts.axisChart.AxisChart;
-import org.jCharts.axisChart.ScatterPlotAxisChart;
+import org.jCharts.chartData.IAxisChartDataSet;
+import org.jCharts.chartData.IAxisPlotDataSet;
+import org.jCharts.chartData.IDataSeries;
+import org.jCharts.AxisChart;
 import org.jCharts.chartData.interfaces.*;
-import org.jCharts.types.ChartType;
-import org.jCharts.chartText.TextTagGroup;
+import org.jCharts.ChartType;
 import org.jCharts.properties.DataAxisProperties;
 
-import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.util.Iterator;
-
 
 /*******************************************************************************************
  *
  ********************************************************************************************/
-public class AxisChartDataProcessor
-{
-	private double max;
-	private double min;
+public class AxisChartDataProcessor {
 
-	//private TextLayout titleTextLayout;
+    private double max;
+    private double min;
+    //private TextLayout titleTextLayout;
+    //---need this so know how many items are on the 'label' axis.
+    private int numberOfElementsInADataSet;
 
+    /******************************************************************************************
+     * Constructor
+     *
+     *******************************************************************************************/
+    public AxisChartDataProcessor() {
+    }
 
-	//---need this so know how many items are on the 'label' axis.
-	private int numberOfElementsInADataSet;
-
-
-
-	/******************************************************************************************
-	 * Constructor
-	 *
-	 *******************************************************************************************/
-	public AxisChartDataProcessor()
-	{
-
-	}
-
-
-
-	/******************************************************************************************
-	 * Method to perform all chart data processing.
-	 *
-	 * @param axisChart
-	 ******************************************************************************************/
-	public void processData( AxisChart axisChart, FontRenderContext fontRenderContext )
-	{
+    /******************************************************************************************
+     * Method to perform all chart data processing.
+     *
+     * @param axisChart
+     ******************************************************************************************/
+    public void processData(AxisChart axisChart, FontRenderContext fontRenderContext) {
 //todo would it make sense to do this and do the axis titles?
 		/*
-	   if( axisChart.getIDataSeries().getChartTitle() != null )
-		{
-			this.titleTextLayout= new TextLayout(  axisChart.getIDataSeries().getChartTitle(),
-																axisChart.getChartProperties().getTitleFont(),
-																fontRenderContext );
-		}
-		*/
+        if( axisChart.getIDataSeries().getChartTitle() != null )
+        {
+        this.titleTextLayout= new TextLayout(  axisChart.getIDataSeries().getChartTitle(),
+        axisChart.getChartProperties().getTitleFont(),
+        fontRenderContext );
+        }
+         */
 
-		DataAxisProperties dataAxisProperties;
-		if( axisChart.getAxisProperties().isPlotHorizontal() )
-		{
-			dataAxisProperties= (DataAxisProperties) axisChart.getAxisProperties().getXAxisProperties();
-		}
-		else
-		{
-			dataAxisProperties= (DataAxisProperties) axisChart.getAxisProperties().getYAxisProperties();
-		}
+        DataAxisProperties dataAxisProperties;
+        if (axisChart.getAxisProperties().isPlotHorizontal()) {
+            dataAxisProperties = (DataAxisProperties) axisChart.getAxisProperties().getXAxisProperties();
+        } else {
+            dataAxisProperties = (DataAxisProperties) axisChart.getAxisProperties().getYAxisProperties();
+        }
 
 
-		//---if there is a user defined scale, there is no reason to process the data.
-		if( ! dataAxisProperties.hasUserDefinedScale() )
-		{
-			this.processDataSet( (IDataSeries) axisChart.getIAxisDataSeries() );
-		}
+        //---if there is a user defined scale, there is no reason to process the data.
+        if (!dataAxisProperties.hasUserDefinedScale()) {
+            this.processDataSet((IDataSeries) axisChart.getIAxisDataSeries());
+        }
 
 
-		//---need to set the number of items on the scale in case there are no labels displayed
-		Iterator iterator = axisChart.getIAxisDataSeries().getIAxisPlotDataSetIterator();
-		IAxisPlotDataSet iAxisPlotDataSet = ( IAxisPlotDataSet ) iterator.next();
-		this.numberOfElementsInADataSet= iAxisPlotDataSet.getNumberOfDataItems();
+        //---need to set the number of items on the scale in case there are no labels displayed
+        Iterator iterator = axisChart.getIAxisDataSeries().getIAxisPlotDataSetIterator();
+        IAxisPlotDataSet iAxisPlotDataSet = (IAxisPlotDataSet) iterator.next();
+        this.numberOfElementsInADataSet = iAxisPlotDataSet.getNumberOfDataItems();
 
 
 //todo does it make sense to do the legend label processing here?
 		/*
-		if( axisChart.hasLegend() )
-		{
-			//this.lengendLabelProcessor= new TextProcessor();
-		  // this.lengendLabelProcessor
-		}
-		*/
-	}
+        if( axisChart.hasLegend() )
+        {
+        //this.lengendLabelProcessor= new TextProcessor();
+        // this.lengendLabelProcessor
+        }
+         */
+    }
 
+    /******************************************************************************************
+     * Processes the numeric values in the chart data. If there is a user defined scale
+     *  there is no need to call this.
+     *
+     * @param iDataSeries
+     ******************************************************************************************/
+    private void processDataSet(IDataSeries iDataSeries) {
+        IAxisPlotDataSet iAxisPlotDataSet;
+        Iterator iterator = iDataSeries.getIAxisPlotDataSetIterator();
 
-	/******************************************************************************************
-	 * Processes the numeric values in the chart data. If there is a user defined scale
-	 *  there is no need to call this.
-	 *
-	 * @param iDataSeries
-	 ******************************************************************************************/
-	private void processDataSet( IDataSeries iDataSeries )
-	{
-		IAxisPlotDataSet iAxisPlotDataSet;
-		Iterator iterator = iDataSeries.getIAxisPlotDataSetIterator();
+        //LOOP
+        while (iterator.hasNext()) {
+            iAxisPlotDataSet = (IAxisPlotDataSet) iterator.next();
 
-		//LOOP
-		while( iterator.hasNext() )
-		{
-			iAxisPlotDataSet = ( IAxisPlotDataSet ) iterator.next();
+            if (iAxisPlotDataSet.getChartType().isStacked()) {
+                //---StockChartDataSet is NEVER stacked!!!!
+                StackedDataProcessor.processData((IAxisChartDataSet) iAxisPlotDataSet, this);
+            } else {
+                NonStackedDataProcessor.processData((IAxisChartDataSet) iAxisPlotDataSet, this);
+            }
+        }
+    }
 
-			if( iAxisPlotDataSet.getChartType().isStacked() )
-			{
-				//---StockChartDataSet is NEVER stacked!!!!
-				StackedDataProcessor.processData( ( IAxisChartDataSet ) iAxisPlotDataSet, this );
-			}
-			else
-			{
-				//---stock charts dont fit well here as the data comes in structured.
-				//---in this case only care about the high and low; no need to search close, open, volume
-				if( iAxisPlotDataSet.getChartType().equals( ChartType.STOCK ) )
-				{
-					StockDataProcessor.processData( ( IStockChartDataSet ) iAxisPlotDataSet, this );
-				}
-				else
-				{
-					NonStackedDataProcessor.processData( ( IAxisChartDataSet ) iAxisPlotDataSet, this );
-				}
-			}
-		}
-	}
+    /******************************************************************************************
+     *
+     *
+     ******************************************************************************************/
+    void setMaxValue(double max) {
+        this.max = max;
+    }
 
+    /******************************************************************************************
+     *
+     *
+     *
+     ******************************************************************************************/
+    public double getMaxValue() {
+        return this.max;
+    }
 
-	/******************************************************************************************
-	 *
-	 *
-	 ******************************************************************************************/
-	void setMaxValue( double max )
-	{
-		this.max = max;
-	}
+    /******************************************************************************************
+     *
+     *
+     ******************************************************************************************/
+    void setMinValue(double min) {
+        this.min = min;
+    }
 
+    /******************************************************************************************
+     *
+     *
+     *
+     ******************************************************************************************/
+    public double getMinValue() {
+        return this.min;
+    }
 
-	/******************************************************************************************
-	 *
-	 *
-	 *
-	 ******************************************************************************************/
-	public double getMaxValue()
-	{
-		return this.max;
-	}
+    public int getNumberOfElementsInADataSet() {
+        return numberOfElementsInADataSet;
+    }
+    /*********************************************************************************************
+     * Enables the testing routines to display the contents of this Object.
+     *
+     * @param htmlGenerator
+     **********************************************************************************************
+    public void toHTML( HTMLGenerator htmlGenerator )
+    {
+    super.toHTML( htmlGenerator );
 
+    String name= this.getClass().getSuperclass().getName() + "->";
 
-	/******************************************************************************************
-	 *
-	 *
-	 ******************************************************************************************/
-	void setMinValue( double min )
-	{
-		this.min = min;
-	}
-
-
-	/******************************************************************************************
-	 *
-	 *
-	 *
-	 ******************************************************************************************/
-	public double getMinValue()
-	{
-		return this.min;
-	}
-
-
-	public int getNumberOfElementsInADataSet()
-	{
-		return numberOfElementsInADataSet;
-	}
-
-
-	/*********************************************************************************************
-	 * Enables the testing routines to display the contents of this Object.
-	 *
-	 * @param htmlGenerator
-	 **********************************************************************************************
-	 public void toHTML( HTMLGenerator htmlGenerator )
-	 {
-	 super.toHTML( htmlGenerator );
-
-	 String name= this.getClass().getSuperclass().getName() + "->";
-
-	 //---calling on instance of YAxis or XAxis
-	 Field[] fields= this.getClass().getSuperclass().getDeclaredFields();
-	 for( int i=0; i< fields.length; i++ )
-	 {
-	 htmlGenerator.addField( name + fields[ i ].getName(), fields[ i ].get( this ) );
-	 }
-	 }
-	 */
+    //---calling on instance of YAxis or XAxis
+    Field[] fields= this.getClass().getSuperclass().getDeclaredFields();
+    for( int i=0; i< fields.length; i++ )
+    {
+    htmlGenerator.addField( name + fields[ i ].getName(), fields[ i ].get( this ) );
+    }
+    }
+     */
 }

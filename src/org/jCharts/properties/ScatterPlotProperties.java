@@ -40,8 +40,7 @@
 package org.jCharts.properties;
 
 
-import org.jCharts.chartData.interfaces.IAxisPlotDataSet;
-import org.jCharts.test.HTMLGenerator;
+import org.jCharts.chartData.IAxisPlotDataSet;
 
 import java.awt.*;
 
@@ -78,19 +77,6 @@ final public class ScatterPlotProperties extends AxisChartTypeProperties
 	public Shape[] getShapes()
 	{
 		return this.shapes;
-	}
-
-
-	/*********************************************************************************************
-	 * Enables the testing routines to display the contents of this Object.
-	 *
-	 * @param htmlGenerator
-	 **********************************************************************************************/
-	public void toHTML( HTMLGenerator htmlGenerator )
-	{
-		htmlGenerator.propertiesTableStart( "ScatterPlotProperties" );
-		//htmlGenerator.addTableRow( "Zero Degree Offset", Double.toString( this.getZeroDegreeOffset() ) );
-		htmlGenerator.propertiesTableEnd();
 	}
 
 

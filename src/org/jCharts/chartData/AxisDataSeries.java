@@ -40,9 +40,7 @@
 package org.jCharts.chartData;
 
 
-import org.jCharts.chartData.interfaces.IAxisDataSeries;
-import org.jCharts.chartData.interfaces.IAxisPlotDataSet;
-import org.jCharts.types.ChartType;
+import org.jCharts.ChartType;
 import org.jCharts.properties.PropertyException;
 
 import java.util.Iterator;

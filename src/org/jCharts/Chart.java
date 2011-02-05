@@ -40,9 +40,8 @@
 package org.jCharts;
 
 
-import org.jCharts.imageMap.ImageMap;
+import org.jCharts.renderElements.ImageMap;
 import org.jCharts.properties.*;
-import org.jCharts.test.HTMLGenerator;
 import org.jCharts.chartData.ChartDataException;
 
 import java.awt.*;
@@ -328,32 +327,6 @@ abstract public class Chart implements Serializable
 	public final ImageMap getImageMap()
 	{
 		return this.imageMap;
-	}
-
-
-	/**********************************************************************************************
-	 * Enables the testing routines to display the contents of this Object.
-	 *
-	 * @param htmlGenerator
-	 * @param imageFileName
-	 * @param imageMap if this is NULL we are not creating image map data in html
-	 **********************************************************************************************/
-	public void toHTML( HTMLGenerator htmlGenerator, String imageFileName, ImageMap imageMap )
-	{
-		htmlGenerator.chartTableStart( this.getClass().getName(), imageFileName, imageMap );
-
-		htmlGenerator.chartTableRowStart();
-		this.chartProperties.toHTML( htmlGenerator );
-		htmlGenerator.chartTableRowEnd();
-
-		if( this.legend != null )
-		{
-			htmlGenerator.chartTableRowStart();
-			this.getLegend().toHTML( htmlGenerator );
-			htmlGenerator.chartTableRowEnd();
-		}
-
-		htmlGenerator.chartTableEnd();
 	}
 
 

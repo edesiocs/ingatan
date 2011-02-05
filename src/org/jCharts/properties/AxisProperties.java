@@ -41,13 +41,7 @@
 package org.jCharts.properties;
 
 
-import org.jCharts.test.HTMLGenerator;
-import org.jCharts.test.HTMLTestable;
-
-import java.lang.reflect.Field;
-
-
-final public class AxisProperties extends Properties implements HTMLTestable
+final public class AxisProperties extends Properties
 {
 	private AxisTypeProperties xAxisProperties;
 	private AxisTypeProperties yAxisProperties;
@@ -132,43 +126,6 @@ final public class AxisProperties extends Properties implements HTMLTestable
 	public void setXAxisLabelsAreVertical( boolean xAxisLabelsAreVertical )
 	{
 		this.xAxisLabelsAreVertical = xAxisLabelsAreVertical;
-	}
-
-
-	/*********************************************************************************************
-	 * Enables the testing routines to display the contents of this Object.
-	 *
-	 * @param htmlGenerator
-	 **********************************************************************************************/
-	public void toHTML( HTMLGenerator htmlGenerator )
-	{
-		htmlGenerator.propertiesTableStart( this.getClass().getName() );
-		super.toHTML( htmlGenerator );
-
-		Field[] fields = this.getClass().getDeclaredFields();
-		for( int i = 0; i < fields.length; i++ )
-		{
-			try
-			{
-				htmlGenerator.addField( fields[ i ].getName(), fields[ i ].get( this ) );
-			}
-			catch( IllegalAccessException illegalAccessException )
-			{
-				illegalAccessException.printStackTrace();
-			}
-		}
-
-
-		htmlGenerator.innerTableRowStart();
-		this.xAxisProperties.toHTML( htmlGenerator );
-		htmlGenerator.innerTableRowEnd();
-
-
-		htmlGenerator.innerTableRowStart();
-		this.yAxisProperties.toHTML( htmlGenerator );
-		htmlGenerator.innerTableRowEnd();
-
-		htmlGenerator.propertiesTableEnd();
 	}
 
 

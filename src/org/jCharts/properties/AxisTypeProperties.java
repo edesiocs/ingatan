@@ -41,15 +41,7 @@
 package org.jCharts.properties;
 
 
-import org.jCharts.properties.util.ChartFont;
-import org.jCharts.properties.util.ChartStroke;
-import org.jCharts.test.HTMLGenerator;
-import org.jCharts.test.HTMLTestable;
-
-import java.lang.reflect.Field;
-
-
-public class AxisTypeProperties extends Properties implements HTMLTestable
+public class AxisTypeProperties extends Properties
 {
 	public static final int TICKS_NONE = 0;
 	public static final int TICKS_ALL = 1;
@@ -278,35 +270,6 @@ public class AxisTypeProperties extends Properties implements HTMLTestable
 	public void setPaddingBetweenXAxisLabels( float paddingBetweenAxisLabels )
 	{
 		this.paddingBetweenAxisLabels = paddingBetweenAxisLabels;
-	}
-
-
-	/*********************************************************************************************
-	 * Enables the testing routines to display the contents of this Object.
-	 *
-	 * @param htmlGenerator
-	 **********************************************************************************************/
-	public void toHTML( HTMLGenerator htmlGenerator )
-	{
-		htmlGenerator.propertiesTableStart( AxisTypeProperties.class.getName() );
-
-		super.toHTML( htmlGenerator );
-
-		Field[] fields = this.getClass().getDeclaredFields();
-		for( int i = 0; i < fields.length; i++ )
-		{
-			try
-			{
-				htmlGenerator.addField( fields[ i ].getName(), fields[ i ].get( this ) );
-			}
-			catch( IllegalAccessException illegalAccessException )
-			{
-				System.out.println( "can not access field: " + fields[i].getName() );
-				//illegalAccessException.printStackTrace();
-			}
-		}
-
-		htmlGenerator.propertiesTableEnd();
 	}
 
 

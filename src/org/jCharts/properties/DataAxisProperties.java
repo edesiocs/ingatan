@@ -41,15 +41,11 @@
 package org.jCharts.properties;
 
 
-import org.jCharts.test.HTMLGenerator;
-import org.jCharts.test.HTMLTestable;
-import org.jCharts.properties.util.ChartStroke;
-import org.jCharts.axisChart.axis.scale.ScaleCalculator;
-
-import java.lang.reflect.Field;
+import org.jCharts.axis.ScaleCalculator;
 
 
-public final class DataAxisProperties extends LabelAxisProperties implements HTMLTestable
+
+public final class DataAxisProperties extends LabelAxisProperties
 {
 	//---round to nearest power of ten. 2==100, -3=.001
 	private int roundToNearest = 0;
@@ -224,33 +220,5 @@ public final class DataAxisProperties extends LabelAxisProperties implements HTM
 	{
 		this.scaleCalculator = scaleCalculator;
 	}
-
-
-	/*********************************************************************************************
-	 * Enables the testing routines to display the contents of this Object.
-	 *
-	 * @param htmlGenerator
-	 **********************************************************************************************/
-	public void toHTML( HTMLGenerator htmlGenerator )
-	{
-		htmlGenerator.propertiesTableStart( DataAxisProperties.class.getName() );
-		//super.toHTML( htmlGenerator );
-
-		Field[] fields = this.getClass().getDeclaredFields();
-		for( int i = 0; i < fields.length; i++ )
-		{
-			try
-			{
-				htmlGenerator.addField( fields[ i ].getName(), fields[ i ].get( this ) );
-			}
-			catch( IllegalAccessException illegalAccessException )
-			{
-				illegalAccessException.printStackTrace();
-			}
-		}
-
-		htmlGenerator.propertiesTableEnd();
-	}
-
 
 }
