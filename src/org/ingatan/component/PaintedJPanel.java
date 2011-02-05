@@ -27,6 +27,7 @@
  */
 package org.ingatan.component;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import org.ingatan.ThemeConstants;
 import java.awt.Graphics;
@@ -47,6 +48,7 @@ public class PaintedJPanel extends JPanel {
 
     Color border = ThemeConstants.borderUnselected;
     Color bg = ThemeConstants.backgroundUnselected;
+    float borderWidth = 1.0f;
 
     public PaintedJPanel() {
     }
@@ -73,6 +75,7 @@ public class PaintedJPanel extends JPanel {
 
         //draw the border
         g2d.setPaint(border);
+        g2d.setStroke(new BasicStroke(borderWidth));
         g2d.draw(shapeBorder);
 
         paintExtension(g);
@@ -84,6 +87,11 @@ public class PaintedJPanel extends JPanel {
 
     public void setBorderColour(Color newBorder) {
         border = newBorder;
+    }
+
+    public void setBorderWeigth(float weight)
+    {
+        borderWidth = weight;
     }
 
     /**

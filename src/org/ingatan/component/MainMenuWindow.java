@@ -280,7 +280,7 @@ public class MainMenuWindow extends JFrame implements WindowListener {
         }
 
         public void actionPerformed(ActionEvent e) {
-            new QuizHistoryWindow(MainMenuWindow.this).setVisible(true);
+            new StatsWindow().setVisible(true);
             MainMenuWindow.this.setVisible(false);
         }
     }

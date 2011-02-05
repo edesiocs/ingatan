@@ -1,5 +1,5 @@
 /*
- * QuizHistoryWindow.java
+ * QuisHistoryPane.java
  *
  * Copyright (C) 2011 Thomas Everingham
  *
@@ -33,11 +33,9 @@ import org.ingatan.data.QuizHistoryEntry;
 import org.ingatan.io.IOManager;
 import org.ingatan.io.ParserWriter;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Insets;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -46,20 +44,17 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 /**
- * Simple window displaying past quiz results. Results are displayed in the following
- * format:<br><br>
- * Date: X%, Y asked, Z skipped. Score=W. Libraries used=.
+ * Panel displaying the recent quiz history. 
  * 
  * @author ThomasEveringham
- * @version 1.0
+ * @version 2.0
  */
-public class QuizHistoryWindow extends JFrame implements WindowListener {
+public class QuizHistoryPane extends JPanel {
 
     /**
      * Content of the scroll pane, contains each record.
@@ -70,39 +65,24 @@ public class QuizHistoryWindow extends JFrame implements WindowListener {
      */
     private JScrollPane scroller = new JScrollPane();
     /**
-     * The window to return to when this window is closed.
+     * Holds the menu items (sidebar).
      */
-    private Window returnToOnClose;
-    /**
-     * The label that displays the total score accumulated over all quizes.
-     */
-    private JLabel lblTotalScore = new JLabel();
+    private PaintedJPanel menuPanel = new PaintedJPanel();
 
     /**
      * Creates a new <code>QuizHistoryWindow</code>.
      * @param returnToOnClose the window to return to once this window has closed.
      */
-    public QuizHistoryWindow(Window returnToOnClose) {
-        this.returnToOnClose = returnToOnClose;
-
-        this.setTitle("Quiz Records");
-        this.setIconImage(IOManager.windowIcon);
-
+    public QuizHistoryPane() {
         this.setSize(new Dimension(500, 500));
+        this.setLayout(new FlowLayout());
         scroller.setViewportView(scrollerContent);
-        scroller.setPreferredSize(new Dimension(400, 300));
-        this.setLocationRelativeTo(null);
-        this.addWindowListener(this);
-
+        scroller.setAlignmentX(LEFT_ALIGNMENT);
+        scroller.setPreferredSize(new Dimension(500,300));
+        scroller.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, ThemeConstants.borderUnselected));
         scrollerContent.setLayout(new BoxLayout(scrollerContent, BoxLayout.Y_AXIS));
 
-        lblTotalScore.setText("<html><h2>Total Score: " + IOManager.getQuizHistoryFile().getTotalScore() + "</h2>");
-        lblTotalScore.setAlignmentX(LEFT_ALIGNMENT);
-        scroller.setAlignmentX(LEFT_ALIGNMENT);
-        this.getContentPane().setLayout(new BoxLayout(this.getContentPane(), BoxLayout.Y_AXIS));
-        this.getContentPane().add(lblTotalScore);
-        this.getContentPane().add(Box.createVerticalStrut(10));
-        this.getContentPane().add(scroller);
+        this.add(scroller);
 
         rebuild();
 
@@ -128,33 +108,8 @@ public class QuizHistoryWindow extends JFrame implements WindowListener {
                 scrollerContent.add(Box.createVerticalStrut(10));
             }
         }
-        QuizHistoryWindow.this.validate();
+        QuizHistoryPane.this.validate();
         scrollerContent.repaint();
-    }
-
-    public void windowOpened(WindowEvent e) {
-    }
-
-    public void windowClosing(WindowEvent e) {
-        returnToOnClose.setVisible(true);
-        //any changes (i.e. deleted records) can be saved as follows
-        ParserWriter.writeQuizHistoryFile(IOManager.getQuizHistoryFile());
-        this.dispose();
-    }
-
-    public void windowClosed(WindowEvent e) {
-    }
-
-    public void windowIconified(WindowEvent e) {
-    }
-
-    public void windowDeiconified(WindowEvent e) {
-    }
-
-    public void windowActivated(WindowEvent e) {
-    }
-
-    public void windowDeactivated(WindowEvent e) {
     }
 
     /**
@@ -182,6 +137,7 @@ public class QuizHistoryWindow extends JFrame implements WindowListener {
         public QuizRecord(QuizHistoryEntry record) {
             this.record = record;
             this.setBorder(BorderFactory.createEmptyBorder(0, 8, 8, 8));
+            this.setBorderWeigth(2.0f);
 
             btnDelete.setMargin(new Insets(1, 1, 1, 1));
             btnDelete.setFont(ThemeConstants.niceFont);
@@ -226,14 +182,12 @@ public class QuizHistoryWindow extends JFrame implements WindowListener {
             lblRecord.setText(buildString);
 
             //set colour of the record to indicate score
-            if (record.getPercentage() <= 35) {
-                this.setBackgroundColour(new Color(243, 180, 180));
-            } else if ((record.getPercentage() <= 70) && (record.getPercentage() > 35)) {
-                this.setBackgroundColour(new Color(243, 235, 195));
-            } else if ((record.getPercentage() > 70) && (record.getPercentage() < 100)) {
-                this.setBackgroundColour(new Color(226, 243, 195));
-            } else if (record.getPercentage() == 100) {
-                this.setBackgroundColour(new Color(226, 255, 195));
+            if (record.getPercentage() <= 40) {
+                this.setBorderColour(new Color(225, 71, 71));
+            } else if ((record.getPercentage() <= 75) && (record.getPercentage() > 40)) {
+                this.setBorderColour(ThemeConstants.borderUnselected);//new Color(240, 230, 40));
+            } else if ((record.getPercentage() > 75) && (record.getPercentage() <= 100)) {
+                this.setBorderColour(new Color(153, 220, 37));
             }
         }
 
@@ -249,6 +203,7 @@ public class QuizHistoryWindow extends JFrame implements WindowListener {
             public void actionPerformed(ActionEvent e) {
                 //this change will be saved to file when this window is closed.
                 IOManager.getQuizHistoryFile().removeEntry(record);
+                ParserWriter.writeQuizHistoryFile(IOManager.getQuizHistoryFile());
                 rebuild();
             }
         }
