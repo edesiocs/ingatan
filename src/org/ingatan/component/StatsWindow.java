@@ -1,29 +1,60 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
  * StatsWindow.java
  *
- * Created on Feb 5, 2011, 3:01:09 PM
+ * Copyright (C) 2011 Thomas Everingham
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * A copy of the GNU General Public License can be found in the file
+ * LICENSE.txt provided with the source distribution of this program (see
+ * the META-INF directory in the source jar). This license can also be
+ * found on the GNU website at http://www.gnu.org/licenses/gpl.html.
+ *
+ * If you did not receive a copy of the GNU General Public License along
+ * with this program, contact the lead developer, or write to the Free
+ * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * 02110-1301, USA.
+ *
+ * If you find this program useful, please tell me about it! I would be delighted
+ * to hear from you at tom.ingatan@gmail.com.
  */
 
 package org.ingatan.component;
 
 import org.ingatan.ThemeConstants;
-import org.ingatan.component.librarymanager.MultipleLibrarySelector;
 
 /**
+ * A statistics window with a sidebar and content pane. Allows the user to view
+ * quiz history, as well as graphical statistics of quiz results for selected
+ * libraries and flashcard type questions. Also holds the RewardsPane.
  *
- * @author thomas
+ * @author Thomas Everingham
+ * @version 1.0
  */
 public class StatsWindow extends javax.swing.JFrame {
+
+    /** The QuizHistoryPane displayed by this stats window */
+    QuizHistoryPane historyPane = new QuizHistoryPane();
+
+    /** The GropuStatsGraphPane displayed by this stats window */
+    GroupStatsGraphPane groupStatsPane = new GroupStatsGraphPane();
+
+    /** The LibraryStatsGraphPane displayed by this stats window */
+    LibraryStatsGraphPane libStatsPane = new LibraryStatsGraphPane();
+
+    /** Rewards pane displayed by this stats window */
+    RewardsPane rewardsPane = new RewardsPane();
 
     /** Creates new form StatsWindow */
     public StatsWindow() {
         initComponents();
-        contentPane.add(new LibraryStatsGraphPane());
     }
 
     /** This method is called from within the constructor to
@@ -63,6 +94,11 @@ public class StatsWindow extends javax.swing.JFrame {
         menuPanel.setLayout(new java.awt.GridLayout(4, 0, 0, 10));
 
         btnQuizHistory.setText("Quiz History");
+        btnQuizHistory.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnQuizHistoryActionPerformed(evt);
+            }
+        });
         menuPanel.add(btnQuizHistory);
 
         btnLibraryGraphs.setText("Library Graphs");
@@ -74,9 +110,19 @@ public class StatsWindow extends javax.swing.JFrame {
         menuPanel.add(btnLibraryGraphs);
 
         btnGroupGraphs.setText("Group Graphs");
+        btnGroupGraphs.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGroupGraphsActionPerformed(evt);
+            }
+        });
         menuPanel.add(btnGroupGraphs);
 
         btnRewards.setText("Rewards");
+        btnRewards.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRewardsActionPerformed(evt);
+            }
+        });
         menuPanel.add(btnRewards);
 
         horiz.add(menuPanel);
@@ -102,8 +148,40 @@ public class StatsWindow extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnLibraryGraphsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLibraryGraphsActionPerformed
-        // TODO add your handling code here:
+        contentPane.remove(historyPane);
+        contentPane.remove(groupStatsPane);
+        contentPane.remove(rewardsPane);
+        contentPane.add(libStatsPane);
+        contentPane.validate();
+        contentPane.repaint();
     }//GEN-LAST:event_btnLibraryGraphsActionPerformed
+
+    private void btnQuizHistoryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnQuizHistoryActionPerformed
+        contentPane.remove(libStatsPane);
+        contentPane.remove(groupStatsPane);
+        contentPane.remove(rewardsPane);
+        contentPane.add(historyPane);
+        contentPane.validate();
+        contentPane.repaint();
+    }//GEN-LAST:event_btnQuizHistoryActionPerformed
+
+    private void btnGroupGraphsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGroupGraphsActionPerformed
+        contentPane.remove(libStatsPane);
+        contentPane.remove(rewardsPane);
+        contentPane.remove(historyPane);
+        contentPane.add(groupStatsPane);
+        contentPane.validate();
+        contentPane.repaint();
+    }//GEN-LAST:event_btnGroupGraphsActionPerformed
+
+    private void btnRewardsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRewardsActionPerformed
+        contentPane.remove(libStatsPane);
+        contentPane.remove(historyPane);
+        contentPane.remove(groupStatsPane);
+        contentPane.add(rewardsPane);
+        contentPane.validate();
+        contentPane.repaint();
+    }//GEN-LAST:event_btnRewardsActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

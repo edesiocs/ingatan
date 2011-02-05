@@ -66,6 +66,9 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="Quiz History"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnQuizHistoryActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JButton" name="btnLibraryGraphs">
               <Properties>
@@ -79,11 +82,17 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="Group Graphs"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnGroupGraphsActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JButton" name="btnRewards">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Rewards"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnRewardsActionPerformed"/>
+              </Events>
             </Component>
           </SubComponents>
         </Container>
