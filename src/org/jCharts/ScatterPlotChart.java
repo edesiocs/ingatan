@@ -41,7 +41,6 @@ package org.jCharts;
 
 
 import org.jCharts.chartData.IScatterPlotDataSet;
-import org.jCharts.chartData.interfaces.*;
 import org.jCharts.renderElements.CircleMapArea;
 import org.jCharts.properties.*;
 

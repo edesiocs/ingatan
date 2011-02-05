@@ -4,6 +4,7 @@
  * Author: Nathaniel G. Auvil
  * Contributor(s):
  *
+ * 
  * Copyright 2002 (C) Nathaniel G. Auvil. All Rights Reserved.
  *
  * Redistribution and use of this software and associated documentation ("Software"), with or

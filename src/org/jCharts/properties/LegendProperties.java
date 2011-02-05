@@ -40,13 +40,11 @@
 package org.jCharts.properties;
 
 
-import org.jCharts.test.HTMLGenerator;
-import org.jCharts.test.HTMLTestable;
 
 import java.awt.*;
 
 
-final public class LegendProperties extends LegendAreaProperties implements HTMLTestable
+final public class LegendProperties extends LegendAreaProperties
 {
 	public static final Font DEFAULT_FONT = new Font( "Serif", Font.PLAIN, 12 );
 	public static final Paint DEFAULT_FONT_PAINT = Color.black;
@@ -161,24 +159,6 @@ final public class LegendProperties extends LegendAreaProperties implements HTML
 	{
 		return this.fontPaint;
 	}
-
-
-	/*********************************************************************************************
-	 * Enables the testing routines to display the contents of this Object.
-	 *
-	 * @param htmlGenerator
-	 **********************************************************************************************/
-	public void toHTML( HTMLGenerator htmlGenerator )
-	{
-		htmlGenerator.propertiesTableStart( "LegendProperties" );
-		super.toHTML( htmlGenerator );
-		htmlGenerator.addTableRow( "Icon Border Paint", this.getIconBorderPaint() );
-		htmlGenerator.addTableRow( "Icon Border Stroke", this.getIconBorderStroke() );
-		htmlGenerator.addTableRow( "Font", this.getFont() );
-		htmlGenerator.addTableRow( "Font Paint", this.getFontPaint() );
-		htmlGenerator.propertiesTableEnd();
-	}
-
 
 	/** Getter for property size.
 	 * @return Value of property size.

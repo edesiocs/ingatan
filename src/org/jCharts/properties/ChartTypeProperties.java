@@ -40,14 +40,11 @@
 package org.jCharts.properties;
 
 
-import org.jCharts.test.HTMLTestable;
-
-
 /********************************************************************************************
  * Common parent for all Chart type specific properties Objects.
  *
  *******************************************************************************************/
-public abstract class ChartTypeProperties implements HTMLTestable
+public abstract class ChartTypeProperties
 {
 /*
    private boolean isAntiAliased= true;

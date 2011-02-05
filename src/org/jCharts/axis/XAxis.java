@@ -43,19 +43,16 @@ package org.jCharts.axis;
 
 import org.jCharts.AxisChart;
 import org.jCharts.properties.*;
-import org.jCharts.test.HTMLGenerator;
-import org.jCharts.test.HTMLTestable;
 import org.jCharts.chartData.IAxisPlotDataSet;
 import org.jCharts.chartData.IAxisDataSeries;
 import org.jCharts.ChartType;
 
 import java.awt.*;
 import java.awt.geom.Line2D;
-import java.lang.reflect.Field;
 import java.util.Iterator;
 
 
-public final class XAxis extends Axis implements HTMLTestable
+public final class XAxis extends Axis
 {
 	//---indicates which labels to display 1=every, 2=every other, 3=every third, etc...
 	private int xLabelFilter = 1;
@@ -447,35 +444,6 @@ public final class XAxis extends Axis implements HTMLTestable
 			this.xLabelFilter= 1;
 		}
 	}
-
-
-	/*********************************************************************************************
-	 * Enables the testing routines to display the contents of this Object.
-	 *
-	 * @param htmlGenerator
-	 **********************************************************************************************/
-	public void toHTML( HTMLGenerator htmlGenerator )
-	{
-		htmlGenerator.propertiesTableStart( this.getClass().getName() );
-
-		super.toHTML( htmlGenerator );
-
-		Field[] fields = this.getClass().getDeclaredFields();
-		for( int i = 0; i < fields.length; i++ )
-		{
-			try
-			{
-				htmlGenerator.addField( fields[ i ].getName(), fields[ i ].get( this ) );
-			}
-			catch( IllegalAccessException illegalAccessException )
-			{
-				illegalAccessException.printStackTrace();
-			}
-		}
-
-		htmlGenerator.propertiesTableEnd();
-	}
-
 
 	/*************************************************************************************************
 	 * Takes a value and determines the screen coordinate it should be drawn at. THe only difference

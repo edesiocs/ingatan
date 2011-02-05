@@ -40,13 +40,7 @@
 package org.jCharts.properties;
 
 
-import org.jCharts.test.HTMLGenerator;
-import org.jCharts.test.HTMLTestable;
-
-import java.lang.reflect.Field;
-
-
-public class ChartProperties extends AreaProperties implements HTMLTestable
+public class ChartProperties extends AreaProperties
 {
 	public ChartFont titleChartFont = ChartFont.DEFAULT_CHART_TITLE;
 
@@ -111,43 +105,6 @@ public class ChartProperties extends AreaProperties implements HTMLTestable
 	public void setValidate( boolean validate )
 	{
 		this.validate = validate;
-	}
-
-
-	/*********************************************************************************************
-	 * Enables the testing routines to display the contents of this Object.
-	 *
-	 * @param htmlGenerator
-	 **********************************************************************************************/
-	public void toHTML( HTMLGenerator htmlGenerator )
-	{
-		htmlGenerator.propertiesTableStart( this.getClass().getName() );
-		super.toHTML( htmlGenerator );
-
-		Field[] fields = this.getClass().getDeclaredFields();
-		for( int i = 0; i < fields.length; i++ )
-		{
-			try
-			{
-				htmlGenerator.addField( fields[ i ].getName(), fields[ i ].get( this ) );
-			}
-			catch( IllegalAccessException illegalAccessException )
-			{
-				illegalAccessException.printStackTrace();
-			}
-		}
-
-		htmlGenerator.propertiesTableEnd();
-
-
-/*
-
-		super.toHTML( htmlGenerator );
-		htmlGenerator.addTableRow( "ChartProperties-Title Padding", Float.toString( this.getTitlePadding() ) );
-		htmlGenerator.addTableRow( "ChartProperties-Title Font", this.getTitleFont() );
-		htmlGenerator.addTableRow( "ChartProperties-Title Paint", this.getTitlePaint() );
-		htmlGenerator.addTableRow( "ChartProperties-Title Paint", this.getTitlePaint() );
-*/
 	}
 
 }

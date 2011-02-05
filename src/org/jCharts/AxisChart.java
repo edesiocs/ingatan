@@ -48,7 +48,6 @@ import org.jCharts.chartData.IDataSeries;
 import org.jCharts.axis.*;
 import org.jCharts.renderElements.NumericTagGroup;
 import org.jCharts.renderElements.TextTagGroup;
-import org.jCharts.chartData.interfaces.*;
 import org.jCharts.chartData.processors.AxisChartDataProcessor;
 import org.jCharts.chartData.ChartDataException;
 import org.jCharts.renderElements.ImageMap;

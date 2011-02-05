@@ -41,14 +41,12 @@
 package org.jCharts.properties;
 
 
-import org.jCharts.test.HTMLGenerator;
-import org.jCharts.test.HTMLTestable;
 
 import java.awt.*;
 import java.io.Serializable;
 
 
-abstract public class Properties implements Serializable, HTMLTestable
+abstract public class Properties implements Serializable
 {
 	public static final Paint DEFAULT_BACKGROUND_PAINT = Color.white;
 
@@ -82,17 +80,6 @@ abstract public class Properties implements Serializable, HTMLTestable
 	public Paint getBackgroundPaint()
 	{
 		return this.backgroundPaint;
-	}
-
-
-	/*********************************************************************************************
-	 * Enables the testing routines to display the contents of this Object.
-	 *
-	 * @param htmlGenerator
-	 **********************************************************************************************/
-	public void toHTML( HTMLGenerator htmlGenerator )
-	{
-		htmlGenerator.addTableRow( "Properties-Background Paint", this.getBackgroundPaint() );
 	}
 
 

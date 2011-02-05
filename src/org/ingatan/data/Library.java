@@ -31,6 +31,8 @@ package org.ingatan.data;
 import java.io.File;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.List;
+import java.util.Map.Entry;
 
 /**
  * Encapsulates a library of questions.
@@ -70,6 +72,10 @@ public class Library {
      */
     protected File fileLibraryFile;
     /**
+     * A list of all previous results from quizzes that included this library.
+     */
+    protected List<HistoryEntry> quizHistory;
+    /**
      * A hashtable of image identifiers and the corresponding File object. The
      * Parser class has methods to generate this hash table.
      */
@@ -88,7 +94,7 @@ public class Library {
      * @param fileQuestionData the file in the temporary directory that contains all question data for this library.
      * @param images hashtable of imageIDs and their corresponding File objects that point to files in the temporary directory.
      */
-    public Library(String libName, String id, String libDescription, Date dateOfCreation, IQuestion[] questions, File pathTempLib, File fileQuestionData, Hashtable images)
+    public Library(String libName, String id, String libDescription, Date dateOfCreation, IQuestion[] questions, File pathTempLib, File fileQuestionData, List<HistoryEntry> quizHistory, Hashtable images)
     {
         this.name = libName;
         this.id = id;
@@ -97,6 +103,7 @@ public class Library {
         this.questions = questions;
         this.pathTempLib = pathTempLib;
         this.fileLibraryFile = fileQuestionData;
+        this.quizHistory = quizHistory;
         this.images = images;
     }
 

@@ -45,7 +45,6 @@ import org.jCharts.chartData.IAxisPlotDataSet;
 import org.jCharts.chartData.IScatterPlotDataSet;
 import org.jCharts.chartData.IScatterPlotDataSeries;
 import org.jCharts.axis.*;
-import org.jCharts.chartData.interfaces.*;
 import org.jCharts.chartData.processors.AxisChartDataProcessor;
 import org.jCharts.chartData.processors.ScatterPlotDataProcessor;
 import org.jCharts.renderElements.NumericTagGroup;

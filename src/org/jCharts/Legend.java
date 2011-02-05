@@ -40,7 +40,6 @@ import org.jCharts.chartData.IAxisDataSeries;
 import org.jCharts.chartData.IData;
 import org.jCharts.chartData.IAxisPlotDataSet;
 import org.jCharts.chartData.IPieChartDataSet;
-import org.jCharts.chartData.interfaces.*;
 import org.jCharts.chartData.processors.TextProcessor;
 import org.jCharts.properties.*;
 

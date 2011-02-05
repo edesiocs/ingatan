@@ -41,11 +41,7 @@
 package org.jCharts.properties;
 
 
-import org.jCharts.test.HTMLGenerator;
-import org.jCharts.test.HTMLTestable;
-
-
-abstract public class LegendAreaProperties extends AreaProperties implements HTMLTestable
+abstract public class LegendAreaProperties extends AreaProperties
 {
 	public static final int COLUMNS_AS_MANY_AS_NEEDED = 0;
 
@@ -216,23 +212,6 @@ abstract public class LegendAreaProperties extends AreaProperties implements HTM
 	public void setIconPadding( int iconPadding )
 	{
 		this.iconPadding = iconPadding;
-	}
-
-
-	/*********************************************************************************************
-	 * Enables the testing routines to display the contents of this Object.
-	 *
-	 * @param htmlGenerator
-	 **********************************************************************************************/
-	public void toHTML( HTMLGenerator htmlGenerator )
-	{
-		super.toHTML( htmlGenerator );
-		htmlGenerator.addTableRow( "LegendAreaProperties->Num Columns", Integer.toString( this.getNumColumns() ) );
-		htmlGenerator.addTableRow( "LegendAreaProperties->Row Padding", Integer.toString( this.getRowPadding() ) );
-		htmlGenerator.addTableRow( "LegendAreaProperties->Icon Padding", Integer.toString( this.getIconPadding() ) );
-		htmlGenerator.addTableRow( "LegendAreaProperties->Chart Padding", Integer.toString( this.getChartPadding() ) );
-		htmlGenerator.addTableRow( "LegendAreaProperties->Column Padding", Integer.toString( this.getColumnPadding() ) );
-		htmlGenerator.addTableRow( "LegendAreaProperties->Placement", Integer.toString( this.getPlacement() ) );
 	}
 
 }

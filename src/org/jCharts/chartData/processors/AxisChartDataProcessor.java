@@ -50,8 +50,6 @@ import org.jCharts.chartData.IAxisChartDataSet;
 import org.jCharts.chartData.IAxisPlotDataSet;
 import org.jCharts.chartData.IDataSeries;
 import org.jCharts.AxisChart;
-import org.jCharts.chartData.interfaces.*;
-import org.jCharts.ChartType;
 import org.jCharts.properties.DataAxisProperties;
 
 import java.awt.font.FontRenderContext;

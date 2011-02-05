@@ -27,9 +27,31 @@
  */
 package org.ingatan.component;
 
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.Shape;
+import java.awt.Stroke;
+import java.awt.geom.Area;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
+import org.jCharts.AxisChart;
+import org.jCharts.ChartType;
+import org.jCharts.chartData.AxisChartDataSet;
+import org.jCharts.chartData.ChartDataException;
+import org.jCharts.chartData.DataSeries;
+import org.jCharts.properties.AxisProperties;
+import org.jCharts.properties.ChartProperties;
+import org.jCharts.properties.LegendProperties;
+import org.jCharts.properties.LineChartProperties;
+import org.jCharts.properties.PointChartProperties;
+import org.jCharts.TestDataGenerator;
+import org.jCharts.properties.AreaChartProperties;
+import org.jCharts.properties.PropertyException;
 
 /**
  * Interactive panel with graphical representation of quiz history for the selected
@@ -42,6 +64,8 @@ import javax.swing.JPanel;
  */
 public class LibraryStatsGraphPane extends JPanel {
 
+    AxisChart axisChart = null;
+
     /**
      * Creates a new <code>QuizHistoryWindow</code>.
      * @param returnToOnClose the window to return to once this window has closed.
@@ -50,8 +74,49 @@ public class LibraryStatsGraphPane extends JPanel {
         this.setSize(new Dimension(500, 500));
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        String[] series_names = {"Ohmsfords"};
+        String[] xAxisLabels = {"1998", "1999", "2000", "2001", "2002", "2003", "2004"};
+        String xAxisTitle = "Years";
+        String yAxisTitle = "Problems";
+        String title = "Micro$oft at Work";
+        DataSeries dataSeries = new DataSeries(xAxisLabels, xAxisTitle, yAxisTitle, title);
 
+        double[][] data = new double[][]{{250, 45, -36, 66, 145, 80, 55}, {100, 150, 175, 80, 25, 135, 120}};
+        String[] legendLabels = {"Bugs", "Thomas"};
+        Paint[] paints = TestDataGenerator.getRandomPaints(2);
 
+        Stroke[] strokes = new Stroke[]{LineChartProperties.DEFAULT_LINE_STROKE, LineChartProperties.DEFAULT_LINE_STROKE};
+        Shape[] shapes = new Shape[]{PointChartProperties.SHAPE_CIRCLE, PointChartProperties.SHAPE_DIAMOND};
+        LineChartProperties lineChartProperties = new LineChartProperties(strokes, shapes);
+        AreaChartProperties areaChartProperties = new AreaChartProperties();
+
+        AxisChartDataSet axisChartDataSet;
+        try {
+            axisChartDataSet = new AxisChartDataSet(data, legendLabels, paints, ChartType.LINE, lineChartProperties);
+            dataSeries.addIAxisPlotDataSet(axisChartDataSet);
+        } catch (ChartDataException ex) {
+            Logger.getLogger(LibraryStatsGraphPane.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        ChartProperties chartProperties = new ChartProperties();
+        chartProperties.setBackgroundPaint(Color.white);
+        AxisProperties axisProperties = new AxisProperties();
+        LegendProperties legendProperties = new LegendProperties();
+
+        axisChart = new AxisChart(dataSeries, chartProperties, axisProperties, legendProperties, 400, 400);
+
+    }
+
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        axisChart.setGraphics2D((Graphics2D) g);
+        if (axisChart != null) {
+            try {
+                axisChart.render();
+            } catch (ChartDataException ex) {
+                Logger.getLogger(LibraryStatsGraphPane.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (PropertyException ex) {
+                Logger.getLogger(LibraryStatsGraphPane.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 }

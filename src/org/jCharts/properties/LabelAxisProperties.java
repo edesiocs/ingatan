@@ -41,14 +41,7 @@
 package org.jCharts.properties;
 
 
-import org.jCharts.test.HTMLGenerator;
-import org.jCharts.test.HTMLTestable;
-
-import java.awt.*;
-import java.lang.reflect.Field;
-
-
-public class LabelAxisProperties extends AxisTypeProperties implements HTMLTestable
+public class LabelAxisProperties extends AxisTypeProperties
 {
 
 
