@@ -291,7 +291,7 @@ public class QuizManager {
      * @throws IOException if there is a problem loading the library.
      */
     public void saveQuestion(IQuestion question) throws IOException {
-        ParserWriter.writeLibraryFile(IOManager.getLibraryFromID(question.getParentLibrary()));
+        ParserWriter.writeLibraryFile(IOManager.getLibraryFromID(question.getParentLibrary()), true);
     }
 
     /**

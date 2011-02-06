@@ -67,6 +67,7 @@ import javax.imageio.ImageIO;
 import org.ingatan.component.answerfield.AnsFieldEmbeddedAudio;
 import org.ingatan.component.answerfield.AnsFieldHint;
 import org.ingatan.component.image.ImageAcquisitionDialog;
+import org.ingatan.data.HistoryEntry;
 import org.jdom.DataConversionException;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -964,8 +965,8 @@ public abstract class IOManager {
         File tempPath = new File(getTempPath() + id);
         tempPath.mkdir();
         //create Library object
-        Library lib = new Library(name, id, description, new Date(), new IQuestion[0], tempPath, new File(getTempPath() + id + "/" + id), new Hashtable<String, File>());
-        ParserWriter.writeLibraryFile(lib);
+        Library lib = new Library(name, id, description, new Date(), new IQuestion[0], tempPath, new File(getTempPath() + id + "/" + id), new ArrayList<HistoryEntry>(), new Hashtable<String, File>());
+        ParserWriter.writeLibraryFile(lib, true);
 
         //update libraries array
         Library[] temp = new Library[libraries.length + 1];
@@ -1041,7 +1042,7 @@ public abstract class IOManager {
             temp[libraries.length] = lib;
             libraries = temp;
 
-            ParserWriter.writeLibraryFile(lib);
+            ParserWriter.writeLibraryFile(lib, true);
 
             packageLibrary(libID);
 
@@ -1191,8 +1192,8 @@ public abstract class IOManager {
             }
         }
 
-        //write the file
-        ParserWriter.writeLibraryFile(lib);
+        //write the file to disk
+        ParserWriter.writeLibraryFile(lib, true);
         packageLibrary(libID);
 
         ParserWriter.writeGroupsFile(groups);

@@ -115,6 +115,10 @@ public class Library {
         return creationDate;
     }
 
+    public List<HistoryEntry> getQuizHistory() {
+        return quizHistory;
+    }
+
     /**
      * Sets the creation date of this library.
      * @param creationDate the creation date of this library.

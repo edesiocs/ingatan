@@ -47,7 +47,7 @@ public class HistoryEntry {
         this.averageImprovement = averageImprovement;
     }
 
-    public Date getEntryDate() {
+    public Date getDate() {
         return entryDate;
     }
 

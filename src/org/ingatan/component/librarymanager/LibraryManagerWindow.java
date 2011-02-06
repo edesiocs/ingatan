@@ -297,7 +297,8 @@ public class LibraryManagerWindow extends JFrame implements WindowListener {
         questionList.updateQuestionsWithContent();
         //update library with data from the question list
         lib.setQuestions(questionList.getQuestions());
-        ParserWriter.writeLibraryFile(lib);
+        //write to disk
+        ParserWriter.writeLibraryFile(lib, true);
     }
 
     public void windowOpened(WindowEvent e) {

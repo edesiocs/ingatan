@@ -27,6 +27,7 @@
  */
 package org.ingatan.io;
 
+import java.text.ParseException;
 import org.ingatan.component.text.RichTextArea;
 import org.ingatan.data.AnswerFieldsFile;
 import org.ingatan.data.FlexiQuestion;
@@ -40,6 +41,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
@@ -53,6 +55,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.ingatan.data.HistoryEntry;
 import org.jdom.Attribute;
 import org.jdom.DataConversionException;
 import org.jdom.Document;
@@ -77,37 +80,65 @@ public abstract class ParserWriter {
      * Write the specified library file to the library file on disk that is specified within
      * that library file.
      * @param lib the library file to write to disk.
+     * @param writeToDisk set true if the written library file should be written to disk (to lib.getFileLibraryFile()).
+     * @return Element the root element of the XML document written.
      */
-    public static void writeLibraryFile(Library lib) {
+    public static Element writeLibraryFile(Library lib, boolean writeToDisk) {
         Document doc = new Document();
 
         //lib metadata
-        Element e = new Element("library").setAttribute("fileVersion", "1.0").setAttribute("name", lib.getName()).setAttribute("id", lib.getId()).setAttribute("created", lib.getCreationDate().toString());
+        Element e = new Element("library").setAttribute("fileVersion", "2.0").setAttribute("name", lib.getName()).setAttribute("id", lib.getId()).setAttribute("created", lib.getCreationDate().toString());
         e.addContent(new Element("libDesc").setText(lib.getDescription()));
         doc.addContent(e);
 
-
+        Element questions = new Element("Questions");
 
         //write question data - for each question in the library:
         for (int i = 0; i < lib.getQuestionCount(); i++) {
-            e.addContent(questionToElement(lib.getQuestion(i)));
+            questions.addContent(questionToElement(lib.getQuestion(i)));
         }
 
-        XMLOutputter fmt = new XMLOutputter();
-        FileOutputStream f = null;
-        try {
-            f = new FileOutputStream(lib.getFileLibraryFile());
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(ParserWriter.class.getName()).log(Level.SEVERE, "while trying to create output stream for the library file in the temp\n"
-                    + "directory corresponding to " + lib.getId() + ". File = " + lib.getFileLibraryFile().getAbsolutePath(), ex);
+        doc.addContent(questions);
+
+        //create an element for holding quiz history
+        Element historyElement = new Element("QuizHistories");
+        List<HistoryEntry> histories = lib.getQuizHistory();
+        Iterator<HistoryEntry> it = histories.iterator();
+        HistoryEntry currentEntry;
+        Element currentElement;
+        while (it.hasNext()) {
+            currentEntry = it.next();
+            currentElement = new Element("record");
+
+            currentElement.setAttribute("date", DateFormat.getDateInstance().format(currentEntry.getDate()));
+            currentElement.setAttribute("numberAnswered", String.valueOf(currentEntry.getQuestionsAnswered()));
+            currentElement.setAttribute("grade", String.valueOf(currentEntry.getGrade()));
+            currentElement.setAttribute("averageImprovement", String.valueOf(currentEntry.getAverageImprovement()));
+            historyElement.addContent(currentElement);
         }
-        try {
-            fmt.output(doc, f);
-            f.close();
-        } catch (IOException ex) {
-            Logger.getLogger(ParserWriter.class.getName()).log(Level.SEVERE, "While trying to write to the already opened library file output stream (file=" + lib.getFileLibraryFile().getAbsolutePath() + ")\n"
-                    + " Writing the xml document to the file.", ex);
+
+        e.addContent(historyElement);
+
+        //if we need to write to disk, do that.
+        if (writeToDisk) {
+            XMLOutputter fmt = new XMLOutputter();
+            FileOutputStream f = null;
+            try {
+                f = new FileOutputStream(lib.getFileLibraryFile());
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(ParserWriter.class.getName()).log(Level.SEVERE, "while trying to create output stream for the library file in the temp\n"
+                        + "directory corresponding to " + lib.getId() + ". File = " + lib.getFileLibraryFile().getAbsolutePath(), ex);
+            }
+            try {
+                fmt.output(doc, f);
+                f.close();
+            } catch (IOException ex) {
+                Logger.getLogger(ParserWriter.class.getName()).log(Level.SEVERE, "While trying to write to the already opened library file output stream (file=" + lib.getFileLibraryFile().getAbsolutePath() + ")\n"
+                        + " Writing the xml document to the file.", ex);
+            }
         }
+
+        return e;
     }
 
     /**
@@ -214,19 +245,8 @@ public abstract class ParserWriter {
      */
     public static String writeLibraryToString(Library lib) {
         Document doc = new Document();
-
-        //lib metadata
-        Element e = new Element("library").setAttribute("encodeVersion", "1.0").setAttribute("name", lib.getName()).setAttribute("id", lib.getId()).setAttribute("created", lib.getCreationDate().toString());
-        e.addContent(new Element("libDesc").setText(lib.getDescription()));
-        doc.addContent(e);
-
-
-
-        //write question data - for each question in the library:
-        for (int i = 0; i < lib.getQuestionCount(); i++) {
-            e.addContent(questionToElement(lib.getQuestion(i)));
-        }
-
+        //write the library file to the document without writing to the hard disk (false flag stops write to disk).
+        doc.addContent(ParserWriter.writeLibraryFile(lib, false));
         XMLOutputter fmt = new XMLOutputter();
         return fmt.outputString(doc);
     }
@@ -237,27 +257,14 @@ public abstract class ParserWriter {
      * @return the resulting <code>Library</code> object.
      */
     public static Library parseLibraryFile(File libraryFile) throws DataConversionException {
-        libraryFile.getPath();
+        //load the XML document and update the library if required.
+        Element e = FileFormatUpdater.updateLibraryFileType(libraryFile);
 
-        SAXBuilder sax = new SAXBuilder();
-        Document doc = null;
-        try {
-            doc = sax.build(libraryFile);
-        } catch (JDOMException ex) {
-            Logger.getLogger(ParserWriter.class.getName()).log(Level.SEVERE, "While trying to build xml document from library file", ex);
-        } catch (IOException ex) {
-            Logger.getLogger(ParserWriter.class.getName()).log(Level.SEVERE, "While trying to build xml document from library file", ex);
-        }
-
-        if (doc == null) {
-            return null;
-        }
-
-        String libraryName = doc.getRootElement().getAttributeValue("name");
-        String libraryID = doc.getRootElement().getAttributeValue("id");
-        String libraryDescription = doc.getRootElement().getChildText("libDesc");
-        Date creationDate = new Date(doc.getRootElement().getAttributeValue("created"));
-        ListIterator questionList = doc.getRootElement().getChildren("question").listIterator();
+        String libraryName = e.getAttributeValue("name");
+        String libraryID = e.getAttributeValue("id");
+        String libraryDescription = e.getChildText("libDesc");
+        Date creationDate = new Date(e.getAttributeValue("created"));
+        ListIterator questionList = e.getChild("Questions").getChildren("question").listIterator();
 
         //create list of questions
         IQuestion[] questions = new IQuestion[0];
@@ -267,6 +274,20 @@ public abstract class ParserWriter {
             System.arraycopy(questions, 0, temp, 0, questions.length);
             temp[questions.length] = questionFromElement((Element) questionList.next(), libraryID);
             questions = temp;
+        }
+
+        //read in the quiz histories into a list object
+        List<HistoryEntry> histories = new ArrayList<HistoryEntry>();
+        List<Element> records = e.getChild("QuizHistories").getChildren("record");
+        Iterator<Element> it = records.iterator();
+        Element curEl;
+        while (it.hasNext()) {
+            curEl = it.next();
+            try {
+                histories.add(new HistoryEntry(DateFormat.getInstance().parse(curEl.getAttributeValue("date")), curEl.getAttribute("numberAnswered").getIntValue(), curEl.getAttribute("grade").getFloatValue(), curEl.getAttribute("averageImprovement").getFloatValue()));
+            } catch (ParseException ex) {
+                Logger.getLogger(ParserWriter.class.getName()).log(Level.SEVERE, "Trying to create a HistoryEntry object in parseLibraryFile.", ex);
+            }
         }
 
         //create id to file hashtable
@@ -293,7 +314,7 @@ public abstract class ParserWriter {
 
             }
         }
-        return new Library(libraryName, libraryID, libraryDescription, creationDate, questions, new File(libraryFile.getParent()), libraryFile, images);
+        return new Library(libraryName, libraryID, libraryDescription, creationDate, questions, new File(libraryFile.getParent()), libraryFile, histories, images);
     }
 
     /**
