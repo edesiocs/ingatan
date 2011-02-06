@@ -66,31 +66,31 @@ public class LibraryBrowser extends JPanel {
     /**
      * The new library button was pressed.
      */
-    protected static final int ADD_LIBRARY_ACTION = 0;
+    public static final int ADD_LIBRARY_ACTION = 0;
     /**
      * The delete library button was pressed.
      */
-    protected static final int REMOVE_LIBRARY_ACTION = 1;
+    public static final int REMOVE_LIBRARY_ACTION = 1;
     /**
      * The edit library button was pressed.
      */
-    protected static final int EDIT_LIBRARY_ACTION = 2;
+    public static final int EDIT_LIBRARY_ACTION = 2;
     /**
      * The edit groups button was pressed.
      */
-    protected static final int EDIT_GROUPS_ACTION = 3;
+    public static final int EDIT_GROUPS_ACTION = 3;
     /**
      * The export/import button was pressed.
      */
-    protected static final int EXPORT_IMPORT_ACTION = 4;
+    public static final int EXPORT_IMPORT_ACTION = 4;
     /**
      * The selected group has changed.
      */
-    protected static final int GROUP_SELECTION_CHANGED = 5;
+    public static final int GROUP_SELECTION_CHANGED = 5;
     /**
      * The selected library has changed.
      */
-    protected static final int LIBRARY_SELECTION_CHANGED = 6;
+    public static final int LIBRARY_SELECTION_CHANGED = 6;
     /**
      * The name of the default group which contains all libraries that exist in all groups.
      */
@@ -162,10 +162,11 @@ public class LibraryBrowser extends JPanel {
 
     /**
      * Creates a new LibraryBrowser object.
+     * @param editMode Set to true if the sidebar buttons should be shown.
      */
-    public LibraryBrowser() {
+    public LibraryBrowser(boolean editMode) {
         super();
-        setUpGUI();
+        setUpGUI(editMode);
 
         updateGroups();
         //set the selected group to the 'all libraries' group, and update the library list.
@@ -174,6 +175,8 @@ public class LibraryBrowser extends JPanel {
         listLibraries.addListSelectionListener(new libListSelectionListener());
         listLibraries.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
+        if (!editMode) {
+        }
     }
 
     /**
@@ -211,7 +214,7 @@ public class LibraryBrowser extends JPanel {
         }
     }
 
-    private void setUpGUI() {
+    private void setUpGUI(boolean editMode) {
         this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
         btnAddLib = createButton("/resources/icons/add.png", "", "Add a new library");
@@ -231,20 +234,22 @@ public class LibraryBrowser extends JPanel {
         scrollLibraries.setMinimumSize(new Dimension(200, 500));
         //sizes
 
+        if (editMode) {
+            Box vert = Box.createVerticalBox();
+            vert.add(btnEditGroup);
+            Box boxBtn = Box.createVerticalBox();
+            boxBtn.add(btnAddLib);
+            boxBtn.add(btnRemoveLib);
+            boxBtn.add(btnEditLib);
+            boxBtn.add(btnExport);
+            vert.add(Box.createVerticalGlue());
+            vert.add(boxBtn);
+
+
+            this.add(vert);
+        }
+        
         Box vert = Box.createVerticalBox();
-        vert.add(btnEditGroup);
-        Box boxBtn = Box.createVerticalBox();
-        boxBtn.add(btnAddLib);
-        boxBtn.add(btnRemoveLib);
-        boxBtn.add(btnEditLib);
-        boxBtn.add(btnExport);
-        vert.add(Box.createVerticalGlue());
-        vert.add(boxBtn);
-
-
-        this.add(vert);
-
-        vert = Box.createVerticalBox();
 
 
         vert.add(comboGroups);

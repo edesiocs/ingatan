@@ -89,7 +89,7 @@ public class LibraryManagerWindow extends JFrame implements WindowListener {
      * editor button, library editor button, library create/delete buttons, and
      * the library export/import tool button.
      */
-    LibraryBrowser libBrowser = new LibraryBrowser();
+    LibraryBrowser libBrowser = new LibraryBrowser(true);
     /**
      * Where an open library is displayed. A continuous scrolling list of all questions
      * within the library, directly editable within the list.

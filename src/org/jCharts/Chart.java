@@ -268,7 +268,7 @@ abstract public class Chart implements Serializable
 	 *******************************************************************************************/
 	protected final Legend getLegend()
 	{
-		return this.legend;
+		return null;//this.legend;
 	}
 
 

@@ -15,7 +15,7 @@ import java.util.Date;
  * @author Thomas Everingham
  * @version 1.0
  */
-public class HistoryEntry {
+public class HistoryEntry implements Comparable<HistoryEntry> {
 
     /** Date the quiz was taken. */
     Date entryDate;
@@ -128,5 +128,14 @@ public class HistoryEntry {
         }
 
         return sum;
+    }
+
+    /**
+     * Compares the dates of the HistoryEntry objects.
+     * @param o the other history entry object.
+     * @return int the result of this.entryDate.compareTo(o.getDate());
+     */
+    public int compareTo(HistoryEntry o) {
+        return this.entryDate.compareTo(o.getDate());
     }
 }

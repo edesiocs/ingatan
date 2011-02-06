@@ -73,7 +73,7 @@ public class AboutWindow extends JDialog {
                 "[u]SketchEl[u][br]sketchel.sf.net: GNU GPL[br]A great little chemistry structure drawing program that is sure to make my organic chem study much easier. Written by Dr. Alex M. Clark.[br][br]" +
                 "[u]Silk Icon Set[u][br]www.famfamfam.com: Creative Commons Attribution 2.5 License[br]A great set of icons by Mark James. Thank you![br][br]" +
                 "[u]JOgg and JOrbis[u] from www.jcraft.com under LGPL 3 - Great libraries made so much easier using the EasyOgg wrapper by Kevin from http://www.cokeandcode.com.[br][br]" +
-                "[u]JCharts[u] http://jcharts.krysalis.org: 'jCharts license' (bundled inside this JAR). Author: Nathaniel G. Auvil.[br][br]" +
+                "[u]JCharts[u] http://jcharts.sf.net: 'jCharts license' (bundled inside this JAR). Author: Nathaniel G. Auvil.[br][br]" +
                 "[u]Arrow2D.java[u] from www.geotools.org under LGPL 2.1 - Thankyou, glad not to write my own.[br][br][br]" +
                 "Thankyou to Hugh for being my bug hunter.[end]");
 
