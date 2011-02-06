@@ -44,10 +44,10 @@ public class StatsWindow extends javax.swing.JFrame {
     QuizHistoryPane historyPane = new QuizHistoryPane();
 
     /** The GropuStatsGraphPane displayed by this stats window */
-    GroupStatsGraphPane groupStatsPane = new GroupStatsGraphPane();
+    GroupStatsPane groupStatsPane = new GroupStatsPane();
 
     /** The LibraryStatsGraphPane displayed by this stats window */
-    LibraryStatsGraphPane libStatsPane = new LibraryStatsGraphPane();
+    LibraryGraphsPane libStatsPane = new LibraryGraphsPane();
 
     /** Rewards pane displayed by this stats window */
     RewardsPane rewardsPane = new RewardsPane();
@@ -71,6 +71,7 @@ public class StatsWindow extends javax.swing.JFrame {
         menuPanel = new javax.swing.JPanel();
         btnQuizHistory = new javax.swing.JButton();
         btnLibraryGraphs = new javax.swing.JButton();
+        btnFlashcardScatter = new javax.swing.JButton();
         btnGroupGraphs = new javax.swing.JButton();
         btnRewards = new javax.swing.JButton();
         contentPane = new javax.swing.JPanel();
@@ -83,15 +84,13 @@ public class StatsWindow extends javax.swing.JFrame {
         lblHeading.setForeground(ThemeConstants.textColour);
         getContentPane().add(lblHeading);
 
-        horiz.setBackground(new java.awt.Color(254, 254, 185));
         horiz.setAlignmentX(0.0F);
         horiz.setLayout(new javax.swing.BoxLayout(horiz, javax.swing.BoxLayout.LINE_AXIS));
 
-        menuPanel.setBackground(new java.awt.Color(217, 228, 239));
         menuPanel.setAlignmentY(0.05F);
-        menuPanel.setMaximumSize(new java.awt.Dimension(100, 150));
+        menuPanel.setMaximumSize(new java.awt.Dimension(100, 200));
         menuPanel.setPreferredSize(new java.awt.Dimension(150, 450));
-        menuPanel.setLayout(new java.awt.GridLayout(4, 0, 0, 10));
+        menuPanel.setLayout(new java.awt.GridLayout(5, 0, 0, 10));
 
         btnQuizHistory.setText("Quiz History");
         btnQuizHistory.addActionListener(new java.awt.event.ActionListener() {
@@ -109,7 +108,10 @@ public class StatsWindow extends javax.swing.JFrame {
         });
         menuPanel.add(btnLibraryGraphs);
 
-        btnGroupGraphs.setText("Group Graphs");
+        btnFlashcardScatter.setText("Flashcard Scatterplot");
+        menuPanel.add(btnFlashcardScatter);
+
+        btnGroupGraphs.setText("Group Statistics");
         btnGroupGraphs.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnGroupGraphsActionPerformed(evt);
@@ -126,8 +128,6 @@ public class StatsWindow extends javax.swing.JFrame {
         menuPanel.add(btnRewards);
 
         horiz.add(menuPanel);
-
-        contentPane.setBackground(new java.awt.Color(197, 213, 223));
 
         javax.swing.GroupLayout contentPaneLayout = new javax.swing.GroupLayout(contentPane);
         contentPane.setLayout(contentPaneLayout);
@@ -185,6 +185,7 @@ public class StatsWindow extends javax.swing.JFrame {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnFlashcardScatter;
     private javax.swing.JButton btnGroupGraphs;
     private javax.swing.JButton btnLibraryGraphs;
     private javax.swing.JButton btnQuizHistory;

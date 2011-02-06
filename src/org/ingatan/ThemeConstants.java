@@ -93,6 +93,12 @@ public abstract class ThemeConstants {
      * The red/orange colour used for the 'combo' font in quiz time.
      */
     public static final Color comboColour = new Color(255, 60, 0);
+    /** Graph colour C */
+    public static final Color graphColC = new Color(165,173,148);
+    /** Graph colour B */
+    public static final Color graphColB = new Color(96,200,15);
+    /** Graph colour A */
+    public static final Color graphColA = new Color(36,131,163);
     /**
      * Nicer, smaller font based on the default for the JPanel.
      */

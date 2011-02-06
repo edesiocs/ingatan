@@ -45,350 +45,307 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  ************************************************************************************************/
-
-
 package org.jCharts;
-
 
 import org.jCharts.properties.*;
 import org.jCharts.chartData.ScatterPlotDataSet;
 
 import java.awt.*;
 
+final public class TestDataGenerator {
 
-final public class TestDataGenerator
-{
-	private final static Font[] ALL_FONTS=GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts();
+    private final static Font[] ALL_FONTS = GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts();
 
+    /*****************************************************************************************
+     * Random font generator based on the available Fonts on this machine.
+     *
+     * @param minSize
+     * @param maxSize
+     * @return Font
+     ******************************************************************************************/
+    public static Font getRandomFont(double minSize, double maxSize) {
+        Font font = ALL_FONTS[(int) TestDataGenerator.getRandomNumber(ALL_FONTS.length)];
+        font = font.deriveFont((float) TestDataGenerator.getRandomNumber(minSize, maxSize));
+        return font;
+    }
 
-	/*****************************************************************************************
-	 * Random font generator based on the available Fonts on this machine.
-	 *
-	 * @param minSize
-	 * @param maxSize
-	 * @return Font
-	 ******************************************************************************************/
-	public static Font getRandomFont( double minSize, double maxSize )
-	{
-		Font font=ALL_FONTS[ (int) TestDataGenerator.getRandomNumber( ALL_FONTS.length ) ];
-		font=font.deriveFont( (float) TestDataGenerator.getRandomNumber( minSize, maxSize ) );
-		return font;
-	}
+    /*****************************************************************************************
+     * Random number generator.
+     *
+     * @param maxValue
+     * @return double
+     ******************************************************************************************/
+    public static double getRandomNumber(double maxValue) {
+        return Math.random() * maxValue;
+    }
 
+    /*****************************************************************************************
+     * Random number generator in specified range.
+     *
+     * @param minValue
+     * @param maxValue
+     * @return double
+     ******************************************************************************************/
+    protected static double getRandomNumber(double minValue, double maxValue) {
+        return (minValue + (Math.random() * (maxValue - minValue)));
+    }
 
-	/*****************************************************************************************
-	 * Random number generator.
-	 *
-	 * @param maxValue
-	 * @return double
-	 ******************************************************************************************/
-	public static double getRandomNumber( double maxValue )
-	{
-		return Math.random() * maxValue;
-	}
+    /*****************************************************************************************
+     * Random numbers generator in specified range.
+     *
+     * @param numToGenerate the number of doubles to generate
+     * @param minValue
+     * @param maxValue
+     * @return double[]
+     ******************************************************************************************/
+    public static double[] getRandomNumbers(int numToGenerate, double minValue, double maxValue) {
+        double[] data = new double[numToGenerate];
+        for (int i = 0; i < numToGenerate; i++) {
+            data[i] = getRandomNumber(minValue, maxValue);
+        }
+        return data;
+    }
 
+    /*****************************************************************************************
+     * Random numbers generator in specified range.
+     *
+     * @param numberOfDataSets to generate
+     * @param numToGenerate the number of doubles to generate
+     * @param minValue
+     * @param maxValue
+     * @return double[]
+     ******************************************************************************************/
+    public static double[][] getRandomNumbers(int numberOfDataSets, int numToGenerate, double minValue, double maxValue) {
+        double[][] data = new double[numberOfDataSets][numToGenerate];
+        for (int j = 0; j < numberOfDataSets; j++) {
+            for (int i = 0; i < numToGenerate; i++) {
+                data[j][i] = getRandomNumber(minValue, maxValue);
+            }
+        }
+        return data;
+    }
 
-	/*****************************************************************************************
-	 * Random number generator in specified range.
-	 *
-	 * @param minValue
-	 * @param maxValue
-	 * @return double
-	 ******************************************************************************************/
-	protected static double getRandomNumber( double minValue, double maxValue )
-	{
-		return ( minValue + ( Math.random() * ( maxValue - minValue ) ) );
-	}
+    /*****************************************************************************************
+     * Random numbers generator in specified range.
+     *
+     * @param numToGenerate the number of doubles to generate
+     * @param xMinValue
+     * @param xMaxValue
+     * @param yMinValue
+     * @param yMaxValue
+     * @return Point.Double[]
+     ******************************************************************************************/
+    public static Point.Double[] getRandomPoints(int numToGenerate,
+            double xMinValue,
+            double xMaxValue,
+            double yMinValue,
+            double yMaxValue) {
+        Point.Double[] points = new Point.Double[numToGenerate];
+        for (int j = 0; j < numToGenerate; j++) {
+            points[j] = ScatterPlotDataSet.createPoint2DDouble();
+            points[j].setLocation(getRandomNumber(xMinValue, xMaxValue), getRandomNumber(yMinValue, yMaxValue));
+        }
+        return points;
+    }
 
+    /*****************************************************************************************
+     * Random Paint generator.
+     *
+     * @return Paint
+     ******************************************************************************************/
+    protected static Paint getRandomPaint() {
+        if (getRandomNumber(1) > 0.5) {
+            return getRandomColor();
+        } else {
+            float width = (float) TestDataGenerator.getRandomNumber(10, 800);
+            float height = (float) TestDataGenerator.getRandomNumber(10, 600);
+            float x = (float) TestDataGenerator.getRandomNumber(0, 800);
+            float y = (float) TestDataGenerator.getRandomNumber(0, 600);
+            return new GradientPaint(x, y, getRandomColor(), width, height, getRandomColor());
+        }
+    }
 
-	/*****************************************************************************************
-	 * Random numbers generator in specified range.
-	 *
-	 * @param numToGenerate the number of doubles to generate
-	 * @param minValue
-	 * @param maxValue
-	 * @return double[]
-	 ******************************************************************************************/
-	public static double[] getRandomNumbers( int numToGenerate, double minValue, double maxValue )
-	{
-		double[] data=new double[ numToGenerate ];
-		for( int i=0; i < numToGenerate; i++ )
-		{
-			data[ i ]=getRandomNumber( minValue, maxValue );
-		}
-		return data;
-	}
+    /*****************************************************************************************
+     * Random Color generator.
+     *
+     * @return Paint[]
+     ******************************************************************************************/
+    public static Paint[] getRandomPaints(int numToCreate) {
+        Paint paints[] = new Paint[numToCreate];
+        for (int i = 0; i < numToCreate; i++) {
+            paints[i] = getRandomPaint();
 
+            Color c;
+            if (paints[i] instanceof GradientPaint)
+                c = ((GradientPaint) paints[i]).getColor1();
+            else
+                c = (Color) paints[i];
 
-	/*****************************************************************************************
-	 * Random numbers generator in specified range.
-	 *
-	 * @param numberOfDataSets to generate
-	 * @param numToGenerate the number of doubles to generate
-	 * @param minValue
-	 * @param maxValue
-	 * @return double[]
-	 ******************************************************************************************/
-	public static double[][] getRandomNumbers( int numberOfDataSets, int numToGenerate, double minValue, double maxValue )
-	{
-		double[][] data=new double[ numberOfDataSets ][ numToGenerate ];
-		for( int j=0; j < numberOfDataSets; j++ )
-		{
-			for( int i=0; i < numToGenerate; i++ )
-			{
-				data[ j ][ i ]=getRandomNumber( minValue, maxValue );
-			}
-		}
-		return data;
-	}
+            System.out.println("COLOUR");
+            System.out.println("  |---(1)---> Red: " + c.getRed() + " | Green: " + c.getGreen() + " | Blue: " + c.getBlue());
+            if (paints[i] instanceof GradientPaint)
+                c = ((GradientPaint) paints[i]).getColor2();
+            else
+                c = (Color) paints[i];
+            System.out.println("  |---(2)---> Red: " + c.getRed() + " | Green: " + c.getGreen() + " | Blue: " + c.getBlue());
+        }
+        return paints;
+    }
 
+    /*****************************************************************************************
+     * Random Color generator.
+     *
+     * @return Color
+     ******************************************************************************************/
+    protected static Color getRandomColor() {
+        int transparency = (int) getRandomNumber(100, 375);
+        if (transparency > 255) {
+            transparency = 255;
+        }
 
+        return new Color((int) getRandomNumber(255), (int) getRandomNumber(255), (int) getRandomNumber(255), transparency);
+    }
 
-	/*****************************************************************************************
-	 * Random numbers generator in specified range.
-	 *
-	 * @param numToGenerate the number of doubles to generate
-	 * @param xMinValue
-	 * @param xMaxValue
-	 * @param yMinValue
-	 * @param yMaxValue
-	 * @return Point.Double[]
-	 ******************************************************************************************/
-	public static Point.Double[] getRandomPoints( int numToGenerate,
-																 double xMinValue,
-																 double xMaxValue,
-																 double yMinValue,
-																 double yMaxValue )
-	{
-		Point.Double[] points= new Point.Double[ numToGenerate ];
-		for( int j=0; j < numToGenerate; j++ )
-		{
-			points[ j ]= ScatterPlotDataSet.createPoint2DDouble();
-			points[ j ].setLocation( getRandomNumber( xMinValue, xMaxValue ), getRandomNumber( yMinValue, yMaxValue ) );
-		}
-		return points;
-	}
-
-
-	/*****************************************************************************************
-	 * Random Paint generator.
-	 *
-	 * @return Paint
-	 ******************************************************************************************/
-	protected static Paint getRandomPaint()
-	{
-		if( getRandomNumber( 1 ) > 0.5 )
-		{
-			return getRandomColor();
-		}
-		else
-		{
-			float width=(float) TestDataGenerator.getRandomNumber( 10, 800 );
-			float height=(float) TestDataGenerator.getRandomNumber( 10, 600 );
-			float x=(float) TestDataGenerator.getRandomNumber( 0, 800 );
-			float y=(float) TestDataGenerator.getRandomNumber( 0, 600 );
-			return new GradientPaint( x, y, getRandomColor(), width, height, getRandomColor() );
-		}
-	}
-
-
-	/*****************************************************************************************
-	 * Random Color generator.
-	 *
-	 * @return Paint[]
-	 ******************************************************************************************/
-	public static Paint[] getRandomPaints( int numToCreate )
-	{
-		Paint paints[]=new Paint[ numToCreate ];
-		for( int i=0; i < numToCreate; i++ )
-		{
-			paints[ i ]=getRandomPaint();
-		}
-		return paints;
-	}
-
-
-	/*****************************************************************************************
-	 * Random Color generator.
-	 *
-	 * @return Color
-	 ******************************************************************************************/
-	protected static Color getRandomColor()
-	{
-		int transparency=(int) getRandomNumber( 100, 375 );
-		if( transparency > 255 )
-		{
-			transparency=255;
-		}
-
-		return new Color( (int) getRandomNumber( 255 ), (int) getRandomNumber( 255 ), (int) getRandomNumber( 255 ), transparency );
-	}
-
-
-	/*****************************************************************************************
-	 * Random String generator.
-	 *
-	 * @param maxStringLength
-	 * @param canBeNull
-	 * @return String
-	 ******************************************************************************************/
-	protected static String getRandomString( int maxStringLength, boolean canBeNull )
-	{
-		if( canBeNull )
-		{
-			if( TestDataGenerator.getRandomNumber( 10 ) <= 1 )
-			{
-				return null;
-			}
-		}
+    /*****************************************************************************************
+     * Random String generator.
+     *
+     * @param maxStringLength
+     * @param canBeNull
+     * @return String
+     ******************************************************************************************/
+    protected static String getRandomString(int maxStringLength, boolean canBeNull) {
+        if (canBeNull) {
+            if (TestDataGenerator.getRandomNumber(10) <= 1) {
+                return null;
+            }
+        }
 
 
-		int tempVal;
+        int tempVal;
 
-		int stringLength=1 + (int) getRandomNumber( maxStringLength );
-		StringBuffer stringBuffer=new StringBuffer( stringLength );
+        int stringLength = 1 + (int) getRandomNumber(maxStringLength);
+        StringBuffer stringBuffer = new StringBuffer(stringLength);
 
-		while( stringLength-- > 0 )
-		{
-			tempVal=65 + (int) getRandomNumber( 58 );
-			while( tempVal > 90 && tempVal < 97 )
-			{
-				tempVal=65 + (int) getRandomNumber( 58 );
-			}
+        while (stringLength-- > 0) {
+            tempVal = 65 + (int) getRandomNumber(58);
+            while (tempVal > 90 && tempVal < 97) {
+                tempVal = 65 + (int) getRandomNumber(58);
+            }
 
-			stringBuffer.append( (char) tempVal );
-		}
+            stringBuffer.append((char) tempVal);
+        }
 
-		return stringBuffer.toString();
-	}
+        return stringBuffer.toString();
+    }
 
+    /*****************************************************************************************
+     * Random String generator.
+     *
+     * @return String[]
+     ******************************************************************************************/
+    protected static String[] getRandomStrings(int numToCreate, int maxStringLength, boolean canBeNull) {
+        if (canBeNull) {
+            if ((int) TestDataGenerator.getRandomNumber(10) <= 1) {
+                return null;
+            }
+        }
 
-	/*****************************************************************************************
-	 * Random String generator.
-	 *
-	 * @return String[]
-	 ******************************************************************************************/
-	protected static String[] getRandomStrings( int numToCreate, int maxStringLength, boolean canBeNull )
-	{
-		if( canBeNull )
-		{
-			if( (int) TestDataGenerator.getRandomNumber( 10 ) <= 1 )
-			{
-				return null;
-			}
-		}
+        String strings[] = new String[numToCreate];
 
-		String strings[]=new String[ numToCreate ];
+        for (int i = 0; i < numToCreate; i++) {
+            strings[i] = getRandomString(maxStringLength, false);
+        }
 
-		for( int i=0; i < numToCreate; i++ )
-		{
-			strings[ i ]=getRandomString( maxStringLength, false );
-		}
+        return strings;
+    }
 
-		return strings;
-	}
+    /******************************************************************************************
+     * Takes the passed AxisProperties and randomizes it.
+     *
+     * @param axisProperties
+     ******************************************************************************************/
+    protected static void randomizeAxisProperties(AxisProperties axisProperties) {
+        DataAxisProperties dataAxisProperties;
+        LabelAxisProperties labelAxisProperties;
+        if (axisProperties.isPlotHorizontal()) {
+            dataAxisProperties = (DataAxisProperties) axisProperties.getXAxisProperties();
+            labelAxisProperties = (LabelAxisProperties) axisProperties.getYAxisProperties();
+        } else {
+            dataAxisProperties = (DataAxisProperties) axisProperties.getYAxisProperties();
+            labelAxisProperties = (LabelAxisProperties) axisProperties.getXAxisProperties();
+        }
 
+        dataAxisProperties.setNumItems((int) TestDataGenerator.getRandomNumber(2, 15));
+        dataAxisProperties.setRoundToNearest((int) TestDataGenerator.getRandomNumber(-5, 3));
 
-	/******************************************************************************************
-	 * Takes the passed AxisProperties and randomizes it.
-	 *
-	 * @param axisProperties
-	 ******************************************************************************************/
-	protected static void randomizeAxisProperties( AxisProperties axisProperties )
-	{
-		DataAxisProperties dataAxisProperties;
-		LabelAxisProperties labelAxisProperties;
-		if( axisProperties.isPlotHorizontal() )
-		{
-			dataAxisProperties= (DataAxisProperties) axisProperties.getXAxisProperties();
-			labelAxisProperties= (LabelAxisProperties) axisProperties.getYAxisProperties();
-		}
-		else
-		{
-			dataAxisProperties= (DataAxisProperties) axisProperties.getYAxisProperties();
-			labelAxisProperties= (LabelAxisProperties) axisProperties.getXAxisProperties();
-		}
+        dataAxisProperties.setUseDollarSigns(TestDataGenerator.getRandomNumber(1) > 0.5d);
+        dataAxisProperties.setUseCommas(TestDataGenerator.getRandomNumber(1) > 0.5d);
 
-		dataAxisProperties.setNumItems( (int) TestDataGenerator.getRandomNumber( 2, 15 ) );
-		dataAxisProperties.setRoundToNearest( (int) TestDataGenerator.getRandomNumber( -5, 3 ) );
+        //axisProperties.setShowAxisTitle( AxisProperties.X_AXIS, TestDataGenerator.getRandomNumber( 1 ) > 0.5d );
+        //axisProperties.setShowAxisTitle( AxisProperties.Y_AXIS, TestDataGenerator.getRandomNumber( 1 ) > 0.5d );
 
-		dataAxisProperties.setUseDollarSigns( TestDataGenerator.getRandomNumber( 1 ) > 0.5d );
-		dataAxisProperties.setUseCommas( TestDataGenerator.getRandomNumber( 1 ) > 0.5d );
+        //axisProperties.setShowGridLine( AxisProperties.X_AXIS, (int) TestDataGenerator.getRandomNumber( 3 ) );
+        //axisProperties.setShowGridLine( AxisProperties.X_AXIS, AxisProperties.GRID_LINES_ONLY_WITH_LABELS );
+        //axisProperties.setShowGridLine( AxisProperties.Y_AXIS, (int) TestDataGenerator.getRandomNumber( 3 ) );
 
-		//axisProperties.setShowAxisTitle( AxisProperties.X_AXIS, TestDataGenerator.getRandomNumber( 1 ) > 0.5d );
-		//axisProperties.setShowAxisTitle( AxisProperties.Y_AXIS, TestDataGenerator.getRandomNumber( 1 ) > 0.5d );
-
-		//axisProperties.setShowGridLine( AxisProperties.X_AXIS, (int) TestDataGenerator.getRandomNumber( 3 ) );
-		//axisProperties.setShowGridLine( AxisProperties.X_AXIS, AxisProperties.GRID_LINES_ONLY_WITH_LABELS );
-		//axisProperties.setShowGridLine( AxisProperties.Y_AXIS, (int) TestDataGenerator.getRandomNumber( 3 ) );
-
-		dataAxisProperties.setShowEndBorder( TestDataGenerator.getRandomNumber( 1 ) > 0.5d );
-		labelAxisProperties.setShowEndBorder( TestDataGenerator.getRandomNumber( 1 ) > 0.5d );
+        dataAxisProperties.setShowEndBorder(TestDataGenerator.getRandomNumber(1) > 0.5d);
+        labelAxisProperties.setShowEndBorder(TestDataGenerator.getRandomNumber(1) > 0.5d);
 
 //		axisProperties.setShowTicks( AxisProperties.X_AXIS, (int) TestDataGenerator.getRandomNumber( 3 ) );
-		//axisProperties.setShowTicks( AxisProperties.X_AXIS, AxisProperties.TICKS_ONLY_WITH_LABELS );
-		//axisProperties.setShowTicks( AxisProperties.Y_AXIS, (int) TestDataGenerator.getRandomNumber( 3 ) );
+        //axisProperties.setShowTicks( AxisProperties.X_AXIS, AxisProperties.TICKS_ONLY_WITH_LABELS );
+        //axisProperties.setShowTicks( AxisProperties.Y_AXIS, (int) TestDataGenerator.getRandomNumber( 3 ) );
 
-		//axisProperties.setShowZeroLine( TestDataGenerator.getRandomNumber( 1 ) > 0.5d );
-		//axisProperties.setZeroLinePaint( TestDataGenerator.getRandomPaint() );
+        //axisProperties.setShowZeroLine( TestDataGenerator.getRandomNumber( 1 ) > 0.5d );
+        //axisProperties.setZeroLinePaint( TestDataGenerator.getRandomPaint() );
 
 
 //		axisProperties.setScaleFont( TestDataGenerator.getRandomFont( 12.0, 15.0 ) );
-		//axisProperties.setScaleFontColor( TestDataGenerator.getRandomPaint() );
+        //axisProperties.setScaleFontColor( TestDataGenerator.getRandomPaint() );
 
-		//axisProperties.setAxisTitleFont( TestDataGenerator.getRandomFont( 6.0, 20.0 ) );
+        //axisProperties.setAxisTitleFont( TestDataGenerator.getRandomFont( 6.0, 20.0 ) );
 
-		axisProperties.getXAxisProperties().setAxisStroke( new ChartStroke( new BasicStroke( 1.5f ), TestDataGenerator.getRandomPaint() ) );
-		axisProperties.getYAxisProperties().setAxisStroke( new ChartStroke( new BasicStroke( 1.5f ), TestDataGenerator.getRandomPaint() ) );
-
-
-		//axisProperties.setBackgroundPaint( TestDataGenerator.getRandomPaint() );
-	}
+        axisProperties.getXAxisProperties().setAxisStroke(new ChartStroke(new BasicStroke(1.5f), TestDataGenerator.getRandomPaint()));
+        axisProperties.getYAxisProperties().setAxisStroke(new ChartStroke(new BasicStroke(1.5f), TestDataGenerator.getRandomPaint()));
 
 
-	/******************************************************************************************
-	 * Takes the passed Legend and randomizes it.
-	 *
-	 * @param legendProperties
-	 ******************************************************************************************/
-	protected static void randomizeLegend( LegendProperties legendProperties )
-	{
-		Font font;
-		int fontSize;
+        //axisProperties.setBackgroundPaint( TestDataGenerator.getRandomPaint() );
+    }
 
-		int numColumns=(int) TestDataGenerator.getRandomNumber( 1, 6 );
-		if( numColumns == 6 )
-		{
-			numColumns=LegendAreaProperties.COLUMNS_AS_MANY_AS_NEEDED;
-		}
+    /******************************************************************************************
+     * Takes the passed Legend and randomizes it.
+     *
+     * @param legendProperties
+     ******************************************************************************************/
+    protected static void randomizeLegend(LegendProperties legendProperties) {
+        Font font;
+        int fontSize;
 
-		legendProperties.setNumColumns( numColumns );
-		legendProperties.setPlacement( (int) TestDataGenerator.getRandomNumber( 4 ) );
+        int numColumns = (int) TestDataGenerator.getRandomNumber(1, 6);
+        if (numColumns == 6) {
+            numColumns = LegendAreaProperties.COLUMNS_AS_MANY_AS_NEEDED;
+        }
 
-		fontSize=(int) TestDataGenerator.getRandomNumber( 6, 20 );
-		font=ALL_FONTS[ (int) TestDataGenerator.getRandomNumber( ALL_FONTS.length ) ];
-		font=font.deriveFont( (float) fontSize );
-		legendProperties.setFont( font );
-		legendProperties.setFontPaint( TestDataGenerator.getRandomPaint() );
+        legendProperties.setNumColumns(numColumns);
+        legendProperties.setPlacement((int) TestDataGenerator.getRandomNumber(4));
 
-		//---random between null and having a color.
-		if( (int) TestDataGenerator.getRandomNumber( 2 ) == 0 )
-		{
-			legendProperties.setBorderStroke( null );
-		}
-		else
-		{
-			legendProperties.setBorderStroke( ChartStroke.DEFAULT_LEGEND_OUTLINE );
-		}
+        fontSize = (int) TestDataGenerator.getRandomNumber(6, 20);
+        font = ALL_FONTS[(int) TestDataGenerator.getRandomNumber(ALL_FONTS.length)];
+        font = font.deriveFont((float) fontSize);
+        legendProperties.setFont(font);
+        legendProperties.setFontPaint(TestDataGenerator.getRandomPaint());
 
-		//---random between null and having a color.
-		if( (int) TestDataGenerator.getRandomNumber( 2 ) == 0 )
-		{
-			legendProperties.setBackgroundPaint( null );
-		}
-		else
-		{
-			legendProperties.setBackgroundPaint( TestDataGenerator.getRandomPaint() );
-		}
-	}
+        //---random between null and having a color.
+        if ((int) TestDataGenerator.getRandomNumber(2) == 0) {
+            legendProperties.setBorderStroke(null);
+        } else {
+            legendProperties.setBorderStroke(ChartStroke.DEFAULT_LEGEND_OUTLINE);
+        }
+
+        //---random between null and having a color.
+        if ((int) TestDataGenerator.getRandomNumber(2) == 0) {
+            legendProperties.setBackgroundPaint(null);
+        } else {
+            legendProperties.setBackgroundPaint(TestDataGenerator.getRandomPaint());
+        }
+    }
 }

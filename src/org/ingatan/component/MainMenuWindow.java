@@ -276,7 +276,7 @@ public class MainMenuWindow extends JFrame implements WindowListener {
     public class QuizRecordAction extends AbstractAction {
 
         public QuizRecordAction() {
-            super("Quiz Records");
+            super("Statistics Centre");
         }
 
         public void actionPerformed(ActionEvent e) {

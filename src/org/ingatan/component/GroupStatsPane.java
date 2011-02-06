@@ -40,13 +40,13 @@ import javax.swing.JPanel;
  * @author Thomas Everingham
  * @version 1.0
  */
-public class GroupStatsGraphPane extends JPanel {
+public class GroupStatsPane extends JPanel {
 
     /**
      * Creates a new <code>QuizHistoryWindow</code>.
      * @param returnToOnClose the window to return to once this window has closed.
      */
-    public GroupStatsGraphPane() {
+    public GroupStatsPane() {
         this.setSize(new Dimension(500, 500));
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         /** Our labels for each bar */
