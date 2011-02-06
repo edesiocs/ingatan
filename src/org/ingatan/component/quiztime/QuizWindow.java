@@ -620,6 +620,8 @@ public class QuizWindow extends JFrame implements WindowListener {
         //quiz has ended, so exit is cool
         if (quizHasEnded) {
             returnToOnClose.setVisible(true);
+            //save the quiz history entries to the library (these have been accumulated by the quiz manager throughout the quiz).
+            quizManager.commitLibraryHistoryEntries();
             //repack libraries and flush temp directory.
             try {
                 IOManager.cleanUpAndRepackage();
@@ -810,6 +812,8 @@ public class QuizWindow extends JFrame implements WindowListener {
                 //so exit
                 returnToOnClose.setVisible(true);
                 QuizWindow.this.setVisible(false);
+                //commit any history entries to the corresponding library before repacking
+                quizManager.commitLibraryHistoryEntries();
                 //repack libraries and flush temp directory.
                 try {
                     IOManager.cleanUpAndRepackage();
@@ -924,7 +928,7 @@ public class QuizWindow extends JFrame implements WindowListener {
 
                 //------save the question---------
                 try {
-                    quizManager.saveQuestion(currentQuestion);
+                    quizManager.updateLibrary(currentQuestion, marksAwarded, marksAvailable, improvementValue);
                 } catch (IOException ex) {
                     Logger.getLogger(QuizWindow.class.getName()).log(Level.SEVERE, "While saving the current question with updates for times asked, score, etc. (quiz window)", ex);
                 }

@@ -42,6 +42,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
@@ -98,7 +99,7 @@ public abstract class ParserWriter {
             questions.addContent(questionToElement(lib.getQuestion(i)));
         }
 
-        doc.addContent(questions);
+        e.addContent(questions);
 
         //create an element for holding quiz history
         Element historyElement = new Element("QuizHistories");
@@ -110,7 +111,7 @@ public abstract class ParserWriter {
             currentEntry = it.next();
             currentElement = new Element("record");
 
-            currentElement.setAttribute("date", DateFormat.getDateInstance().format(currentEntry.getDate()));
+            currentElement.setAttribute("date", new SimpleDateFormat("MMM d, yyyy, hh:mm:ss").format(currentEntry.getDate()));
             currentElement.setAttribute("numberAnswered", String.valueOf(currentEntry.getQuestionsAnswered()));
             currentElement.setAttribute("grade", String.valueOf(currentEntry.getGrade()));
             currentElement.setAttribute("averageImprovement", String.valueOf(currentEntry.getAverageImprovement()));
@@ -138,7 +139,7 @@ public abstract class ParserWriter {
             }
         }
 
-        return e;
+        return (Element) e.clone();
     }
 
     /**
@@ -284,7 +285,7 @@ public abstract class ParserWriter {
         while (it.hasNext()) {
             curEl = it.next();
             try {
-                histories.add(new HistoryEntry(DateFormat.getInstance().parse(curEl.getAttributeValue("date")), curEl.getAttribute("numberAnswered").getIntValue(), curEl.getAttribute("grade").getFloatValue(), curEl.getAttribute("averageImprovement").getFloatValue()));
+                histories.add(new HistoryEntry(new SimpleDateFormat("MMM d, yyyy, hh:mm:ss").parse(curEl.getAttributeValue("date")), curEl.getAttribute("numberAnswered").getIntValue(), curEl.getAttribute("grade").getFloatValue(), curEl.getAttribute("averageImprovement").getFloatValue()));
             } catch (ParseException ex) {
                 Logger.getLogger(ParserWriter.class.getName()).log(Level.SEVERE, "Trying to create a HistoryEntry object in parseLibraryFile.", ex);
             }

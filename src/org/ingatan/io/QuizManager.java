@@ -25,7 +25,6 @@
  * If you find this program useful, please tell me about it! I would be delighted
  * to hear from you at tom.ingatan@gmail.com.
  */
-
 package org.ingatan.io;
 
 import org.ingatan.component.quiztime.TableQuestionUnit;
@@ -35,9 +34,12 @@ import org.ingatan.data.Library;
 import org.ingatan.data.TableQuestion;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.ingatan.data.HistoryEntry;
 
 /**
  * Prepares all questions from the selected libraries, and generates the order in
@@ -109,6 +111,10 @@ public class QuizManager {
      */
     private ArrayList<Library> libraries = new ArrayList<Library>(0);
     /**
+     * Histories for each of the libraries.
+     */
+    private HistoryEntry[] libHistories;
+    /**
      * Whether or not the questions are randomised and asked based on correctness values, etc.
      */
     private boolean randomise = true;
@@ -150,16 +156,20 @@ public class QuizManager {
             questionBucket.add(new ArrayList<IQuestion>(0));
         }
 
+        //create the array of history entries.
+        libHistories = new HistoryEntry[libraryIDs.length];
+
+        //load and add libraries to the libraries array
         for (int i = 0; i < libraryIDs.length; i++) {
-            //load and add library to the libraries array
             try {
                 libraries.add(IOManager.loadLibrary(libraryIDs[i]));
-                librariesUsed += IOManager.getLibraryName(libraryIDs[i]) + ((i < libraryIDs.length -1) ? ", " : "");
+                librariesUsed += IOManager.getLibraryName(libraryIDs[i]) + ((i < libraryIDs.length - 1) ? ", " : "");
+                libHistories[i] = new HistoryEntry(Calendar.getInstance().getTime());
             } catch (IOException ex) {
                 Logger.getLogger(QuizManager.class.getName()).log(Level.SEVERE, "Ocurred during quiz manager construction while trying to\n"
                         + "load each library from ID using IOManager", ex);
             }
-            
+
         }
 
         //extract the questions from each library
@@ -172,9 +182,9 @@ public class QuizManager {
                     addQuestionToBucket(ques[j]);
                 } //otherwise, just append them to the category 1 vector
                 else {
-                    if (ques[j] instanceof FlexiQuestion)
+                    if (ques[j] instanceof FlexiQuestion) {
                         questionBucket.get(CAT_ONE).add(ques[j]);
-                    else if (ques[j] instanceof TableQuestion) {
+                    } else if (ques[j] instanceof TableQuestion) {
                         for (int k = 0; k < ((TableQuestion) ques[j]).getQuestionUnits().length; k++) {
                             questionBucket.get(CAT_ONE).add(((TableQuestion) ques[j]).getQuestionUnits()[k]);
                         }
@@ -187,10 +197,8 @@ public class QuizManager {
         //array list will mean the questions are asked in the order they were added
         if (!randomise) {
             Collections.reverse(questionBucket.get(CAT_ONE));
-        }
-        //otherwise, we want the questions to be random, so shake the bucket.
-        else
-        {
+        } //otherwise, we want the questions to be random, so shake the bucket.
+        else {
             shakeBucket();
         }
     }
@@ -283,15 +291,37 @@ public class QuizManager {
         }
     }
 
-
     /**
      * Ask the ParserWriter to save this question by writing out its library to file. Does
      * not pack the library.
      * @param question the question to save.
      * @throws IOException if there is a problem loading the library.
      */
-    public void saveQuestion(IQuestion question) throws IOException {
-        ParserWriter.writeLibraryFile(IOManager.getLibraryFromID(question.getParentLibrary()), true);
+    public void updateLibrary(IQuestion question, int marksAwarded, int marksAvailable, float improvement) throws IOException {
+        //get the parent library of the question
+        Library lib = IOManager.getLibraryFromID(question.getParentLibrary());
+        //get the corresponding history entry
+        HistoryEntry entry = libHistories[libraries.indexOf(lib)];
+        //update the history entry
+        entry.addQuestionResults(marksAwarded, marksAvailable, improvement);
+        /*we don't want to add the history entry to the library until the very end of the quiz because we only want to
+         *add 1 entry for the entire quiz per library. Saving the history entries to the libraries is done in
+         *the commitLibraryHistoryEntries() method when the quiz finishes (called by the quiz manager).
+         *write the library to file.*/
+
+        //save data for this question to the library (write to disk)
+        ParserWriter.writeLibraryFile(lib, true);
+    }
+
+    public void commitLibraryHistoryEntries() {
+        for (int i = 0; i < libraries.size(); i++) {
+            //don't add empty records (the user may have exited quiz before library was used).
+            if (libHistories[i].isUsed()) {
+                libraries.get(i).addQuizHistory(libHistories[i]);
+                //save the library to disk
+                ParserWriter.writeLibraryFile(libraries.get(i), true);
+            }
+        }
     }
 
     /**
@@ -343,7 +373,7 @@ public class QuizManager {
         }
 
         //get the last question in the bucket, remove it from the vector, and
-        IQuestion retVal = questionBucket.get(category).get(questionBucket.get(category).size()-1);
+        IQuestion retVal = questionBucket.get(category).get(questionBucket.get(category).size() - 1);
         questionBucket.get(category).remove(questionBucket.get(category).size() - 1);
         return retVal;
     }

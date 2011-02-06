@@ -38,6 +38,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.JOptionPane;
 import org.ingatan.component.text.RichTextArea;
 import org.ingatan.data.FlexiQuestion;
 import org.ingatan.data.HistoryEntry;
@@ -86,6 +87,11 @@ public class FileFormatUpdater {
 
         Element e = doc.getRootElement();
 
+        //some pre-file-version-attribute libraries are still floating around on my system,
+        //these should all be compatible with version 1.0.
+        if (e.getAttribute("fileVersion") == null)
+            e.setAttribute("fileVersion","1.0");
+        
         ///update the library if required
         if (e.getAttribute("fileVersion").getFloatValue() == CURRENT_VERSION_LIBRARY_FILE) {
             return e; //the element is already up to date.

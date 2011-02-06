@@ -115,8 +115,20 @@ public class Library {
         return creationDate;
     }
 
+    /**
+     * Gets the list of HistoryEntries associated with this library.
+     * @return the list of quiz HistoryEntries held by this library.
+     */
     public List<HistoryEntry> getQuizHistory() {
         return quizHistory;
+    }
+
+    /**
+     * Add a quiz history to this library.
+     * @param entry the entry to add.
+     */
+    public void addQuizHistory(HistoryEntry entry) {
+        quizHistory.add(entry);
     }
 
     /**
