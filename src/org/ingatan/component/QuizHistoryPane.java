@@ -47,6 +47,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingConstants;
 
 /**
  * Panel displaying the recent quiz history. 
@@ -74,15 +75,21 @@ public class QuizHistoryPane extends JPanel {
      * @param returnToOnClose the window to return to once this window has closed.
      */
     public QuizHistoryPane() {
-        this.setSize(new Dimension(500, 500));
-        this.setLayout(new FlowLayout());
+        this.setSize(new Dimension(500, 300));
+        this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         scroller.setViewportView(scrollerContent);
         scroller.setAlignmentX(LEFT_ALIGNMENT);
         scroller.setPreferredSize(new Dimension(500,300));
         scroller.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, ThemeConstants.borderUnselected));
         scrollerContent.setLayout(new BoxLayout(scrollerContent, BoxLayout.Y_AXIS));
+        scroller.setAlignmentY(CENTER_ALIGNMENT);
 
-        this.add(scroller);
+        this.add(Box.createHorizontalStrut(30));
+        Box vert = Box.createVerticalBox();
+        vert.add(Box.createVerticalStrut(23));
+        vert.add(scroller);
+        vert.setAlignmentY(TOP_ALIGNMENT);
+        this.add(vert);
 
         rebuild();
 

@@ -248,7 +248,7 @@ public class LibraryGraphsPane extends JPanel {
         legendProperties.setFontPaint(ThemeConstants.textColour);
         legendProperties.setBackgroundPaint(Color.white);
 
-        axisChart = new AxisChart(dataSeries, chartProperties, axisProperties, legendProperties, 650, 400);
+        axisChart = new AxisChart(dataSeries, chartProperties, axisProperties, legendProperties, 600, 400);
     }
 
     /**

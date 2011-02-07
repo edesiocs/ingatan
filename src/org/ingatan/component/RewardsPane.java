@@ -28,8 +28,14 @@
 package org.ingatan.component;
 
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import org.ingatan.ThemeConstants;
+import org.ingatan.io.IOManager;
 
 /**
  * A little store with icons (+caption) that cost a particular number of points. Several
@@ -43,6 +49,10 @@ import javax.swing.JPanel;
  */
 public class RewardsPane extends JPanel {
 
+
+    JButton btnAddReward = new JButton(new AddRewardAction());
+    JButton btnEditRewards = new JButton(new AddEditRewardsAction());
+    JLabel lblPoints = new JLabel("Balance: ");
     /**
      * Creates a new <code>QuizHistoryWindow</code>.
      * @param returnToOnClose the window to return to once this window has closed.
@@ -50,6 +60,32 @@ public class RewardsPane extends JPanel {
     public RewardsPane() {
         this.setSize(new Dimension(500, 500));
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        
+        lblPoints.setText("Balance: " + IOManager.getQuizHistoryFile().getTotalScore() + " pts");
+        lblPoints.setFont(ThemeConstants.hugeFont.deriveFont(16.0f));
+        this.add(lblPoints);
+    }
+
+    /** Action for the edit rewards button. */
+    private static class AddEditRewardsAction extends AbstractAction {
+
+        public AddEditRewardsAction() {
+            super("Edit Rewards");
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+    }
+
+    /** Action for the add rewards button. */
+    private static class AddRewardAction extends AbstractAction {
+
+        public AddRewardAction() {
+            super("Add Rewards");
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
     }
 }

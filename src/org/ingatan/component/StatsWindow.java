@@ -28,6 +28,7 @@
 
 package org.ingatan.component;
 
+import java.awt.Dimension;
 import org.ingatan.ThemeConstants;
 
 /**
@@ -58,6 +59,7 @@ public class StatsWindow extends javax.swing.JFrame {
     /** Creates new form StatsWindow */
     public StatsWindow() {
         initComponents();
+        this.setSize(new Dimension(1000,500));
     }
 
     /** This method is called from within the constructor to
@@ -145,7 +147,7 @@ public class StatsWindow extends javax.swing.JFrame {
         );
         contentPaneLayout.setVerticalGroup(
             contentPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 434, Short.MAX_VALUE)
+            .addGap(0, 429, Short.MAX_VALUE)
         );
 
         horiz.add(contentPane);
