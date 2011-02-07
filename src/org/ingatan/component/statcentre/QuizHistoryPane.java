@@ -25,7 +25,7 @@
  * If you find this program useful, please tell me about it! I would be delighted
  * to hear from you at tom.ingatan@gmail.com.
  */
-package org.ingatan.component;
+package org.ingatan.component.statcentre;
 
 import java.awt.Color;
 import org.ingatan.ThemeConstants;
@@ -48,6 +48,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
+import org.ingatan.component.PaintedJPanel;
 
 /**
  * Panel displaying the recent quiz history. 

@@ -27,6 +27,7 @@
  */
 package org.ingatan.component;
 
+import org.ingatan.component.statcentre.StatsWindow;
 import java.awt.Color;
 import java.awt.event.WindowEvent;
 import org.ingatan.component.librarymanager.LibraryManagerWindow;

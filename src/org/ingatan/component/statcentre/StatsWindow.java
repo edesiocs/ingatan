@@ -26,7 +26,7 @@
  * to hear from you at tom.ingatan@gmail.com.
  */
 
-package org.ingatan.component;
+package org.ingatan.component.statcentre;
 
 import java.awt.Dimension;
 import org.ingatan.ThemeConstants;

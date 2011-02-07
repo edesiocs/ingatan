@@ -25,7 +25,7 @@
  * If you find this program useful, please tell me about it! I would be delighted
  * to hear from you at tom.ingatan@gmail.com.
  */
-package org.ingatan.component;
+package org.ingatan.component.statcentre;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
