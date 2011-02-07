@@ -29,10 +29,10 @@ package org.ingatan.component;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Paint;
+import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -69,7 +69,6 @@ import org.jCharts.properties.DataAxisProperties;
 import org.jCharts.properties.LegendProperties;
 import org.jCharts.properties.PointChartProperties;
 import org.jCharts.properties.PropertyException;
-import sun.font.Font2D;
 
 /**
  * Interactive panel with graphical representation of quiz history for the selected
@@ -103,6 +102,16 @@ public class FlashcardScatterPane extends JPanel {
                 } catch (PropertyException ex) {
                     Logger.getLogger(FlashcardScatterPane.class.getName()).log(Level.SEVERE, null, ex);
                 }
+            } else {
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setFont(ThemeConstants.niceFont.deriveFont(16.0f));
+                g2.drawString("Please select a library from the list.", 30, 50);
+                g2.setFont(ThemeConstants.niceFont);
+                g2.drawString("Select a library that contains flashcard type questions. Ingatan", 30, 64);
+                g2.drawString("will generate a scatterplot showing you your average grade for each", 30, 76);
+                g2.drawString("flashcard compared with how many times the card has been asked.", 30, 88);
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
             }
         }
     };
@@ -136,7 +145,9 @@ public class FlashcardScatterPane extends JPanel {
      * @param lib the library to draw.
      */
     public void drawChart(Library lib) {
-        if (lib == null) return;
+        if (lib == null) {
+            return;
+        }
 
         //build the table questions array from the library
         ArrayList<TableQuestion> tblQuestions = new ArrayList<TableQuestion>();
@@ -150,7 +161,10 @@ public class FlashcardScatterPane extends JPanel {
         TableQuestionRecordDeck recordDeck = new TableQuestionRecordDeck(tblQuestions.toArray(new TableQuestion[0]));
 
         //there are no table questions here.
-        if (recordDeck.getData().length == 0) return;
+        if (recordDeck.getData().length == 0) {
+            axisChart = null;
+            return;
+        }
 
         String[] xTicks = recordDeck.getTimesAskedDomain();
         double[][] data = recordDeck.getData();
@@ -158,7 +172,7 @@ public class FlashcardScatterPane extends JPanel {
 
         Paint[] paintsOutline = new Paint[cardShapes.length];
         Arrays.fill(paintsOutline, ThemeConstants.borderUnselected);
-        
+
         Paint[] paintsFill = new Paint[cardShapes.length];
         Arrays.fill(paintsFill, ThemeConstants.backgroundUnselected);
 
@@ -166,10 +180,11 @@ public class FlashcardScatterPane extends JPanel {
         Arrays.fill(legend, " ");
 
         boolean[] fillpointFlags = new boolean[cardShapes.length];
-        for (int i = 0; i < fillpointFlags.length; i++)
+        for (int i = 0; i < fillpointFlags.length; i++) {
             fillpointFlags[i] = true;
+        }
 
-        DataSeries dataSeries = new DataSeries(xTicks, "Times Asked", "Average Grade (%)", " ");
+        DataSeries dataSeries = new DataSeries(xTicks, "Times Asked", "Average Grade (%)", "Library: " + libBrowser.getSelectedLibraryName());
 
         PointChartProperties pointChartProperties = new PointChartProperties(cardShapes, fillpointFlags, paintsOutline);
         AxisChartDataSet axisChartDataSet;
@@ -193,7 +208,7 @@ public class FlashcardScatterPane extends JPanel {
         axisProperties.getXAxisProperties().setAxisTitleChartFont(new ChartFont(ThemeConstants.niceFont.deriveFont(14.0f), ThemeConstants.textColour));
         axisProperties.getXAxisProperties().setPaddingBetweenAxisTitleAndLabels(14.0f);
 
-        DataAxisProperties dataAxisProperties= (DataAxisProperties) axisProperties.getYAxisProperties();
+        DataAxisProperties dataAxisProperties = (DataAxisProperties) axisProperties.getYAxisProperties();
         try {
             dataAxisProperties.setUserDefinedScale(-10, 10);
         } catch (PropertyException ex) {
@@ -294,7 +309,7 @@ public class FlashcardScatterPane extends JPanel {
             //by 1 each time. So new String length is (to+1)-from.
             timesAskedDomain = new String[(to + 1) - from];
             for (int i = 0; i < timesAskedDomain.length; i++) {
-                timesAskedDomain[i] = String.valueOf(from+i);
+                timesAskedDomain[i] = String.valueOf(from + i);
             }
 
             //generate the data array (the data series, 1 series per card so that they can have different shapes).
@@ -317,7 +332,7 @@ public class FlashcardScatterPane extends JPanel {
             //generate the shapes to use with each of the data series.
             RoundRectangle2D rect = new RoundRectangle2D.Float(0, 0, 60, 25, 10, 10);
             //add a marker to show where the card indicates on the scale.
-            Rectangle2D marker = new Rectangle2D.Float(-10.0f, 12.3f, 30.0f, 0.5f);
+            Rectangle2D marker = new Rectangle2D.Float(-10.0f, 12.0f, 30.0f, 1.0f);
             Area rectArea = new Area(rect);
             Area lineArea = new Area(marker);
             rectArea.add(lineArea);
@@ -327,12 +342,13 @@ public class FlashcardScatterPane extends JPanel {
                 Graphics2D g2d = (Graphics2D) FlashcardScatterPane.this.getGraphics();
                 //get card text and ensure is not too long
                 String cardText = cards.get(i).getSide1();
-                if (cardText.length() > MAX_CARD_ICON_CHARACTERS) cardText = cardText.substring(0,MAX_CARD_ICON_CHARACTERS) + "..";
+                if (cardText.length() > MAX_CARD_ICON_CHARACTERS) {
+                    cardText = cardText.substring(0, MAX_CARD_ICON_CHARACTERS) + "..";
+                }
 
                 //create outline shape of card text
                 GlyphVector glyphText = ThemeConstants.niceFont.deriveFont(12.0f).createGlyphVector(g2d.getFontRenderContext(), cardText);
-                for (int g = 0; g < glyphText.getNumGlyphs(); g++)
-                {
+                for (int g = 0; g < glyphText.getNumGlyphs(); g++) {
                     glyphText.setGlyphTransform(g, AffineTransform.getTranslateInstance(0.5, 0));
                 }
                 Shape shapeTxt = glyphText.getOutline();

@@ -34,6 +34,7 @@ import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Paint;
+import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.event.ActionEvent;
@@ -62,7 +63,6 @@ import org.jCharts.properties.AxisProperties;
 import org.jCharts.properties.AxisTypeProperties;
 import org.jCharts.properties.ChartFont;
 import org.jCharts.properties.ChartProperties;
-import org.jCharts.properties.ChartStroke;
 import org.jCharts.properties.DataAxisProperties;
 import org.jCharts.properties.LegendProperties;
 import org.jCharts.properties.LineChartProperties;
@@ -105,6 +105,17 @@ public class LibraryGraphsPane extends JPanel {
                 } catch (PropertyException ex) {
                     Logger.getLogger(LibraryGraphsPane.class.getName()).log(Level.SEVERE, null, ex);
                 }
+            } else {
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setFont(ThemeConstants.niceFont.deriveFont(16.0f));
+                g2.drawString("Please select a library from the list.", 30, 50);
+                g2.setFont(ThemeConstants.niceFont);
+                g2.drawString("Select a library that you have used in a quiz at least once. Ingatan", 30, 64);
+                g2.drawString("will generate a plot that shows you your average grade for the quiz", 30, 76);
+                g2.drawString("over time. You can also choose to overlay a plot of the number of ", 30, 88);
+                g2.drawString("questions you answered in each quiz, and your average improvement. ", 30, 100);
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
             }
         }
     };
@@ -155,7 +166,13 @@ public class LibraryGraphsPane extends JPanel {
         }
 
         HistoryEntry[] historyEntries = lib.getQuizHistory().toArray(new HistoryEntry[0]);
-        //axisChart = EasyChart.createLineChart("Times Asked", "Correctness", data);
+
+        if (historyEntries.length == 0)
+        {
+            axisChart = null;
+            return;
+        }
+
         String[] legendLabels;
         String[] xTicks = buildXTicks(historyEntries);
 

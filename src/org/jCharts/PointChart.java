@@ -149,7 +149,18 @@ abstract class PointChart
 				//---render the point
 				if( pointChartProperties.getFillPointsFlag( dataSetIndex ) )
 				{
+
+                                        g2d.translate(-2.5, 2);
+                                        g2d.setPaint(new Color(100, 100, 100, 80));
+                                        g2d.draw(pointChartProperties.getShape(dataSetIndex));
+                                        g2d.fill(pointChartProperties.getShape(dataSetIndex));
+
+                                        //back to normal painting
 					//---fill the point
+                                        //restore offset back
+                                        g2d.translate( 2.5, -2);
+                                        g2d.setPaint( iAxisChartDataSet.getPaint( dataSetIndex ) );
+
 					g2d.fill( pointChartProperties.getShape( dataSetIndex ) );
 
 					//---if we are filling the points, see if we should outline the Shape
