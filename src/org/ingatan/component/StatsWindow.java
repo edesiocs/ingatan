@@ -52,6 +52,9 @@ public class StatsWindow extends javax.swing.JFrame {
     /** Rewards pane displayed by this stats window */
     RewardsPane rewardsPane = new RewardsPane();
 
+    /** Flashcard scatter pane displayed by this stats window */
+    FlashcardScatterPane scatterPane = new FlashcardScatterPane();
+
     /** Creates new form StatsWindow */
     public StatsWindow() {
         initComponents();
@@ -109,6 +112,11 @@ public class StatsWindow extends javax.swing.JFrame {
         menuPanel.add(btnLibraryGraphs);
 
         btnFlashcardScatter.setText("Flashcard Scatterplot");
+        btnFlashcardScatter.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnFlashcardScatterActionPerformed(evt);
+            }
+        });
         menuPanel.add(btnFlashcardScatter);
 
         btnGroupGraphs.setText("Group Statistics");
@@ -151,6 +159,7 @@ public class StatsWindow extends javax.swing.JFrame {
         contentPane.remove(historyPane);
         contentPane.remove(groupStatsPane);
         contentPane.remove(rewardsPane);
+        contentPane.remove(scatterPane);
         contentPane.add(libStatsPane);
         contentPane.validate();
         contentPane.repaint();
@@ -160,6 +169,7 @@ public class StatsWindow extends javax.swing.JFrame {
         contentPane.remove(libStatsPane);
         contentPane.remove(groupStatsPane);
         contentPane.remove(rewardsPane);
+        contentPane.remove(scatterPane);
         contentPane.add(historyPane);
         contentPane.validate();
         contentPane.repaint();
@@ -169,6 +179,7 @@ public class StatsWindow extends javax.swing.JFrame {
         contentPane.remove(libStatsPane);
         contentPane.remove(rewardsPane);
         contentPane.remove(historyPane);
+        contentPane.remove(scatterPane);
         contentPane.add(groupStatsPane);
         contentPane.validate();
         contentPane.repaint();
@@ -178,10 +189,21 @@ public class StatsWindow extends javax.swing.JFrame {
         contentPane.remove(libStatsPane);
         contentPane.remove(historyPane);
         contentPane.remove(groupStatsPane);
+        contentPane.remove(scatterPane);
         contentPane.add(rewardsPane);
         contentPane.validate();
         contentPane.repaint();
     }//GEN-LAST:event_btnRewardsActionPerformed
+
+    private void btnFlashcardScatterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFlashcardScatterActionPerformed
+        contentPane.remove(historyPane);
+        contentPane.remove(groupStatsPane);
+        contentPane.remove(rewardsPane);
+        contentPane.remove(libStatsPane);
+        contentPane.add(scatterPane);
+        contentPane.validate();
+        contentPane.repaint();
+    }//GEN-LAST:event_btnFlashcardScatterActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

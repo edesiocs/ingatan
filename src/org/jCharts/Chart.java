@@ -75,6 +75,7 @@ abstract public class Chart implements Serializable
 	private boolean generateImageMap = false;
 	private ImageMap imageMap = null;
 	private BufferedImage bufferedImage = null;
+        private boolean useLegend = true;
 
 
 	/******************************************************************************************
@@ -268,7 +269,10 @@ abstract public class Chart implements Serializable
 	 *******************************************************************************************/
 	protected final Legend getLegend()
 	{
+            if (useLegend)
 		return this.legend;
+            else
+                return null;
 	}
 
 
@@ -281,6 +285,10 @@ abstract public class Chart implements Serializable
 	{
 		return this.legend != null;
 	}
+
+        public void setUseLegend(boolean use) {
+            useLegend = use;
+        }
 
 
 	/******************************************************************************************
