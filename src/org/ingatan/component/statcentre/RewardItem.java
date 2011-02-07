@@ -13,6 +13,11 @@ import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Ellipse2D;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import org.ingatan.ThemeConstants;
@@ -23,20 +28,46 @@ import org.ingatan.ThemeConstants;
  * @author Thomas Everingham
  */
 public class RewardItem extends JPanel implements MouseListener {
-    
-    private static final float SIDE_DIMENSION = 120;
-    private static final float ICON_DIMENSION = 32;
+
+    /** The size of the reward item */
+    private static final float SIDE_DIMENSION = 140;
+    /** The size of the icon */
+    private static final float ICON_DIMENSION = 48;
+    /** The line weight of the outline of the reward item. */
     private static final float OUTLINE_WEIGHT = 1.5f;
-    private static final Ellipse2D CIRC = new Ellipse2D.Float(3, 3, SIDE_DIMENSION-6, SIDE_DIMENSION-6);
-    /** icon drawn to the reward item. */
+    /** The circle shape border of the reward item. */
+    private static final Ellipse2D CIRC = new Ellipse2D.Float(3, 3, SIDE_DIMENSION - 6, SIDE_DIMENSION - 6);
+    /** Icon drawn to the reward item. */
     private ImageIcon rewardIcon = null;
+    /** Brief description of the reward, for example "Bottle of Wine". */
+    private String description = "Reward";
+    /** Path to the rewards icon. If it is prefixed with 'jar://', then class loader should be used.*/
+    private String rewardIconPath = "";
+    /** How many points the item costs. */
+    private int price = 0;
+    /** Flag indicating whether or not this item is selected. */
     private boolean selected = false;
 
-    public RewardItem() {
+    /**
+     * Creates a new RewardItem object.
+     * @param description the description of the reward (e.g. "Bar of Chocolate").
+     * @param price the price of the reward in points.
+     * @param iconPath The path to the icon to be used. If prefixed with "jar://", then
+     * class loader will be used.
+     */
+    public RewardItem(String description, int price, String iconPath) {
         this.setSize((int) SIDE_DIMENSION, (int) SIDE_DIMENSION);
         this.setMaximumSize(new Dimension((int) SIDE_DIMENSION, (int) SIDE_DIMENSION));
         this.setPreferredSize(new Dimension((int) SIDE_DIMENSION, (int) SIDE_DIMENSION));
         this.addMouseListener(this);
+        this.description = description;
+        this.price = price;
+        this.rewardIconPath = iconPath;
+        //load the icon
+        if (rewardIconPath.startsWith("jar://")) {
+            rewardIcon = new ImageIcon(RewardItem.class.getResource(rewardIconPath.replace("jar://", "/")));
+        } else {
+        }
     }
 
     @Override
@@ -50,11 +81,15 @@ public class RewardItem extends JPanel implements MouseListener {
         } else {
             g2d.setPaint(Color.white);
         }
-        
+
         g2d.fill(CIRC);
         g2d.setStroke(new BasicStroke(2.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, OUTLINE_WEIGHT, new float[]{7, 5}, 0));
         g2d.setPaint(ThemeConstants.textColour);
         g2d.draw(CIRC);
+
+        g2d.setFont(ThemeConstants.niceFont.deriveFont(12.0f));
+        g2d.drawString(description, (int) (SIDE_DIMENSION * 0.2), (int) (SIDE_DIMENSION * 0.23));
+        g2d.drawString(price + " pts", (int) (SIDE_DIMENSION * 0.3), (int) (SIDE_DIMENSION - (SIDE_DIMENSION * 0.18)));
 
         if (rewardIcon != null) {
             g2d.drawImage(rewardIcon.getImage(), (int) ((SIDE_DIMENSION / 2) - (ICON_DIMENSION / 2)), (int) ((SIDE_DIMENSION / 2) - (ICON_DIMENSION / 2)), null);
@@ -62,24 +97,21 @@ public class RewardItem extends JPanel implements MouseListener {
     }
 
     public void mouseClicked(MouseEvent e) {
-        if (CIRC.contains(e.getX(), e.getY()))
+        if (CIRC.contains(e.getX(), e.getY())) {
             selected = !selected;
+        }
         this.repaint();
     }
 
     public void mousePressed(MouseEvent e) {
-        
     }
 
     public void mouseReleased(MouseEvent e) {
-        
     }
 
     public void mouseEntered(MouseEvent e) {
-        
     }
 
     public void mouseExited(MouseEvent e) {
-        
     }
 }
