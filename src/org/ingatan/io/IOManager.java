@@ -434,7 +434,7 @@ public abstract class IOManager {
             File quizHistFile = new File(getQuizHistoryFilePath());
             if (quizHistFile.exists() == false) {
                 System.out.println("Quiz history file does not exist. Creating new empty file.");
-                quizHistoryFile = new QuizHistoryFile(new ArrayList<QuizHistoryEntry>(), 0);
+                quizHistoryFile = new QuizHistoryFile(new ArrayList<QuizHistoryEntry>(), 0, new ArrayList<String>(), new ArrayList<Number>(), new ArrayList<String>());
                 ParserWriter.writeQuizHistoryFile(quizHistoryFile);
             } else {
                 quizHistoryFile = ParserWriter.parseQuizHistoryFile();

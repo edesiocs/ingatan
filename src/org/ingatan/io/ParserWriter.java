@@ -41,7 +41,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -151,15 +150,16 @@ public abstract class ParserWriter {
 
         //lib metadata
         Element e = new Element("QuizHistory").setAttribute("fileVersion", "1.0").setAttribute("totalScore", String.valueOf(history.getTotalScore()));
-        doc.addContent(e);
+        doc.setRootElement(e);
 
         ArrayList<QuizHistoryEntry> entries = history.getEntries();
-        Iterator<QuizHistoryEntry> iterate = entries.iterator();
+        Iterator<QuizHistoryEntry> entriesIt = entries.iterator();
 
+        //generate the quiz history entries
         QuizHistoryEntry curEntry;
         Element el;
-        while (iterate.hasNext()) {
-            curEntry = iterate.next();
+        while (entriesIt.hasNext()) {
+            curEntry = entriesIt.next();
             el = new Element("entry");
             el.setAttribute("date", curEntry.getDate());
             el.setAttribute("libraries", curEntry.getLibraries());
@@ -167,9 +167,29 @@ public abstract class ParserWriter {
             el.setAttribute("qsAnswered", String.valueOf(curEntry.getQuestionsAnswered()));
             el.setAttribute("qsSkipped", String.valueOf(curEntry.getQuestionsSkipped()));
             el.setAttribute("score", String.valueOf(curEntry.getScore()));
-
             e.addContent(el);
         }
+
+        //now generate the rewards entries
+        ArrayList<String> descriptions = history.getRewardDescriptions();
+        ArrayList<Number> prices = history.getRewardPrices();
+        ArrayList<String> iconPaths = history.getRewardIconPaths();
+        Iterator<String> descIt = descriptions.iterator();
+        Iterator<Number> priceIt = prices.iterator();
+        Iterator<String> iconPathIt = iconPaths.iterator();
+
+        String curDesc;
+        String curIconPath;
+        int curPrice;
+        while (descIt.hasNext() && priceIt.hasNext() && iconPathIt.hasNext()) {
+            curDesc = descIt.next();
+            curIconPath = iconPathIt.next();
+            curPrice = priceIt.next().intValue();
+            el = new Element("reward");
+            el.setAttribute("description", curDesc).setAttribute("price", String.valueOf(curPrice)).setAttribute("iconPath", curIconPath);
+            e.addContent(el);
+        }
+
 
         XMLOutputter fmt = new XMLOutputter();
         FileOutputStream f = null;
@@ -206,8 +226,23 @@ public abstract class ParserWriter {
         }
 
         int totalScore = 0;
+        try {
+            totalScore = doc.getRootElement().getAttribute("totalScore").getIntValue();
+        } catch (DataConversionException ex) {
+            Logger.getLogger(ParserWriter.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
+        // quiz history entries.
         ArrayList<QuizHistoryEntry> historyEntries = new ArrayList<QuizHistoryEntry>();
+        //reward descriptions
+        ArrayList<String> rewardDescriptions = new ArrayList<String>();
+        //paths to the icons used by the rewards
+        ArrayList<String> rewardIconPaths = new ArrayList<String>();
+        //prices of the rewards.
+        ArrayList<Number> rewardPrices = new ArrayList<Number>();
+
+
+        //build the quiz history entries.
         Iterator<Element> entries = doc.getRootElement().getChildren("entry").iterator();
         Element curEl;
         String date = "??";
@@ -220,7 +255,6 @@ public abstract class ParserWriter {
             curEl = entries.next();
 
             try {
-                totalScore = doc.getRootElement().getAttribute("totalScore").getIntValue();
                 date = curEl.getAttributeValue("date");
                 libraries = curEl.getAttributeValue("libraries");
                 percentage = curEl.getAttribute("percentage").getIntValue();
@@ -234,7 +268,23 @@ public abstract class ParserWriter {
             historyEntries.add(new QuizHistoryEntry(date, percentage, qsAnswered, qsSkipped, score, libraries));
         }
 
-        return new QuizHistoryFile(historyEntries, totalScore);
+        //build the rewards
+        //build the quiz history entries.
+        Iterator<Element> rewards = doc.getRootElement().getChildren("reward").iterator();
+        while (rewards.hasNext()) {
+            curEl = rewards.next();
+
+            try {
+                rewardDescriptions.add(curEl.getAttributeValue("description"));
+                rewardIconPaths.add(curEl.getAttributeValue("iconPath"));
+                rewardPrices.add(curEl.getAttribute("price").getIntValue());
+            } catch (DataConversionException ex) {
+                Logger.getLogger(ParserWriter.class.getName()).log(Level.SEVERE, "While parsing the QuizHistoryFile.", ex);
+            }
+
+        }
+
+        return new QuizHistoryFile(historyEntries,totalScore,rewardDescriptions, rewardPrices, rewardIconPaths);
 
     }
 
@@ -774,22 +824,22 @@ public abstract class ParserWriter {
         } else {
             IOManager.setPreviouslySelectedGroup(prevGroup.getValue());
         }
-        
 
 
-            //set the symbol menu configuration (build hashmap)
-            List<Element> symbolMenuData = doc.getRootElement().getChild("SymbolMenuConfiguration").getChildren("entry");
-            Iterator<Element> iterate = symbolMenuData.iterator();
 
-            String datum = "";
-            HashMap<String, String> characterMap = new HashMap<String, String>();
+        //set the symbol menu configuration (build hashmap)
+        List<Element> symbolMenuData = doc.getRootElement().getChild("SymbolMenuConfiguration").getChildren("entry");
+        Iterator<Element> iterate = symbolMenuData.iterator();
 
-            while (iterate.hasNext()) {
-                datum = iterate.next().getText();
-                characterMap.put(String.valueOf(datum.charAt(0)), datum.substring(1));
-            }
+        String datum = "";
+        HashMap<String, String> characterMap = new HashMap<String, String>();
 
-
-            return characterMap;
+        while (iterate.hasNext()) {
+            datum = iterate.next().getText();
+            characterMap.put(String.valueOf(datum.charAt(0)), datum.substring(1));
         }
+
+
+        return characterMap;
     }
+}

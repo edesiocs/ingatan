@@ -29,11 +29,14 @@ package org.ingatan.component.statcentre;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -52,16 +55,20 @@ import org.ingatan.io.IOManager;
  * @version 1.0
  */
 public class RewardsPane extends JPanel {
+
     /** Button for adding a reward. */
     JButton btnAddReward = new JButton(new AddRewardAction());
     /** Button for editing a reward. */
     JButton btnEditRewards = new JButton(new AddEditRewardsAction());
+    /** Button for showing a dialog that explains the rewards system. */
+    JButton btnHelp = new JButton(new HelpAction());
     /** Label to show the user's pts balance */
     JLabel lblPoints = new JLabel("Balance: ");
     /** Panel to hold the rewards in the scroller. */
     JPanel scrollerContent = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 15));
     /** Scroller for the rewards */
     JScrollPane scroller = new JScrollPane(scrollerContent);
+
     /**
      * Creates a new <code>QuizHistoryWindow</code>.
      * @param returnToOnClose the window to return to once this window has closed.
@@ -72,14 +79,22 @@ public class RewardsPane extends JPanel {
         lblPoints.setText("Balance: " + IOManager.getQuizHistoryFile().getTotalScore() + " pts");
         lblPoints.setFont(ThemeConstants.hugeFont.deriveFont(16.0f));
         lblPoints.setAlignmentX(LEFT_ALIGNMENT);
-        scrollerContent.add(new RewardItem("Bottle of Wine", 2000, "jar://resources/rewards/wine.png"));
-        scrollerContent.add(new RewardItem(" Play a Game", 500, "jar://resources/rewards/game.png"));
-        scrollerContent.add(new RewardItem("Go Sunbathing", 350, "jar://resources/rewards/sun.png"));
-        scrollerContent.add(new RewardItem("Hot Chocolate", 600, "jar://resources/rewards/coffee.png"));
-        scrollerContent.add(new RewardItem("Watch a Movie", 1200, "jar://resources/rewards/movie.png"));
-        scrollerContent.add(new RewardItem("Afternoon Tea", 200, "jar://resources/rewards/coffee.png"));
-        scrollerContent.add(new RewardItem("  Skype Beth", 450, "jar://resources/rewards/webcam.png"));
-        scrollerContent.setPreferredSize(new Dimension(450,500));
+        ArrayList<String> descriptions = IOManager.getQuizHistoryFile().getRewardDescriptions();
+        ArrayList<String> iconPaths = IOManager.getQuizHistoryFile().getRewardIconPaths();
+        ArrayList<Number> prices = IOManager.getQuizHistoryFile().getRewardPrices();
+
+        if (descriptions.size() == 0) {
+            //add a label that says there are no rewards added.
+            JLabel lblNoRewards = new JLabel("No rewards have been added yet.");
+            lblNoRewards.setFont(ThemeConstants.niceFont.deriveFont(14.0f));
+            scrollerContent.add(lblNoRewards);
+        } else {
+            for (int i = 0; i < descriptions.size(); i++) {
+                scrollerContent.add(new RewardItem(descriptions.get(i), prices.get(i).intValue(), iconPaths.get(i)));
+            }
+        }
+
+        scrollerContent.setPreferredSize(new Dimension(450, 500));
 
         scroller.setAlignmentX(LEFT_ALIGNMENT);
         scroller.setMaximumSize(new Dimension(560, 300));
@@ -95,13 +110,31 @@ public class RewardsPane extends JPanel {
         vert.setAlignmentY(TOP_ALIGNMENT);
         this.add(vert);
 
+        this.add(Box.createHorizontalStrut(8));
+
+        vert = Box.createVerticalBox();
+        vert.add(Box.createVerticalStrut(50));
+        vert.add(btnAddReward);
+        btnAddReward.setMargin(new Insets(1, 1, 1, 1));
+        btnAddReward.setToolTipText("Add a reward");
+        vert.add(Box.createVerticalStrut(5));
+        vert.add(btnEditRewards);
+        btnEditRewards.setMargin(new Insets(1, 1, 1, 1));
+        btnEditRewards.setToolTipText("Edit/Remove selected rewards");
+        vert.add(Box.createVerticalStrut(5));
+        vert.add(btnHelp);
+        btnHelp.setMargin(new Insets(1, 1, 1, 1));
+        btnHelp.setToolTipText("About the rewards list");
+        vert.setAlignmentY(TOP_ALIGNMENT);
+        this.add(vert);
+
     }
 
     /** Action for the edit rewards button. */
     private static class AddEditRewardsAction extends AbstractAction {
 
         public AddEditRewardsAction() {
-            super("Edit Rewards");
+            super("", new ImageIcon(RewardsPane.class.getResource("/resources/icons/image/pencil.png")));
         }
 
         public void actionPerformed(ActionEvent e) {
@@ -113,7 +146,19 @@ public class RewardsPane extends JPanel {
     private static class AddRewardAction extends AbstractAction {
 
         public AddRewardAction() {
-            super("Add Rewards");
+            super("", new ImageIcon(RewardsPane.class.getResource("/resources/icons/add.png")));
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+    }
+
+    /** Action for the add rewards button. */
+    private static class HelpAction extends AbstractAction {
+
+        public HelpAction() {
+            super("", new ImageIcon(RewardsPane.class.getResource("/resources/icons/help.png")));
         }
 
         public void actionPerformed(ActionEvent e) {

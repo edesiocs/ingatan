@@ -29,6 +29,7 @@
 package org.ingatan.data;
 
 import java.util.ArrayList;
+import org.ingatan.component.statcentre.RewardsPane;
 
 /**
  * Quiz history including a record for each time a quiz has been entered, the result, and
@@ -46,15 +47,28 @@ public class QuizHistoryFile {
     /**
      * Total historic score.
      */
-    private int score;
+    private int totalScore;
+
+    /** Descriptions of the rewards that have been added by the user. */
+    private ArrayList<String> rewardDescriptions;
+    /** Prices of the rewards that have been added by the user. */
+    private ArrayList<Number> rewardPrices;
+    /** Paths to icons for the rewards that have been added by the user. */
+    private ArrayList<String> rewardIconPaths;
 
     /**
      * Creates a new QuizHistoryFile, containing the specified entries.
      * @param entries the quiz history entries to include in the file.
+     * @param rewardDescriptions The descriptions of the rewards (e.g. read a book).
+     * @param rewardPrices The costs, in points, of the rewards.
+     * @param rewardIconPaths The paths to the icons used by the rewards. If prefixed by "jar://" class loader is used.
      */
-    public QuizHistoryFile(ArrayList<QuizHistoryEntry> entries, int score) {
+    public QuizHistoryFile(ArrayList<QuizHistoryEntry> entries, int score, ArrayList<String> rewardDescriptions, ArrayList<Number> rewardPrices, ArrayList<String> rewardIconPaths) {
         historyEntries = entries;
-        this.score = score;
+        this.totalScore = score;
+        this.rewardDescriptions = rewardDescriptions;
+        this.rewardPrices = rewardPrices;
+        this.rewardIconPaths = rewardIconPaths;
     }
 
     /**
@@ -62,7 +76,7 @@ public class QuizHistoryFile {
      * @return the total score accumulated over all quizes that have been undertaken.
      */
     public int getTotalScore() {
-        return score;
+        return totalScore;
     }
 
     /**
@@ -70,7 +84,7 @@ public class QuizHistoryFile {
      * @param increment the amount by which the total score should be increased.
      */
     public void addToTotalScore(int increment) {
-        score += increment;
+        totalScore += increment;
     }
 
     /**
@@ -87,12 +101,49 @@ public class QuizHistoryFile {
     }
 
     /**
+     * Add a reward to the quiz history file.
+     * @param description The description of the reward (e.g. read a book).
+     * @param price The cost, in points, of the reward.
+     * @param iconPath The path to the icon used by the reward. If prefixed by "jar://" use class loader.
+     */
+    public void addReward(String description, int price, String iconPath) {
+        rewardDescriptions.add(description);
+        rewardPrices.add(price);
+        rewardIconPaths.add(iconPath);
+    }
+
+    /**
      * Remove the specified entry from the array list.
      * @param entry the entry to remove.
      */
     public void removeEntry(QuizHistoryEntry entry) {
         historyEntries.remove(entry);
     }
+
+    /**
+     * Gets the reward descriptions encapsulated by this QuizHistoryFile.
+     * @return the reward descriptions.
+     */
+    public ArrayList<String> getRewardDescriptions() {
+        return rewardDescriptions;
+    }
+
+    /**
+     * Gets the reward icon paths encapsulated by this QuizHistoryFile.
+     * @return the reward icon paths.
+     */
+    public ArrayList<String> getRewardIconPaths() {
+        return rewardIconPaths;
+    }
+
+    /**
+     * Gets the reward prices encapsulated by this QuizHistoryFile.
+     * @return the reward prices.
+     */
+    public ArrayList<Number> getRewardPrices() {
+        return rewardPrices;
+    }
+
 
     /**
      * Gets all history entries contained by this file.
