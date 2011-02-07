@@ -62,7 +62,8 @@ public class RewardsPane extends JPanel {
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         lblPoints.setText("Balance: " + IOManager.getQuizHistoryFile().getTotalScore() + " pts");
         lblPoints.setFont(ThemeConstants.hugeFont.deriveFont(16.0f));
-        this.add(lblPoints);
+        //this.add(lblPoints);
+        this.add(new RewardItem());
     }
 
     /** Action for the edit rewards button. */
