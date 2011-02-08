@@ -29,6 +29,9 @@
 package org.ingatan.component.statcentre;
 
 import java.awt.Dimension;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import javax.swing.JFrame;
 import org.ingatan.ThemeConstants;
 
 /**
@@ -39,7 +42,7 @@ import org.ingatan.ThemeConstants;
  * @author Thomas Everingham
  * @version 1.0
  */
-public class StatsWindow extends javax.swing.JFrame {
+public class StatsWindow extends javax.swing.JFrame implements WindowListener {
 
     /** The QuizHistoryPane displayed by this stats window */
     QuizHistoryPane historyPane = new QuizHistoryPane();
@@ -53,11 +56,15 @@ public class StatsWindow extends javax.swing.JFrame {
     /** Flashcard scatter pane displayed by this stats window */
     FlashcardScatterPane scatterPane = new FlashcardScatterPane();
 
+    JFrame returnToOnClose;
+
     /** Creates new form StatsWindow */
-    public StatsWindow() {
+    public StatsWindow(JFrame returnToOnClose) {
         initComponents();
         this.setSize(new Dimension(1000,500));
         this.setLocationRelativeTo(null);
+        this.returnToOnClose = returnToOnClose;
+        this.addWindowListener(this);
     }
 
     /** This method is called from within the constructor to
@@ -194,5 +201,27 @@ public class StatsWindow extends javax.swing.JFrame {
     private javax.swing.JLabel lblHeading;
     private javax.swing.JPanel menuPanel;
     // End of variables declaration//GEN-END:variables
+
+    public void windowOpened(WindowEvent e) {
+    }
+
+    public void windowClosing(WindowEvent e) {
+        returnToOnClose.setVisible(true);
+    }
+
+    public void windowClosed(WindowEvent e) {
+    }
+
+    public void windowIconified(WindowEvent e) {
+    }
+
+    public void windowDeiconified(WindowEvent e) {
+    }
+
+    public void windowActivated(WindowEvent e) {
+    }
+
+    public void windowDeactivated(WindowEvent e) {
+    }
 
 }

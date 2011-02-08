@@ -281,7 +281,7 @@ public class MainMenuWindow extends JFrame implements WindowListener {
         }
 
         public void actionPerformed(ActionEvent e) {
-            new StatsWindow().setVisible(true);
+            new StatsWindow(MainMenuWindow.this).setVisible(true);
             MainMenuWindow.this.setVisible(false);
         }
     }
