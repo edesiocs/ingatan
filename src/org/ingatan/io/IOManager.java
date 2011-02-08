@@ -622,26 +622,36 @@ public abstract class IOManager {
      * @param defaultsTable the Hashtable with String keys and String objects to which the default answer fields should be added.
      */
     public static void addDefaultAnswerFieldsToTables(Hashtable<String, Class> classTable, Hashtable<String, String> defaultsTable) {
-        classTable.put("org.ingatan.component.answerfield.AnsFieldSimpleText", AnsFieldSimpleText.class);
-        defaultsTable.put("org.ingatan.component.answerfield.AnsFieldSimpleText", "");
+        
         classTable.put("org.ingatan.component.answerfield.AnsFieldMultiChoice", AnsFieldMultiChoice.class);
         defaultsTable.put("org.ingatan.component.answerfield.AnsFieldMultiChoice", "");
+
         classTable.put("org.ingatan.component.answerfield.AnsFieldTrueFalse", AnsFieldTrueFalse.class);
         defaultsTable.put("org.ingatan.component.answerfield.AnsFieldTrueFalse", "");
+
         classTable.put("org.ingatan.component.answerfield.AnsFieldSimpleMultiChoice", AnsFieldSimpleMultiChoice.class);
         defaultsTable.put("org.ingatan.component.answerfield.AnsFieldSimpleMultiChoice", "");
+
         classTable.put("org.ingatan.component.answerfield.AnsFieldLabelPicture", AnsFieldLabelPicture.class);
         defaultsTable.put("org.ingatan.component.answerfield.AnsFieldLabelPicture", "");
+
         classTable.put("org.ingatan.component.answerfield.AnsFieldList", AnsFieldList.class);
         defaultsTable.put("org.ingatan.component.answerfield.AnsFieldList", "");
+
         classTable.put("org.ingatan.component.answerfield.AnsFieldTable", AnsFieldTable.class);
         defaultsTable.put("org.ingatan.component.answerfield.AnsFieldTable", "");
+
         classTable.put("org.ingatan.component.answerfield.AnsFieldSelfGraded", AnsFieldSelfGraded.class);
         defaultsTable.put("org.ingatan.component.answerfield.AnsFieldSelfGraded", "");
+
         classTable.put("org.ingatan.component.answerfield.AnsFieldEmbeddedAudio", AnsFieldEmbeddedAudio.class);
         defaultsTable.put("org.ingatan.component.answerfield.AnsFieldEmbeddedAudio", "");
+
         classTable.put("org.ingatan.component.answerfield.AnsFieldHint", AnsFieldHint.class);
         defaultsTable.put("org.ingatan.component.answerfield.AnsFieldHint", "");
+
+        classTable.put("org.ingatan.component.answerfield.AnsFieldSimpleText", AnsFieldSimpleText.class);
+        defaultsTable.put("org.ingatan.component.answerfield.AnsFieldSimpleText", "");
     }
 
     /**

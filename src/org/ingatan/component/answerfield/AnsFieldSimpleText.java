@@ -269,11 +269,10 @@ public class AnsFieldSimpleText extends JPanel implements IAnswerField {
 
         ansText = "<html><body>";
 
-        ansText += "possible answers are:<ul>";
+        ansText += "possible answers are:<br>";
         for (int i = 0; i < correctAnswers.length; i++) {
-            ansText += "<li>" + correctAnswers[i] + "</li>";
+            ansText += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-" + correctAnswers[i] + "<br>";
         }
-        ansText += "</ul>";
         JLabel lblAnsDisplay = new JLabel(ansText);
         lblAnsDisplay.setFont(ThemeConstants.niceFont);
         btnGiveHint.setVisible(false);
