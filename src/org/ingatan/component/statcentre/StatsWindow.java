@@ -78,7 +78,8 @@ public class StatsWindow extends javax.swing.JFrame {
         btnRewards = new javax.swing.JButton();
         contentPane = new javax.swing.JPanel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Statistics Centre");
         getContentPane().setLayout(new javax.swing.BoxLayout(getContentPane(), javax.swing.BoxLayout.Y_AXIS));
 
         lblHeading.setText("Statistics and History");

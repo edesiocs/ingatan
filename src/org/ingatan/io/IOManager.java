@@ -433,8 +433,15 @@ public abstract class IOManager {
 
             File quizHistFile = new File(getQuizHistoryFilePath());
             if (quizHistFile.exists() == false) {
-                System.out.println("Quiz history file does not exist. Creating new empty file.");
-                quizHistoryFile = new QuizHistoryFile(new ArrayList<QuizHistoryEntry>(), 0, new ArrayList<String>(), new ArrayList<Number>(), new ArrayList<String>());
+                System.out.println("Quiz history file does not exist. Creating new file.");
+                //create a few 'starter' rewards
+                ArrayList<String> names = new ArrayList<String>();
+                ArrayList<String> icons = new ArrayList<String>();
+                ArrayList<Number> prices = new ArrayList<Number>();
+                names.add("Chocolate Bar"); names.add("Bottle of Wine"); names.add("See a Movie"); names.add("Play a Game"); names.add("Afternoon Tea");
+                icons.add("jar://resources/rewards/choc.png"); icons.add("jar://resources/rewards/wine.png"); icons.add("jar://resources/rewards/movie.png"); icons.add("jar://resources/rewards/game.png"); icons.add("jar://resources/rewards/coffee.png");
+                prices.add(250); prices.add(2000); prices.add(1200); prices.add(500); prices.add(150);
+                quizHistoryFile = new QuizHistoryFile(new ArrayList<QuizHistoryEntry>(), 0, names, prices, icons);
                 ParserWriter.writeQuizHistoryFile(quizHistoryFile);
             } else {
                 quizHistoryFile = ParserWriter.parseQuizHistoryFile();
