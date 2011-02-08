@@ -31,6 +31,7 @@ package org.ingatan.component;
 import org.ingatan.io.IOManager;
 import org.ingatan.io.ParserWriter;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -87,16 +88,20 @@ public class PreferencesDialog extends JDialog {
      */
     private OptionsPane optionPane = new OptionsPane();
     /**
+     * heading for symbol menu options.
+     */
+    private JLabel lblSymbolMenu = new JLabel("Symbol Menu Configuration");
+    /**
      * info label for above the symbol menu settings.
      */
-    private JLabel lblSymbolMenuInfo = new JLabel("<html><h4>Symbol Menu Configuration</h4>The symbol menu is shown whenever you press ctrl+space " +
+    private JLabel lblSymbolMenuInfo = new JLabel("<html>The symbol menu is shown whenever you press ctrl+space " +
             "in a text field, followed by any letter or number on the keyboard. " +
             "The symbols shown for a particular number or letter can be set below. " +
             "Note: by capitalising a letter, the corresponding symbols are also capitalised.");
     /**
      * heading for the options pane
      */
-    private JLabel lblOptionsPane = new JLabel("<html><h4>General Preferences</h4>");
+    private JLabel lblOptionsPane = new JLabel("General Preferences");
 
     public PreferencesDialog(JFrame owner) {
         super(owner);
@@ -116,11 +121,17 @@ public class PreferencesDialog extends JDialog {
         btnSave.setMargin(new Insets(1, 1, 1, 1));
         btnDefaults.setMargin(new Insets(1, 1, 1, 1));
         lblSymbolMenuInfo.setFont(ThemeConstants.niceFont);
+        lblOptionsPane.setFont(ThemeConstants.hugeFont.deriveFont(18.0f));
+        lblSymbolMenu.setFont(ThemeConstants.hugeFont.deriveFont(18.0f));
         
         this.getContentPane().setLayout(new BoxLayout(this.getContentPane(), BoxLayout.Y_AXIS));
         this.getContentPane().add(lblOptionsPane);
+        this.getContentPane().add(Box.createVerticalStrut(8));
         this.getContentPane().add(optionPane);
+        this.getContentPane().add(Box.createVerticalStrut(8));
+        this.getContentPane().add(lblSymbolMenu);
         this.getContentPane().add(lblSymbolMenuInfo);
+        this.getContentPane().add(Box.createVerticalStrut(8));
         this.getContentPane().add(scroller);
 
 
@@ -135,7 +146,7 @@ public class PreferencesDialog extends JDialog {
 
         this.getContentPane().add(horiz);
 
-        this.setSize(new Dimension(350,400));
+        this.setSize(new Dimension(440,400));
         this.setLocationRelativeTo(null);
         
         this.validate();
