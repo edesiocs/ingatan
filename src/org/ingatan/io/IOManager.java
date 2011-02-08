@@ -66,6 +66,7 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import org.ingatan.component.answerfield.AnsFieldEmbeddedAudio;
 import org.ingatan.component.answerfield.AnsFieldHint;
+import org.ingatan.component.answerfield.AnsFieldTable;
 import org.ingatan.component.image.ImageAcquisitionDialog;
 import org.ingatan.data.HistoryEntry;
 import org.jdom.DataConversionException;
@@ -633,6 +634,8 @@ public abstract class IOManager {
         defaultsTable.put("org.ingatan.component.answerfield.AnsFieldLabelPicture", "");
         classTable.put("org.ingatan.component.answerfield.AnsFieldList", AnsFieldList.class);
         defaultsTable.put("org.ingatan.component.answerfield.AnsFieldList", "");
+        classTable.put("org.ingatan.component.answerfield.AnsFieldTable", AnsFieldTable.class);
+        defaultsTable.put("org.ingatan.component.answerfield.AnsFieldTable", "");
         classTable.put("org.ingatan.component.answerfield.AnsFieldSelfGraded", AnsFieldSelfGraded.class);
         defaultsTable.put("org.ingatan.component.answerfield.AnsFieldSelfGraded", "");
         classTable.put("org.ingatan.component.answerfield.AnsFieldEmbeddedAudio", AnsFieldEmbeddedAudio.class);
