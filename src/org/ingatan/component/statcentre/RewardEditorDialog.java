@@ -61,8 +61,12 @@ import org.ingatan.component.text.NumericJTextField;
  * @version 1.0
  */
 public class RewardEditorDialog extends JDialog implements FocusListener {
-
-    private String[] iconFilenames = new String[]{"wine.png", "coffee.png", "choc.png", "fruit.png", "tree.png", "sun.png", "soccer.png", "cards.png", "game.png", "movie.png", "birdwatch.png", "swissarmy.png", "book.png", "mail.png", "music.png", "origami.png", "net.png", "camera.png", "webcam.png", "phone.png", "radio.png"};
+    /** The maximum number of characters for the reward item description. */
+    private static final int MAX_REWARD_NAME_LENGTH = 15;
+    /**
+     * The icon filenames bundled int the jar.
+     */
+    private static final String[] iconFilenames = new String[]{"wine.png", "coffee.png", "choc.png", "fruit.png", "tree.png", "sun.png", "soccer.png", "cards.png", "game.png", "movie.png", "birdwatch.png", "swissarmy.png", "book.png", "mail.png", "music.png", "origami.png", "net.png", "camera.png", "webcam.png", "phone.png", "radio.png"};
     /**
      * Label for the reward name field.
      */
@@ -237,7 +241,10 @@ public class RewardEditorDialog extends JDialog implements FocusListener {
      * @return the reward name text.
      */
     public String getNameText() {
-        return rewardName.getText();
+        if (rewardName.getText().length() > MAX_REWARD_NAME_LENGTH)
+            return rewardName.getText().substring(0, MAX_REWARD_NAME_LENGTH) + "..";
+        else
+            return rewardName.getText();
     }
 
     /**
@@ -263,7 +270,7 @@ public class RewardEditorDialog extends JDialog implements FocusListener {
     public void focusGained(FocusEvent e) {}
 
     public void focusLost(FocusEvent e) {
-        reward.resetData(rewardName.getText(), rewardPrice.getValue(), iconFilename);
+        reward.resetData(getNameText(), rewardPrice.getValue(), iconFilename);
         reward.repaint();
     }
 
