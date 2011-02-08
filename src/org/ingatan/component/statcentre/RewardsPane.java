@@ -119,9 +119,9 @@ public class RewardsPane extends JPanel implements ContainerListener {
         scrollerContent.setPreferredSize(new Dimension(450, 500));
 
         scroller.setAlignmentX(LEFT_ALIGNMENT);
-        scroller.setMaximumSize(new Dimension(560, 300));
-        scroller.setMinimumSize(new Dimension(485, 300));
-        scroller.setPreferredSize(new Dimension(485, 300));
+        scroller.setMaximumSize(new Dimension(560, 320));
+        scroller.setMinimumSize(new Dimension(485, 320));
+        scroller.setPreferredSize(new Dimension(485, 320));
         scroller.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, ThemeConstants.borderUnselected));
 
         this.add(Box.createHorizontalStrut(15));
@@ -218,7 +218,9 @@ public class RewardsPane extends JPanel implements ContainerListener {
                 editor.setVisible(true);
 
                 //if the user cancelled, don't save any of that data
-                if (editor.isUserCancelled()) continue;
+                if (editor.isUserCancelled()) {
+                    continue;
+                }
                 toEdit.get(i).resetData(editor.getNameText(), Integer.valueOf(editor.getPriceText()), editor.getIconPath());
             }
 
@@ -334,6 +336,15 @@ public class RewardsPane extends JPanel implements ContainerListener {
                 return;
             }
 
+            //confirm purchase
+            int resp;
+            if (toBuy.size() > 1)
+                resp = JOptionPane.showConfirmDialog(RewardsPane.this, "Are you sure you want to buy these " + toBuy.size() + " rewards?", "Confirm Purchase", JOptionPane.YES_NO_OPTION);
+            else
+                resp = JOptionPane.showConfirmDialog(RewardsPane.this, "Are you sure you want to buy this reward?", "Confirm Purchase", JOptionPane.YES_NO_OPTION);
+            if (resp == JOptionPane.NO_OPTION) {
+                return;
+            }
 
             for (int i = 0; i < toBuy.size(); i++) {
                 if (IOManager.getQuizHistoryFile().getTotalScore() - toBuy.get(i).getPrice() >= 0) {

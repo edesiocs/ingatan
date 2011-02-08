@@ -62,7 +62,7 @@ import org.ingatan.component.text.NumericJTextField;
  */
 public class RewardEditorDialog extends JDialog implements FocusListener {
 
-    private String[] iconFilenames = new String[]{"camera.png", "cards.png", "coffee.png", "fruit.png", "game.png", "mail.png", "movie.png", "sun.png", "swissarmy.png", "webcam.png", "wine.png"};
+    private String[] iconFilenames = new String[]{"wine.png", "coffee.png", "choc.png", "fruit.png", "tree.png", "sun.png", "soccer.png", "cards.png", "game.png", "movie.png", "birdwatch.png", "swissarmy.png", "book.png", "mail.png", "music.png", "origami.png", "net.png", "camera.png", "webcam.png", "phone.png", "radio.png"};
     /**
      * Label for the reward name field.
      */
