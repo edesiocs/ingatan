@@ -60,6 +60,7 @@ public class StatsWindow extends javax.swing.JFrame {
     public StatsWindow() {
         initComponents();
         this.setSize(new Dimension(1000,500));
+        this.setLocationRelativeTo(null);
     }
 
     /** This method is called from within the constructor to

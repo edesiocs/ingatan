@@ -29,8 +29,6 @@
 package org.ingatan.component.image;
 
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -136,6 +134,7 @@ public class ThumbnailPane extends JPanel{
         this.setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
         this.thumbnailImages = thumbnails;
         this.thumbnailSize = thumbnailSize;
+        this.rebuildThumbnails();
     }
 
     /**

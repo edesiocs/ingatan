@@ -29,7 +29,7 @@
 package org.ingatan.data;
 
 import java.util.ArrayList;
-import org.ingatan.component.statcentre.RewardsPane;
+import org.ingatan.component.statcentre.RewardItem;
 
 /**
  * Quiz history including a record for each time a quiz has been entered, the result, and
@@ -153,5 +153,19 @@ public class QuizHistoryFile {
         return historyEntries;
     }
 
-    
+    /**
+     * Replaces the three rewards data ArrayLists with those generated from the given
+     * array of RewardItems.
+     * @param rewards the RewardItems from which to generate the new rewards data.
+     */
+    public void replaceRewardsData(ArrayList<RewardItem> rewards) {
+        rewardDescriptions = new ArrayList<String>();
+        rewardIconPaths = new ArrayList<String>();
+        rewardPrices = new ArrayList<Number>();
+        for (int i = 0; i < rewards.size(); i++) {
+            rewardDescriptions.add(rewards.get(i).getDescription());
+            rewardIconPaths.add(rewards.get(i).getRewardIconPath());
+            rewardPrices.add(rewards.get(i).getPrice());
+        }
+    }
 }

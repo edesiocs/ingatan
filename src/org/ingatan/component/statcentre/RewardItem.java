@@ -7,17 +7,14 @@ package org.ingatan.component.statcentre;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Ellipse2D;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.imageio.ImageIO;
+import java.net.URL;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import org.ingatan.ThemeConstants;
@@ -30,7 +27,7 @@ import org.ingatan.ThemeConstants;
 public class RewardItem extends JPanel implements MouseListener {
 
     /** The size of the reward item */
-    private static final float SIDE_DIMENSION = 140;
+    public static final float SIDE_DIMENSION = 140;
     /** The size of the icon */
     private static final float ICON_DIMENSION = 48;
     /** The line weight of the outline of the reward item. */
@@ -65,9 +62,57 @@ public class RewardItem extends JPanel implements MouseListener {
         this.rewardIconPath = iconPath;
         //load the icon
         if (rewardIconPath.startsWith("jar://")) {
-            rewardIcon = new ImageIcon(RewardItem.class.getResource(rewardIconPath.replace("jar://", "/")));
+            URL tmpURL = RewardItem.class.getResource(rewardIconPath.replace("jar://", "/"));
+            if (tmpURL == null) {
+                //this is the default iamge if the other cannot be loaded
+                tmpURL = RewardItem.class.getResource("/resources/rewards/qmark.png");
+            }
+            rewardIcon = new ImageIcon(tmpURL);
         } else {
+            //load from disk
         }
+    }
+
+    /**
+     * Checks if this RewardItem is selected.
+     * @return whether or not this RewardItem is selected.
+     */
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public int getPrice() {
+        return price;
+    }
+
+    public String getRewardIconPath() {
+        return rewardIconPath;
+    }
+
+    public ImageIcon getIcon() {
+        return rewardIcon;
+    }
+
+    public void resetData(String description, int price, String iconPath) {
+        this.description = description;
+        this.price = price;
+        this.rewardIconPath = iconPath;
+        //load the icon
+        if (rewardIconPath.startsWith("jar://")) {
+            URL tmpURL = RewardItem.class.getResource(rewardIconPath.replace("jar://", "/"));
+            if (tmpURL == null) {
+                //this is the default iamge if the other cannot be loaded
+                tmpURL = RewardItem.class.getResource("/resources/rewards/qmark.png");
+            }
+            rewardIcon = new ImageIcon(tmpURL);
+        } else {
+            //load from disk
+        }
+        this.repaint();
     }
 
     @Override
@@ -88,8 +133,10 @@ public class RewardItem extends JPanel implements MouseListener {
         g2d.draw(CIRC);
 
         g2d.setFont(ThemeConstants.niceFont.deriveFont(12.0f));
-        g2d.drawString(description, (int) (SIDE_DIMENSION * 0.2), (int) (SIDE_DIMENSION * 0.23));
-        g2d.drawString(price + " pts", (int) (SIDE_DIMENSION * 0.3), (int) (SIDE_DIMENSION - (SIDE_DIMENSION * 0.18)));
+        int descWidth = g2d.getFontMetrics().stringWidth(description);
+        int priceWidth = g2d.getFontMetrics().stringWidth(price + " pts");
+        g2d.drawString(description, (int) ((SIDE_DIMENSION - descWidth)/2.0), (int) (SIDE_DIMENSION * 0.23));
+        g2d.drawString(price + " pts", (int) ((SIDE_DIMENSION - priceWidth)/2.0), (int) (SIDE_DIMENSION - (SIDE_DIMENSION * 0.18)));
 
         if (rewardIcon != null) {
             g2d.drawImage(rewardIcon.getImage(), (int) ((SIDE_DIMENSION / 2) - (ICON_DIMENSION / 2)), (int) ((SIDE_DIMENSION / 2) - (ICON_DIMENSION / 2)), null);
