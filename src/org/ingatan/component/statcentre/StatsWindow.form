@@ -80,14 +80,6 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnFlashcardScatterActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JButton" name="btnGroupGraphs">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Group Statistics"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnGroupGraphsActionPerformed"/>
-              </Events>
-            </Component>
             <Component class="javax.swing.JButton" name="btnRewards">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Rewards"/>

@@ -44,9 +44,6 @@ public class StatsWindow extends javax.swing.JFrame {
     /** The QuizHistoryPane displayed by this stats window */
     QuizHistoryPane historyPane = new QuizHistoryPane();
 
-    /** The GropuStatsGraphPane displayed by this stats window */
-    GroupStatsPane groupStatsPane = new GroupStatsPane();
-
     /** The LibraryStatsGraphPane displayed by this stats window */
     LibraryGraphsPane libStatsPane = new LibraryGraphsPane();
 
@@ -78,7 +75,6 @@ public class StatsWindow extends javax.swing.JFrame {
         btnQuizHistory = new javax.swing.JButton();
         btnLibraryGraphs = new javax.swing.JButton();
         btnFlashcardScatter = new javax.swing.JButton();
-        btnGroupGraphs = new javax.swing.JButton();
         btnRewards = new javax.swing.JButton();
         contentPane = new javax.swing.JPanel();
 
@@ -122,14 +118,6 @@ public class StatsWindow extends javax.swing.JFrame {
         });
         menuPanel.add(btnFlashcardScatter);
 
-        btnGroupGraphs.setText("Group Statistics");
-        btnGroupGraphs.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnGroupGraphsActionPerformed(evt);
-            }
-        });
-        menuPanel.add(btnGroupGraphs);
-
         btnRewards.setText("Rewards");
         btnRewards.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -160,7 +148,6 @@ public class StatsWindow extends javax.swing.JFrame {
 
     private void btnLibraryGraphsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLibraryGraphsActionPerformed
         contentPane.remove(historyPane);
-        contentPane.remove(groupStatsPane);
         contentPane.remove(rewardsPane);
         contentPane.remove(scatterPane);
         contentPane.add(libStatsPane);
@@ -170,7 +157,6 @@ public class StatsWindow extends javax.swing.JFrame {
 
     private void btnQuizHistoryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnQuizHistoryActionPerformed
         contentPane.remove(libStatsPane);
-        contentPane.remove(groupStatsPane);
         contentPane.remove(rewardsPane);
         contentPane.remove(scatterPane);
         contentPane.add(historyPane);
@@ -178,20 +164,9 @@ public class StatsWindow extends javax.swing.JFrame {
         contentPane.repaint();
     }//GEN-LAST:event_btnQuizHistoryActionPerformed
 
-    private void btnGroupGraphsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGroupGraphsActionPerformed
-        contentPane.remove(libStatsPane);
-        contentPane.remove(rewardsPane);
-        contentPane.remove(historyPane);
-        contentPane.remove(scatterPane);
-        contentPane.add(groupStatsPane);
-        contentPane.validate();
-        contentPane.repaint();
-    }//GEN-LAST:event_btnGroupGraphsActionPerformed
-
     private void btnRewardsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRewardsActionPerformed
         contentPane.remove(libStatsPane);
         contentPane.remove(historyPane);
-        contentPane.remove(groupStatsPane);
         contentPane.remove(scatterPane);
         contentPane.add(rewardsPane);
         contentPane.validate();
@@ -200,7 +175,6 @@ public class StatsWindow extends javax.swing.JFrame {
 
     private void btnFlashcardScatterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFlashcardScatterActionPerformed
         contentPane.remove(historyPane);
-        contentPane.remove(groupStatsPane);
         contentPane.remove(rewardsPane);
         contentPane.remove(libStatsPane);
         contentPane.add(scatterPane);
@@ -211,7 +185,6 @@ public class StatsWindow extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnFlashcardScatter;
-    private javax.swing.JButton btnGroupGraphs;
     private javax.swing.JButton btnLibraryGraphs;
     private javax.swing.JButton btnQuizHistory;
     private javax.swing.JButton btnRewards;
