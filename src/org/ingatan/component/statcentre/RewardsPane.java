@@ -33,7 +33,11 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -45,6 +49,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import org.ingatan.ThemeConstants;
+import org.ingatan.component.librarymanager.LibraryManagerWindow;
+import org.ingatan.component.librarymanager.TableQuestionContainer;
+import org.ingatan.component.text.EmbeddedImage;
+import org.ingatan.component.text.RichTextArea;
 import org.ingatan.io.IOManager;
 import org.ingatan.io.ParserWriter;
 
@@ -204,7 +212,7 @@ public class RewardsPane extends JPanel implements ContainerListener {
             }
 
             if (toEdit.size() == 0) {
-                JOptionPane.showMessageDialog(btnDeleteRewards, "There are no rewards selected.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(RewardsPane.this, "There are no rewards selected.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
                 return;
             }
 
@@ -280,10 +288,10 @@ public class RewardsPane extends JPanel implements ContainerListener {
 
             //tell user if none are selected
             if (delete.size() == 0) {
-                JOptionPane.showMessageDialog(btnDeleteRewards, "There are no rewards selected.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(RewardsPane.this, "There are no rewards selected.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
                 return;
             } else {
-                int resp = JOptionPane.showConfirmDialog(btnDeleteRewards, "Are you sure you wish to delete all selected rewards?", "Delete Rewards?", JOptionPane.YES_NO_OPTION);
+                int resp = JOptionPane.showConfirmDialog(RewardsPane.this, "Are you sure you wish to delete all selected rewards?", "Delete Rewards?", JOptionPane.YES_NO_OPTION);
                 if (resp == JOptionPane.YES_OPTION) {
                     for (int i = 0; i < delete.size(); i++) {
                         rewardItems.remove(delete.get(i));
@@ -309,7 +317,32 @@ public class RewardsPane extends JPanel implements ContainerListener {
         }
 
         public void actionPerformed(ActionEvent e) {
-            throw new UnsupportedOperationException("Not supported yet.");
+            RichTextArea dispArea = new RichTextArea();
+
+            dispArea.setPreferredSize(new Dimension(450, 415));
+            dispArea.setSize(new Dimension(450, 415));
+            dispArea.setMinimumSize(new Dimension(450, 415));
+
+            dispArea.setBorder(BorderFactory.createEmptyBorder());
+            dispArea.setEditable(false);
+            dispArea.setOpaque(false);
+
+            dispArea.setRichText("[aln]0[!aln][fam]Dialog[!fam][sze]16[!sze][col]51,51,51[!col]Rewards Centre Help[sze]12[!sze][br]"
+                    + "The rewards centre is a motivational tool that lets you set rewards for yourself with a corresponding price in points. Whenever you take a quiz in Ingatan "
+                    + "you earn points; you earn more if you improve on a question, or if you get many questions correct in a row. "
+                    + "When you've studied enough, you can buy the reward and indulge![br][br]"
+                    + "[u]Create a Reward[u][br]"
+                    + "Press the green !osqb;+!csqb; button and enter a short name for the reward and how many points it should cost. Set an icon "
+                    + "for the reward by clicking the Set Icon button and then choosing one from the popup list.[br][br]"
+                    + "[u]Editing Rewards[u][br]"
+                    + "Click on the reward(s) you want to edit to select them, and then press the pencil button to the right of the rewards pane.[br][br]"
+                    + "[u]Deleting Rewards[u][br]"
+                    + "Click on the reward(s) you want to delete to select them, and then press the red !osqb;-!csqb; button to the right of the rewards pane.[br][br]"
+                    + "[u]Buying Rewards[u][br]"
+                    + "Once you have enough points, click on the reward(s) you want to buy and then click on the large shopping trolley button. Enjoy![br][br]"
+                    + "[end]");
+
+            JOptionPane.showMessageDialog(RewardsPane.this, dispArea, "Rewards Centre Help", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
@@ -332,16 +365,17 @@ public class RewardsPane extends JPanel implements ContainerListener {
 
             //if there aren't any selected rewards to 'buy'
             if (toBuy.size() == 0) {
-                JOptionPane.showMessageDialog(btnDeleteRewards, "There are no rewards selected.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(RewardsPane.this, "There are no rewards selected.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
                 return;
             }
 
             //confirm purchase
             int resp;
-            if (toBuy.size() > 1)
+            if (toBuy.size() > 1) {
                 resp = JOptionPane.showConfirmDialog(RewardsPane.this, "Are you sure you want to buy these " + toBuy.size() + " rewards?", "Confirm Purchase", JOptionPane.YES_NO_OPTION);
-            else
+            } else {
                 resp = JOptionPane.showConfirmDialog(RewardsPane.this, "Are you sure you want to buy this reward?", "Confirm Purchase", JOptionPane.YES_NO_OPTION);
+            }
             if (resp == JOptionPane.NO_OPTION) {
                 return;
             }
