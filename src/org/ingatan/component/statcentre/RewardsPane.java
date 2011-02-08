@@ -101,6 +101,8 @@ public class RewardsPane extends JPanel implements ContainerListener {
         ArrayList<String> iconPaths = IOManager.getQuizHistoryFile().getRewardIconPaths();
         ArrayList<Number> prices = IOManager.getQuizHistoryFile().getRewardPrices();
 
+        scrollerContent.addContainerListener(this);
+
         if (descriptions.size() == 0) {
             //add a label that says there are no rewards added.
             JLabel lblNoRewards = new JLabel("No rewards have been added yet.");
@@ -115,7 +117,6 @@ public class RewardsPane extends JPanel implements ContainerListener {
         }
 
         scrollerContent.setPreferredSize(new Dimension(450, 500));
-        scrollerContent.addContainerListener(this);
 
         scroller.setAlignmentX(LEFT_ALIGNMENT);
         scroller.setMaximumSize(new Dimension(560, 300));
