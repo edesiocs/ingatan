@@ -162,20 +162,26 @@ public class RewardsPane extends JPanel implements ContainerListener {
 
     public void componentAdded(ContainerEvent e) {
         //this is the listener method for the scrollerContent pane
-        float rows = rewardItems.size() / COLS;
-        System.out.println("rows = " + rows);
+        int rows = rewardItems.size() / COLS;
+        rows++;
         int height = (int) (rows * (RewardItem.SIDE_DIMENSION + VERT_SPACING));
         int width = (int) (COLS * (RewardItem.SIDE_DIMENSION + HORIZ_SPACING));
         scrollerContent.setPreferredSize(new Dimension(width, height));
+        scrollerContent.validate();
+        scrollerContent.repaint();
+        scroller.validate();
     }
 
     public void componentRemoved(ContainerEvent e) {
         //this is the listener method for the scrollerContent pane
-        float rows = rewardItems.size() / COLS;
-        System.out.println("rows = " + rows);
+        int rows = rewardItems.size() / COLS;
+        rows++;
         int height = (int) (rows * (RewardItem.SIDE_DIMENSION + VERT_SPACING));
         int width = (int) (COLS * (RewardItem.SIDE_DIMENSION + HORIZ_SPACING));
         scrollerContent.setPreferredSize(new Dimension(width, height));
+        scrollerContent.validate();
+        scrollerContent.repaint();
+        scroller.validate();
     }
 
     /** Action for the edit rewards button. */
