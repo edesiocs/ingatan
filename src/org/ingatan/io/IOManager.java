@@ -1197,6 +1197,8 @@ public abstract class IOManager {
                     Arrays.fill(((TableQuestion) questions[i]).getTimesAsked(), 0);
                 }
             }
+            //clear the library specific histories too
+            lib.clearQuizHistory();
         }
 
         //write the file to disk

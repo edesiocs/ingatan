@@ -29,6 +29,7 @@
 package org.ingatan.data;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
@@ -185,6 +186,14 @@ public class Library {
      */
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+     * Clears the HistoryEntry items from this library. Does not clear the individual history for
+     * each quesiton in the library.
+     */
+    public void clearQuizHistory() {
+        quizHistory = new ArrayList<HistoryEntry>();
     }
 
     /**
