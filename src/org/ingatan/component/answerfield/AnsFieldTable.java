@@ -35,8 +35,14 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.EventObject;
+import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
@@ -45,7 +51,6 @@ import javax.swing.BoxLayout;
 import javax.swing.DefaultCellEditor;
 import javax.swing.InputMap;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -63,6 +68,12 @@ import javax.swing.table.TableColumn;
 import org.ingatan.ThemeConstants;
 import org.ingatan.component.text.SimpleTextField;
 import org.ingatan.io.IOManager;
+import org.jdom.DataConversionException;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
+import org.jdom.output.XMLOutputter;
 
 /**
  * A fill in the table type question, with the ability to set some cells as labels.
@@ -77,6 +88,10 @@ public class AnsFieldTable extends JPanel implements IAnswerField {
     private JButton btnCreateTable = new JButton(new CreateTableAction());
     //the table encapsulated by this answer field
     private MultiColumnTable table;
+    //holds the table data at time of xml read-in, this field is used in quiz time context.
+    private String[][] tableData;
+    //holds headings
+    private String[] headings;
 
     public AnsFieldTable() {
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -94,31 +109,179 @@ public class AnsFieldTable extends JPanel implements IAnswerField {
     }
 
     public float checkAnswer() {
-        return 1.0f;
+        int fieldCount = 0;
+        int markCount = 0;
+        for (int i = 0; i < tableData.length; i++) {
+            for (int j = 0; j < tableData[0].length; j++) {
+                if (tableData[i][j].charAt(0) != '*') {
+                    fieldCount++;
+                    //if the answer is correct, ignoring case.
+                    if (((String) table.getValueAt(i, j)).toLowerCase().compareTo(tableData[i][j].toLowerCase()) == 0) {
+                        markCount++;
+                    }
+                }
+            }
+        }
+
+        return ((float) markCount) / ((float) fieldCount);
     }
 
     public int getMaxMarks() {
-        return 1;
+        int fieldCount = 0;
+        for (int i = 0; i < tableData.length; i++) {
+            for (int j = 0; j < tableData[0].length; j++) {
+                if (tableData[i][j].charAt(0) != '*') {
+                    fieldCount++;
+                }
+            }
+        }
+        return fieldCount;
     }
 
     public int getMarksAwarded() {
-        return 1;
+        return (int) (checkAnswer() * getMaxMarks());
     }
 
     public void displayCorrectAnswer() {
-        
+        table.setEnabled(false);
+        for (int i = 0; i < tableData.length; i++) {
+            for (int j = 0; j < tableData[0].length; j++) {
+                if (tableData[i][j].charAt(0) != '*') {
+                    if (((String) table.getValueAt(i, j)).toLowerCase().compareTo(tableData[i][j].toLowerCase()) != 0) {
+                        table.getModel().setValueAt(((String) table.getValueAt(i, j)) + " x " + tableData[i][j], i, j);
+                    }
+                } else {
+                    table.getModel().setValueAt(tableData[i][j].replace("*", ""), i, j);
+                }
+            }
+        }
     }
 
     public void setContext(boolean inLibraryContext) {
         inLibManager = inLibraryContext;
+        if (inLibManager) {
+            table.setDataVector(tableData, headings);
+        } else {
+            String[][] quizData = new String[tableData.length][tableData[0].length];
+            //create a new data vector with all empty spaces, apart from those
+            //prefixed with a star.
+            for (int i = 0; i < tableData.length; i++) {
+                for (int j = 0; j < tableData[0].length; j++) {
+                    if (tableData[i][j].charAt(0) == '*') {
+                        quizData[i][j] = new String(tableData[i][j].replace("*", ""));
+                    } else {
+                        quizData[i][j] = "";
+                    }
+                }
+            }
+
+            table.setDataVector(quizData, headings);
+        }
     }
 
     public String writeToXML() {
-        return "";
+        Document doc = new Document();
+        Element root = new Element(this.getClass().getName()).setAttribute("version", "1.0");
+        doc.setRootElement(root);
+        Element tblData = new Element("TableData");
+        tblData.setAttribute("rowCount", String.valueOf(table.getModel().getRowCount()));
+
+        //build the table headers
+        StringBuilder columnHeadings = new StringBuilder();
+        for (int i = 0; i < table.getModel().getColumnCount(); i++) {
+            columnHeadings.append(((String) table.getColumnModel().getColumn(i).getHeaderValue()).replace("<;>", " "));
+            //don't add separator to the last entry
+            if (i < (table.getModel().getColumnCount() - 1)) {
+                columnHeadings.append("<;>");
+            }
+        }
+
+        tblData.addContent(new Element("columnHeadings").setText(columnHeadings.toString()));
+
+        Element row;
+        StringBuilder rowTemp = new StringBuilder();
+        //for each row
+        for (int i = 0; i < table.getModel().getRowCount(); i++) {
+            row = new Element("row");
+            rowTemp = new StringBuilder();
+            String cell;
+            //for each column in that row
+            for (int j = 0; j < table.getModel().getColumnCount(); j++) {
+                cell = (String) table.getModel().getValueAt(i, j);
+                if ((cell == null) || (cell.isEmpty())) {
+                    cell = " ";
+                }
+                rowTemp.append(cell.replace("<;>", " "));
+                //only add separator to the end
+                if (j < (table.getModel().getColumnCount() - 1)) {
+                    rowTemp.append("<;>");
+                }
+            }
+            row.setText(rowTemp.toString());
+            tblData.addContent(row);
+        }
+
+        root.addContent(tblData);
+
+        XMLOutputter fmt = new XMLOutputter();
+        return fmt.outputString(doc);
     }
 
     public void readInXML(String xml) {
-        
+        //nothing to parse, so leave
+        if (xml == null) {
+            return;
+        }
+
+        if (xml.trim().equals("") == true) {
+            return;
+        }
+
+        //try to build document from input string
+        SAXBuilder sax = new SAXBuilder();
+        Document doc = null;
+        try {
+            doc = sax.build(new StringReader(xml));
+        } catch (JDOMException ex) {
+            Logger.getLogger(AnsFieldLabelPicture.class.getName()).log(Level.SEVERE, "While trying to create a JDOM document in the readInXML method.", ex);
+        } catch (IOException ex) {
+            Logger.getLogger(AnsFieldLabelPicture.class.getName()).log(Level.SEVERE, "While trying to create a JDOM document in the readInXML method.", ex);
+        }
+
+        //nothing to parse, so leave
+        if (doc == null) {
+            return;
+        }
+
+        int numRows;
+        String[] colHeadings;
+        String[][] data;
+
+        Element tblData = doc.getRootElement().getChild("TableData");
+        Element headingsEl = tblData.getChild("columnHeadings");
+        try {
+            numRows = tblData.getAttribute("rowCount").getIntValue();
+            data = new String[numRows][];
+            //tableData used for quiz time
+            tableData = new String[numRows][];
+            colHeadings = headingsEl.getText().split("<;>");
+            headings = Arrays.copyOf(colHeadings, colHeadings.length);
+            Iterator<Element> it = tblData.getChildren("row").iterator();
+
+            Element curRow;
+            int index = 0;
+            while (it.hasNext()) {
+                curRow = it.next();
+                data[index] = curRow.getText().split("<;>");
+                tableData[index] = curRow.getText().split("<;>");
+                index++;
+            }
+            setUpTable(data[0].length, colHeadings);
+            table.setDataVector(data, colHeadings);
+        } catch (DataConversionException ex) {
+            Logger.getLogger(AnsFieldTable.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 
     public String getParentLibraryID() {
@@ -131,11 +294,27 @@ public class AnsFieldTable extends JPanel implements IAnswerField {
     }
 
     public void setQuizContinueListener(ActionListener listener) {
-        
+        //this will not be implemented as there is no logical hot key that
+        //should fire a quiz continue action, e.g. the enter key is used by the table,
+        //so what else do we use?
     }
 
     public void resaveImagesAndResources(String newLibraryID) {
         //unimplemented, this answer field requires no resource read/write.
+    }
+
+    public void setUpTable(int numCols, String[] colNames) {
+        table = new MultiColumnTable(numCols, colNames);
+        table.setMaximumSize(new Dimension(500, 10000));
+        table.setMinimumSize(new Dimension(300, 80));
+        table.setPreferredSize(null);
+        table.setAlignmentX(LEFT_ALIGNMENT);
+        table.getTableHeader().setAlignmentX(LEFT_ALIGNMENT);
+        table.getTableHeader().setOpaque(false);
+        AnsFieldTable.this.remove(btnCreateTable);
+        AnsFieldTable.this.add(table.getTableHeader());
+        AnsFieldTable.this.add(table);
+        AnsFieldTable.this.setMaximumSize(new Dimension(500, 10000));
     }
 
     public class CreateTableAction extends AbstractAction {
@@ -147,33 +326,14 @@ public class AnsFieldTable extends JPanel implements IAnswerField {
         public void actionPerformed(ActionEvent e) {
             CreateTableDialog dialog = new CreateTableDialog();
             dialog.setVisible(true);
-            table = new MultiColumnTable(dialog.getNumberOfColumns(), dialog.getColumnNames());
-            table.setMaximumSize(new Dimension(500, 500));
-            table.setMinimumSize(new Dimension(300, 80));
-            table.setPreferredSize(null);
-            table.setAlignmentX(LEFT_ALIGNMENT);
-            table.getTableHeader().setAlignmentX(LEFT_ALIGNMENT);
-            table.getTableHeader().setOpaque(false);
-            AnsFieldTable.this.remove(btnCreateTable);
-            AnsFieldTable.this.add(table.getTableHeader());
-            AnsFieldTable.this.add(table);
+            setUpTable(dialog.getNumberOfColumns(), dialog.getColumnNames());
         }
     }
-
-
-
-
-
-
-
-
-
 
     /***************************************************************************
      * Below: CreateTableDialog and then DataTable nested classes
      *
      */
-
     /**
      * A dialogue used when the user wishes to create the table for the answer field. Asks for the
      * number of columns that the table should have, and lets the user name them.
@@ -207,6 +367,10 @@ public class AnsFieldTable extends JPanel implements IAnswerField {
          * Label for the column name fields.
          */
         private JLabel lblColNames = new JLabel("Column names: ");
+        /**
+         * Label for the column name fields.
+         */
+        private JLabel lblQuizTime = new JLabel("<html>Note: you can prefix cells with * to turn them into labels at quiz time.");
         /**
          *  Button the proceed with adding new TableQuestion.
          */
@@ -243,12 +407,12 @@ public class AnsFieldTable extends JPanel implements IAnswerField {
 
             setUpGUI();
 
-            this.setPreferredSize(new Dimension(220, 340));
-            this.setMinimumSize(new Dimension(220, 340));
-            this.setMaximumSize(new Dimension(220, 340));
+            this.setPreferredSize(new Dimension(200, 220));
+            this.setMinimumSize(new Dimension(200, 220));
+            this.setMaximumSize(new Dimension(200, 220));
+            this.pack();
 
             this.setResizable(false);
-
             this.setLocationRelativeTo(null);
         }
 
@@ -261,13 +425,18 @@ public class AnsFieldTable extends JPanel implements IAnswerField {
             lblColNames.setAlignmentX(LEFT_ALIGNMENT);
             lblColNames.setHorizontalAlignment(SwingConstants.LEFT);
             lblColNames.setFont(ThemeConstants.niceFont);
+            lblQuizTime.setAlignmentX(LEFT_ALIGNMENT);
+            lblQuizTime.setFont(ThemeConstants.niceFont);
+            lblQuizTime.setMaximumSize(new Dimension(180, 100));
+            lblQuizTime.setHorizontalAlignment(SwingConstants.LEFT);
+            lblQuizTime.setVerticalAlignment(SwingConstants.TOP);
 
             for (int i = 0; i < colNames.length; i++) {
                 colNames[i].setMaximumSize(new Dimension(250, 20));
             }
 
             btnOkay.setMargin(new Insets(1, 1, 1, 1));
-            btnOkay.setPreferredSize(new Dimension(60, 20));
+            btnOkay.setPreferredSize(new Dimension(80, 20));
 
             spinnerColumns.setFont(ThemeConstants.niceFont);
             spinnerColumns.setMaximumSize(new Dimension(35, 20));
@@ -290,10 +459,16 @@ public class AnsFieldTable extends JPanel implements IAnswerField {
             updateColNameFields();
 
             contentPane.add(Box.createVerticalStrut(10));
-            btnOkay.setAlignmentX(LEFT_ALIGNMENT);
-            contentPane.add(btnOkay);
+            horiz = Box.createHorizontalBox();
+            horiz.setAlignmentX(LEFT_ALIGNMENT);
+            horiz.add(btnOkay);
+            horiz.add(Box.createHorizontalGlue());
+            horiz.setMaximumSize(new Dimension(140, 25));
+            contentPane.add(horiz);
+            contentPane.add(Box.createVerticalStrut(7));
+            contentPane.add(lblQuizTime);
 
-            this.pack();
+            this.validate();
 
         }
 
@@ -304,6 +479,10 @@ public class AnsFieldTable extends JPanel implements IAnswerField {
             }
             this.repaint();
             contentPane.validate();
+            this.setPreferredSize(new Dimension(200, getNumberOfColumns() * 25 + 150));
+            this.setMinimumSize(new Dimension(200, getNumberOfColumns() * 25 + 150));
+            this.setMaximumSize(new Dimension(200, getNumberOfColumns() * 25 + 150));
+            this.pack();
         }
 
         /**
@@ -354,14 +533,12 @@ public class AnsFieldTable extends JPanel implements IAnswerField {
         }
 
         private class SpinChangeListener implements ChangeListener {
+
             public void stateChanged(ChangeEvent e) {
                 updateColNameFields();
             }
         }
     }
-
-
-
 
     //------------------------------------------------------
     /**
@@ -417,20 +594,14 @@ public class AnsFieldTable extends JPanel implements IAnswerField {
 
             this.setOpaque(false);
 
-            //add columns
+            //create 2 rows of data, with column width
+            String[][] data = new String[2][numCols];
             for (int i = 0; i < numCols; i++) {
-                tblModel.addColumn(colNames[i]);
-                super.getColumnModel().getColumn(i).setCellEditor(mtce);
+                data[0][i] = "";
+                data[1][i] = "";
             }
 
-            //create and add 2 rows
-            String[] strRow = new String[numCols];
-            for (int i = 0; i < strRow.length; i++) {
-                strRow[i] = "";
-            }
-            tblModel.addRow(strRow);
-            tblModel.addRow(strRow);
-
+            tblModel.setDataVector(data, colNames);
 
             super.setDefaultEditor(String.class, mtce);
 
@@ -510,6 +681,10 @@ public class AnsFieldTable extends JPanel implements IAnswerField {
             editor.setActionMap(aMap);
         }
 
+        public void setDataVector(Object[][] data, Object[] headings) {
+            tblModel.setDataVector(data, headings);
+        }
+
         /**This action will select the next column cell, or create a new one if at the
          *bottom of the table.
          */
@@ -523,7 +698,7 @@ public class AnsFieldTable extends JPanel implements IAnswerField {
                 //if current cell is on the far right hand column
                 if ((MultiColumnTable.this.getSelectedColumn() == MultiColumnTable.this.getColumnCount() - 1) || (!enterMovesLeftToRight)) {
                     //if current cell is on the very bottom row
-                    if (MultiColumnTable.this.getSelectedRow() == MultiColumnTable.this.getRowCount() - 1) {
+                    if ((MultiColumnTable.this.getSelectedRow() == MultiColumnTable.this.getRowCount() - 1) && (inLibManager)) {
                         //create a new row and move to the first cell of that row.
                         tblModel.addRow(new String[]{"", ""});
                     }
@@ -575,7 +750,7 @@ public class AnsFieldTable extends JPanel implements IAnswerField {
                 }
 
                 //if the row is empty, and there is more than 1 row left, delete the row
-                if ((textFound == false) && (MultiColumnTable.this.getRowCount() > 1)) {
+                if ((textFound == false) && (MultiColumnTable.this.getRowCount() > 1) && (inLibManager)) {
                     int selectedRow = MultiColumnTable.this.getSelectedRow();
                     //delete this row, as it is empty
                     tblModel.removeRow(selectedRow);
@@ -594,7 +769,7 @@ public class AnsFieldTable extends JPanel implements IAnswerField {
                             }
                         }
 
-                        if ((textFound == false) && (MultiColumnTable.this.getRowCount() > 1)) {
+                        if ((textFound == false) && (MultiColumnTable.this.getRowCount() > 1) && (inLibManager)) {
                             int selectedRow = MultiColumnTable.this.getSelectedRow();
                             tblModel.removeRow(selectedRow);
                             //move to the bottom right hand corner of the table
@@ -646,7 +821,6 @@ public class AnsFieldTable extends JPanel implements IAnswerField {
             public CustomTableCellEditor(JTextField field) {
                 super(field);
                 super.setClickCountToStart(2);
-                field.add(new JCheckBox("label"));
             }
 
             @Override
