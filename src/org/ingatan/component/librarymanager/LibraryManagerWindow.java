@@ -183,8 +183,8 @@ public class LibraryManagerWindow extends JFrame implements WindowListener {
         libBrowser.setAlignmentX(LEFT_ALIGNMENT);
         libBrowser.addActionListener(new libBrowserActionListener());
 
-        palette.setMinimumSize(new Dimension(300, 200));
-        palette.setMaximumSize(new Dimension(310, 300));
+        palette.setMinimumSize(new Dimension(300, 250));
+        palette.setMaximumSize(new Dimension(310, 350));
         palette.setAlignmentX(LEFT_ALIGNMENT);
         palette.addActionListener(new AnswerFieldPaletteListener());
 
