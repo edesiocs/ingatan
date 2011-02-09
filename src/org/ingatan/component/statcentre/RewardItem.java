@@ -44,6 +44,8 @@ public class RewardItem extends JPanel implements MouseListener {
     private int price = 0;
     /** Flag indicating whether or not this item is selected. */
     private boolean selected = false;
+    /** Sets whether or not the reward item is enabled (can be clicked to select/deselect) */
+    private boolean enabled = true;
 
     /**
      * Creates a new RewardItem object.
@@ -71,6 +73,10 @@ public class RewardItem extends JPanel implements MouseListener {
         } else {
             //load from disk
         }
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     /**
@@ -136,14 +142,22 @@ public class RewardItem extends JPanel implements MouseListener {
         int descWidth = g2d.getFontMetrics().stringWidth(description);
         int priceWidth = g2d.getFontMetrics().stringWidth(price + " pts");
         g2d.drawString(description, (int) ((SIDE_DIMENSION - descWidth)/2.0), (int) (SIDE_DIMENSION * 0.23));
-        g2d.drawString(price + " pts", (int) ((SIDE_DIMENSION - priceWidth)/2.0), (int) (SIDE_DIMENSION - (SIDE_DIMENSION * 0.18)));
+        if (price > 0)
+            g2d.drawString(price + " pts", (int) ((SIDE_DIMENSION - priceWidth)/2.0), (int) (SIDE_DIMENSION - (SIDE_DIMENSION * 0.18)));
+        else
+            g2d.drawString("ingatan.org", 36, (int) (SIDE_DIMENSION - (SIDE_DIMENSION * 0.12)));
 
         if (rewardIcon != null) {
-            g2d.drawImage(rewardIcon.getImage(), (int) ((SIDE_DIMENSION / 2) - (ICON_DIMENSION / 2)), (int) ((SIDE_DIMENSION / 2) - (ICON_DIMENSION / 2)), null);
+            if (price < 0)
+                g2d.drawImage(rewardIcon.getImage(), (int) ((SIDE_DIMENSION / 2) - 25), (int) ((SIDE_DIMENSION / 2) - 30), null);
+            else
+                g2d.drawImage(rewardIcon.getImage(), (int) ((SIDE_DIMENSION / 2) - (ICON_DIMENSION / 2)), (int) ((SIDE_DIMENSION / 2) - (ICON_DIMENSION / 2)), null);
         }
     }
 
     public void mouseClicked(MouseEvent e) {
+        if (!enabled) return;
+
         if (CIRC.contains(e.getX(), e.getY())) {
             selected = !selected;
         }
