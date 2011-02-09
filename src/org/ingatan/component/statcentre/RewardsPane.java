@@ -319,9 +319,9 @@ public class RewardsPane extends JPanel implements ContainerListener {
         public void actionPerformed(ActionEvent e) {
             RichTextArea dispArea = new RichTextArea();
 
-            dispArea.setPreferredSize(new Dimension(450, 415));
-            dispArea.setSize(new Dimension(450, 415));
-            dispArea.setMinimumSize(new Dimension(450, 415));
+            dispArea.setPreferredSize(new Dimension(450, 350));
+            dispArea.setSize(new Dimension(450, 350));
+            dispArea.setMinimumSize(new Dimension(450, 350));
 
             dispArea.setBorder(BorderFactory.createEmptyBorder());
             dispArea.setEditable(false);
