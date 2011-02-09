@@ -52,7 +52,7 @@ public class AboutWindow extends JDialog {
         this.setIconImage(IOManager.windowIcon);
         this.getContentPane().setLayout(new BoxLayout(this.getContentPane(), BoxLayout.Y_AXIS));
         //special rendering when price < 0;
-        RewardItem logo = new RewardItem("Ingatan 1.5.0", -1, "jar://resources/logo.png");
+        RewardItem logo = new RewardItem("Ingatan 1.5.1", -1, "jar://resources/logo.png");
         logo.setEnabled(false);
         this.getContentPane().add(logo);
         this.getContentPane().add(txtAbout.getScroller());
