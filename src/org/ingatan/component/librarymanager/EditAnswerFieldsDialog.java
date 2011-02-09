@@ -40,6 +40,7 @@ import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -216,48 +217,98 @@ public class EditAnswerFieldsDialog extends JDialog {
             chooser.setDialogTitle("Import Answer Field...");
             chooser.setFileFilter(new ClassFilter());
             chooser.setApproveButtonText("Import");
+            //must enable multiselect so that you can select nested class files as well
+            chooser.setMultiSelectionEnabled(true);
             if (chooser.showOpenDialog(EditAnswerFieldsDialog.this) == JFileChooser.APPROVE_OPTION) {
                 //get the class to import
-                File f = chooser.getSelectedFile();
+                File[] f = chooser.getSelectedFiles();
+                File baseClass = null;
+                //set to true when a class file is found without a $ in filename
+                //if >1 case like this is found, error. If < 1 case like this found, error.
+                boolean foundBaseClass = false;
+                //index of the base class
+                int baseClassIndex = -1;
+
+                //work out which is the main class file
+                for (int i = 0; i < f.length; i++) {
+                    //the nested classes contain $ sign in the filename
+                    if (f[i].getName().contains("$") == false) {
+                        //if we have already found the base class.
+                        if (foundBaseClass) {
+                            JOptionPane.showMessageDialog(EditAnswerFieldsDialog.this, "You can only select 1 answer field class and its nested classes.", "Error", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+                        baseClass = f[i];
+                        baseClassIndex = i;
+                        foundBaseClass = true;
+                    }
+                }
+
+                //if no base class was found
+                if (!foundBaseClass) {
+                    JOptionPane.showMessageDialog(EditAnswerFieldsDialog.this, "No answer field class was selected, probably one or more of its nested classes.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                //ensure that the nested classes are valid
+                for (int i = 0; i < f.length; i++) {
+                    //don't test the base class
+                    if (i != baseClassIndex) {
+                        //if the nested class f[i] isn't prefixed baseClassName$
+                        if (f[i].getName().startsWith(baseClass.getName().replace(".class", "") + "$") == false) {
+                            JOptionPane.showMessageDialog(EditAnswerFieldsDialog.this, "You must select 1 answer field class and its nested classes (if any).\n\n"
+                                    + "Ingatan has detected that " + f[i].getName() + " is not a valid nested class for " + baseClass.getName(), "Error", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+                    }
+                }
 
                 //check that it is unique
-                if (new File(IOManager.getAnswerFieldPath() + f.getName()).exists()) {
-                    JOptionPane.showMessageDialog(EditAnswerFieldsDialog.this, "The selected class (" + f.getName() + ") already exists as an imported class. No \n"
+                if (new File(IOManager.getAnswerFieldPath() + baseClass.getName()).exists()) {
+                    JOptionPane.showMessageDialog(EditAnswerFieldsDialog.this, "The selected class (" + baseClass.getName() + ") already exists as an imported class. No \n"
                             + "two answer fields may share the same name.", "Error: Cannot Import", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
-                int deleteResponse = JOptionPane.showConfirmDialog(EditAnswerFieldsDialog.this, "Delete the original file after copying it to the .ingatan "
+                //VALID SELECTION ----------------------------------------------
+
+
+                //check whether the user wants to delete the selected files after copying them?
+                int deleteResponse = JOptionPane.showConfirmDialog(EditAnswerFieldsDialog.this, "Delete the original files after copying them to the .ingatan "
                         + "directory? Choose no if unsure.", "Delete original?", JOptionPane.YES_NO_OPTION);
 
-                //try to copy the class to the .ingatan directory
-                try {
-                    IOManager.copy(f.getAbsolutePath(), IOManager.getAnswerFieldPath() + f.getName());
-                } catch (IOException ex) {
-                    JOptionPane.showMessageDialog(EditAnswerFieldsDialog.this, "There was an IOException while attempting to copy the \n"
-                            + "class from '" + f.getAbsolutePath() + "'. Could not import the answer field.", "Error: Cannot Import", JOptionPane.ERROR_MESSAGE);
-                    Logger.getLogger(EditAnswerFieldsDialog.class.getName()).log(Level.SEVERE, "While trying copy an answer field class to the answer fields directory.\n"
-                            + "source = " + f.getAbsolutePath() + "\n"
-                            + "destination = " + IOManager.getAnswerFieldPath() + f.getName() + "\n", e);
-                    return;
+                //try to copy the classes to the .ingatan directory
+                for (int i = 0; i < f.length; i++) {
+                    try {
+                        IOManager.copy(f[i].getAbsolutePath(), IOManager.getAnswerFieldPath() + f[i].getName());
+                    } catch (IOException ex) {
+                        JOptionPane.showMessageDialog(EditAnswerFieldsDialog.this, "There was an IOException while attempting to copy the \n"
+                                + "class from '" + f[i].getAbsolutePath() + "'. Could not import the answer field.", "Error: Cannot Import", JOptionPane.ERROR_MESSAGE);
+                        Logger.getLogger(EditAnswerFieldsDialog.class.getName()).log(Level.SEVERE, "While trying copy an answer field class to the answer fields directory.\n"
+                                + "source = " + f[i].getAbsolutePath() + "\n"
+                                + "destination = " + IOManager.getAnswerFieldPath() + f[i].getName() + "\n", e);
+                        return;
+                    }
                 }
 
-                //try to delete this original if required
-                if (deleteResponse == JOptionPane.YES_OPTION) {
-                    if (f.delete() == false) {
-                        JOptionPane.showMessageDialog(EditAnswerFieldsDialog.this, "Ingatan tried to delete the original file after copying it, but could not.\n"
-                                + "This may be due to lack of write permission at the source directory.", "Error deleting file", JOptionPane.ERROR_MESSAGE);
+                for (int i = 0; i < f.length; i++) {
+                    //try to delete this original if required
+                    if (deleteResponse == JOptionPane.YES_OPTION) {
+                        if (f[i].delete() == false) {
+                            JOptionPane.showMessageDialog(EditAnswerFieldsDialog.this, "Couldn't delete one of the files after copying them. Answer field still added.", "Error deleting file", JOptionPane.ERROR_MESSAGE);
+                        }
                     }
                 }
 
                 //try to load the class (the IOManager has a URLClassLoader that is set to load classes from the answer field folder
                 Class newClass;
                 try {
-                    newClass = IOManager.getUrlClassLoader().loadClass(f.getName().replace(".class", ""));
+                    newClass = IOManager.getUrlClassLoader().loadClass(baseClass.getName().replace(".class", ""));
+                    IAnswerField ansField = (IAnswerField) newClass.newInstance();
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(EditAnswerFieldsDialog.this, "Could not load the newly imported answer field. Answer fields must: \n"
+                    JOptionPane.showMessageDialog(EditAnswerFieldsDialog.this, "Couldn't load imported answer field. Did you also select the nested class files (if any)?\n\nAnswer fields must: \n"
                             + "    -Follow the IAnswerField interface\n    -Extend JComponent\n    -Not belong to any package\n    -Have an empty constructor available\n"
-                            + "The answer field has not been added.",
+                            + "\nThe answer field has not been added.",
                             "Error: Cannot Load Answer Field Class", JOptionPane.ERROR_MESSAGE);
 
                     int respCopyDel;
@@ -267,22 +318,26 @@ public class EditAnswerFieldsDialog extends JDialog {
                                 + "If you choose no, it will be left in the Ingatan directory at: '" + IOManager.getAnswerFieldPath() + "'", "Delete original?", JOptionPane.YES_NO_OPTION);
 
                     } else {
+                        //if the original wasn't deleted, then it's safe to delete the copied version.
                         respCopyDel = JOptionPane.YES_OPTION;
                     }
 
                     if (respCopyDel == JOptionPane.YES_OPTION) {
-                        File fdel = new File(IOManager.getAnswerFieldPath() + f.getName());
-                        fdel.delete();
+                        File fdel;
+                        for (int i = 0; i < f.length; i++) {
+                            fdel = new File(IOManager.getAnswerFieldPath() + f[i].getName());
+                            fdel.delete();
+                        }
                     }
 
-                    Logger.getLogger(LibraryManagerWindow.class.getName()).log(Level.SEVERE, "Couldn't load the answer field class with name: " + f.getName(), e);
+                    Logger.getLogger(LibraryManagerWindow.class.getName()).log(Level.SEVERE, "Couldn't load the answer field class with name: " + baseClass.getName(), e);
                     return;
                 } catch (Error er) {
-                    JOptionPane.showMessageDialog(EditAnswerFieldsDialog.this, "Could not load the newly imported answer field. Answer fields must: \n"
+                    JOptionPane.showMessageDialog(EditAnswerFieldsDialog.this, "Couldn't load imported answer field. Did you also select the nested class files (if any)?\n\nAnswer fields must: \n"
                             + "    -Follow the IAnswerField interface\n    -Extend JComponent\n    -Not belong to any package\n    -Have an empty constructor available\n"
-                            + "The answer field has not been added.",
+                            + "\nThe answer field has not been added.",
                             "Error: Cannot Load Answer Field Class", JOptionPane.ERROR_MESSAGE);
-                    Logger.getLogger(LibraryManagerWindow.class.getName()).log(Level.SEVERE, "Couldn't load the answer field class with name: " + f.getName(), e);
+                    Logger.getLogger(LibraryManagerWindow.class.getName()).log(Level.SEVERE, "Couldn't load the answer field class with name: " + baseClass.getName(), e);
 
                     int respCopyDel;
                     if (deleteResponse == JOptionPane.YES_OPTION) { //original was deleted
@@ -291,19 +346,25 @@ public class EditAnswerFieldsDialog extends JDialog {
                                 + "If you choose no, it will be left in the Ingatan directory at: '" + IOManager.getAnswerFieldPath() + "'", "Delete original?", JOptionPane.YES_NO_OPTION);
 
                     } else {
+                        //if the original wasn't deleted, then it's safe to delete the copied version.
                         respCopyDel = JOptionPane.YES_OPTION;
                     }
 
                     if (respCopyDel == JOptionPane.YES_OPTION) {
-                        File fdel = new File(IOManager.getAnswerFieldPath() + f.getName());
-                        fdel.delete();
+                        File fdel;
+                        for (int i = 0; i < f.length; i++) {
+                            fdel = new File(IOManager.getAnswerFieldPath() + f[i].getName());
+                            fdel.delete();
+                        }
                     }
 
                     return;
                 }
 
-                IOManager.getAnswerFieldsFile().getAnswerFields().put(f.getName().replace(".class", ""), newClass);
-                IOManager.getAnswerFieldsFile().getAnswerFieldDefaults().put(f.getName().replace(".class", ""), "");
+                //if we got this far it means the added class was loaded as a file, and instantiated successfully
+                //so add it to the IOManager
+                IOManager.getAnswerFieldsFile().getAnswerFields().put(baseClass.getName().replace(".class", ""), newClass);
+                IOManager.getAnswerFieldsFile().getAnswerFieldDefaults().put(baseClass.getName().replace(".class", ""), "");
                 ParserWriter.writeAnswerFieldFile(IOManager.getAnswerFieldsFile());
 
                 buildList();
@@ -367,6 +428,15 @@ public class EditAnswerFieldsDialog extends JDialog {
                     IOManager.getAnswerFieldsFile().getAnswerFieldDefaults().remove(curEntry.getClassName());
                     IOManager.getAnswerFieldsFile().getAnswerFields().remove(curEntry.getClassName());
                     new File(IOManager.getAnswerFieldPath() + curEntry.getClassName() + ".class").delete();
+                    //look for any nested class files and delete these too.
+                    File[] ansFieldPathFiles = new File(IOManager.getAnswerFieldPath()).listFiles();
+                    for (int i = 0; i < ansFieldPathFiles.length; i++)
+                    {
+                        if (ansFieldPathFiles[i].getName().startsWith(curEntry.getClassName() + "$"))
+                        {
+                            ansFieldPathFiles[i].delete();
+                        }
+                    }
                 }
             }
 
@@ -392,7 +462,7 @@ public class EditAnswerFieldsDialog extends JDialog {
         }
 
         public void actionPerformed(ActionEvent e) {
-            JOptionPane.showMessageDialog(EditAnswerFieldsDialog.this, "<html><font size='2'>Note: there is a full tutorial available on the Ingatan project website (ingatan.org).<br><br>"
+            JOptionPane.showMessageDialog(EditAnswerFieldsDialog.this, "<html><font size='2'>Note: there is a full tutorial available on the Ingatan project website (ingatan.org/wiki/AnswerFieldsTutorial).<br><br>"
                     + "Creating custom answer fields in Ingatan is easy. An answer field is simply a Java<br>class that has the following features:<br>"
                     + "<ul><li>implements the ingatan.component.answerfield.IAnswerField interface</li>"
                     + "<li>extends JComponent</li>"
@@ -401,7 +471,7 @@ public class EditAnswerFieldsDialog extends JDialog {
                     + "The IAnswerField interface sets out which methods must appear in your class.<br>Your answer field must be context aware (edit or quiz mode)<br>"
                     + "and also be able to show the correct answers, and grade the answers given<br>by the user. It must also be able to serialise and deserialise<br>"
                     + "itself to/from a string value (XML recommended).<br><br>Please see the IAnswerField javadoc for more information, or<br>consult a tutorial"
-                    + " on the Ingatan project website.", "How to Create Answer Fields", JOptionPane.INFORMATION_MESSAGE);
+                    + " on the Ingatan project website (ingatan.org/wiki/AnswerFieldsTutorial).", "How to Create Answer Fields", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
