@@ -160,7 +160,8 @@ public class AnsFieldTable extends JPanel implements IAnswerField {
     public void setContext(boolean inLibraryContext) {
         inLibManager = inLibraryContext;
         if (inLibManager) {
-            table.setDataVector(tableData, headings);
+            if ((tableData != null) & (headings != null))
+                table.setDataVector(tableData, headings);
         } else {
             String[][] quizData = new String[tableData.length][tableData[0].length];
             //create a new data vector with all empty spaces, apart from those
