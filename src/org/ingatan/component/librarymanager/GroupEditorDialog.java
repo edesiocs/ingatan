@@ -302,7 +302,7 @@ public class GroupEditorDialog extends JDialog {
                 String msg = "";
                 do {
                     newGroup = (String) JOptionPane.showInputDialog(GroupEditorDialog.this, msg + "Please enter a name for the new "
-                            + "group.", "Create a group", JOptionPane.OK_CANCEL_OPTION, null, null, "Wendy");
+                            + "group.", "Create a group", JOptionPane.OK_CANCEL_OPTION, null, null, "New Group");
                     msg = "That group name is already taken.\n\n";
                     //if the user pressed cancel or the specified group name is an empty string
                     if ((newGroup == null) || newGroup.isEmpty()) {

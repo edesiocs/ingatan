@@ -386,7 +386,7 @@ public class LibraryManagerWindow extends JFrame implements WindowListener {
             switch (e.getID()) {
                 case LibraryBrowser.ADD_LIBRARY_ACTION:
                     LibraryEditorDialog newLib = new LibraryEditorDialog(LibraryManagerWindow.this, true, libBrowser.getSelectedGroupName());
-                    newLib.setLibraryNameText("Charles");
+                    newLib.setLibraryNameText("New Library");
                     newLib.setLibraryDescriptionText("");
                     newLib.libraryName.setSelectionStart(0);
                     newLib.libraryName.setSelectionEnd(newLib.libraryName.getText().length());
