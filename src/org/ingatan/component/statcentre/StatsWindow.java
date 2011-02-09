@@ -98,7 +98,7 @@ public class StatsWindow extends javax.swing.JFrame implements WindowListener {
         horiz.setLayout(new javax.swing.BoxLayout(horiz, javax.swing.BoxLayout.LINE_AXIS));
 
         menuPanel.setAlignmentY(0.05F);
-        menuPanel.setMaximumSize(new java.awt.Dimension(100, 200));
+        menuPanel.setMaximumSize(new java.awt.Dimension(150, 200));
         menuPanel.setPreferredSize(new java.awt.Dimension(150, 450));
         menuPanel.setLayout(new java.awt.GridLayout(5, 0, 0, 10));
 
@@ -118,7 +118,8 @@ public class StatsWindow extends javax.swing.JFrame implements WindowListener {
         });
         menuPanel.add(btnLibraryGraphs);
 
-        btnFlashcardScatter.setText("Flashcard Scatterplot");
+        btnFlashcardScatter.setText("Flashcards");
+        btnFlashcardScatter.setActionCommand("Flashcards");
         btnFlashcardScatter.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnFlashcardScatterActionPerformed(evt);
@@ -126,7 +127,8 @@ public class StatsWindow extends javax.swing.JFrame implements WindowListener {
         });
         menuPanel.add(btnFlashcardScatter);
 
-        btnRewards.setText("Rewards");
+        btnRewards.setText("Rewards Game");
+        btnRewards.setActionCommand("Rewards Game");
         btnRewards.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnRewardsActionPerformed(evt);

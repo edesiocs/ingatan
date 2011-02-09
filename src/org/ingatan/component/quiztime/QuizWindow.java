@@ -224,6 +224,8 @@ public class QuizWindow extends JFrame implements WindowListener {
             return;
         }
 
+        this.setLocation(450, 100);
+
         this.returnToOnClose = owner;
         this.quizManager = q;
         this.addWindowListener(this);
