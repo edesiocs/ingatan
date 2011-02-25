@@ -36,7 +36,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.ingatan.data.HistoryEntry;
@@ -137,9 +137,14 @@ public class QuizManager {
      */
     private int[] biasScheme = new int[]{CAT_ONE, CAT_ONE, CAT_TWO, CAT_ONE, CAT_THREE, CAT_ONE, CAT_TWO, CAT_FOUR, CAT_ONE, CAT_TWO, CAT_FIVE, CAT_ONE, CAT_TWO, CAT_THREE, CAT_ONE, CAT_SIX, CAT_THREE, CAT_FOUR, CAT_FIVE, CAT_TWO};
     /**
-     * Pretty record of which libraries were used by this quiz manager. This is used for printing later.
+     * Pretty-ly-formatted record of which libraries were used by this quiz manager. This is used for printing later.
      */
     private String librariesUsed = "";
+
+    /**
+     * Whether or not debug messages should be shown for sorting of questions
+     */
+    private final boolean DEBUG = false;
 
     /**
      * Creates a new quiz manager containing the specified libraries.
@@ -176,10 +181,28 @@ public class QuizManager {
         for (int i = 0; i < libraries.size(); i++) {
             IQuestion[] ques = libraries.get(i).getQuestions();
 
+            /* Get a list of timesAsked values from every question and generate the
+             * percentile distribution. This will be used to priorities when q's are asked. */
+            ArrayList<Number> timesAsked = new ArrayList<Number>();
+            //for every question
+            for (int j = 0; j < ques.length; j++) {
+                //if a flexi question
+                if (ques[j] instanceof FlexiQuestion) {
+                    //add the times asked value to our list
+                    timesAsked.add(((FlexiQuestion) ques[j]).getTimesAsked());
+                //if a table question
+                } else if (ques[j] instanceof TableQuestion) {
+                    //add times asked values for all table entries to our list
+                    timesAsked.addAll(((TableQuestion) ques[j]).getTimesAskedArrayList());
+                }
+            }
+            Collections.sort((List) timesAsked);
+
+
             for (int j = 0; j < ques.length; j++) {
                 //if we need to randomise the questions, then sort them into the appropriate buckets now
                 if (randomise) {
-                    addQuestionToBucket(ques[j]);
+                    addQuestionToBucket(ques[j], timesAsked);
                 } //otherwise, just append them to the category 1 vector
                 else {
                     if (ques[j] instanceof FlexiQuestion) {
@@ -225,12 +248,23 @@ public class QuizManager {
      * Adds a question to the question bucket. If the question is a <code>TableQuestion</code>
      * instance, then it is broken up into <code>TableQuestionUnits</code>.
      * @param question the question to add.
+     * @param timesAsked sorted (ascending) list of the number of times all questions in this library have been asked. This
+     * is used to find the library-specific-percentile of the number of times this question being added has been asked. In other words,
+     * a comparison between the number of times this question has been asked with the number of times other questions have been asked,
+     * questions that have not been asked as much as others will get bias toward them.
      */
-    private void addQuestionToBucket(IQuestion question) {
+    private void addQuestionToBucket(IQuestion question, ArrayList timesAsked) {
+        //historic correctness value
         float correctness = 0;
+        //percentile indicating how many times this question has been asked compared to others in this library
+        float timesAskedPercentile = 0;
+        //the number of times this question has been asked.
+        int questionAskCount = 0;
 
+        //assessing correctness
         if (question instanceof FlexiQuestion) {
             //get the correctness value
+            questionAskCount = ((FlexiQuestion) question).getTimesAsked();
             if ((((FlexiQuestion) question).getTimesAsked() == 0) || (((FlexiQuestion) question).getMarksAvailable() == 0)) {
                 correctness = 0;
             } else {
@@ -241,10 +275,11 @@ public class QuizManager {
             TableQuestionUnit[] units = ((TableQuestion) question).getQuestionUnits();
             //add each table question unit to a bucket
             for (int i = 0; i < units.length; i++) {
-                addQuestionToBucket(units[i]);
+                addQuestionToBucket(units[i], timesAsked);
             }
             return;
         } else if (question instanceof TableQuestionUnit) {
+            questionAskCount = ((TableQuestionUnit) question).getTimesAsked();
             if (((TableQuestionUnit) question).getTimesAsked() == 0) {
                 correctness = 0;
             } else {
@@ -252,21 +287,53 @@ public class QuizManager {
             }
         }
 
+        //assessing times asked
+        //use the last index of, because if a large percentage of questions really have the same
+        //askCount, then we shouldn't take askCount into consideration anyway. Using lastIndexOf
+        //means that the percentile will be higher and we are less likely to skew the results
+        //unnecissarily.
+        timesAskedPercentile = (float) ((timesAsked.lastIndexOf(questionAskCount) - 0.5) / timesAsked.size()) ;
 
+        //which bucket to assign the question to.
+        int bucket = CAT_ONE;
+
+        if (DEBUG) System.out.println("Question with correctness = " + correctness + " and timesAskedPercentile = " + timesAskedPercentile);
         //add the question to the appropriate bucket
         if (correctness < 0.15) {
-            questionBucket.get(CAT_ONE).add(question);
+            bucket = CAT_ONE;
+            if (DEBUG) System.out.println("    - put in CAT_ONE");
         } else if ((correctness >= 0.15) && (correctness < 0.35)) {
-            questionBucket.get(CAT_TWO).add(question);
+            bucket = CAT_TWO;
+            if (DEBUG) System.out.println("    - put in TWO");
         } else if ((correctness >= 0.35) && (correctness < 0.50)) {
-            questionBucket.get(CAT_THREE).add(question);
+            bucket = CAT_THREE;
+            if (DEBUG) System.out.println("    - put in CAT_THREE");
         } else if ((correctness >= 0.50) && (correctness < 0.70)) {
-            questionBucket.get(CAT_FOUR).add(question);
+            bucket = CAT_FOUR;
+            if (DEBUG) System.out.println("    - put in CAT_FOUR");
         } else if ((correctness >= 0.70) && (correctness < 0.85)) {
-            questionBucket.get(CAT_FIVE).add(question);
+            bucket = CAT_FIVE;
+            if (DEBUG) System.out.println("    - put in CAT_FIVE");
         } else if (correctness >= 0.85) {
-            questionBucket.get(CAT_SIX).add(question);
+            bucket = CAT_SIX;
+            if (DEBUG) System.out.println("    - put in CAT_SIX");
         }
+
+        if (timesAskedPercentile < 0.20) {
+            bucket = CAT_ONE;
+            if (DEBUG) System.out.println("    - readjusted to CAT_ONE");
+        } else if ((timesAskedPercentile >= 0.20) && (timesAskedPercentile < 0.50)) {
+            bucket = bucket - 3;
+            if (bucket < CAT_ONE) bucket = CAT_ONE;
+            if (DEBUG) System.out.println("    - readjusted to CAT(" + bucket + ")");
+        } else if ((timesAskedPercentile >= 0.50) && (timesAskedPercentile < 0.70)) {
+            bucket = bucket - 1;
+            if (bucket < CAT_ONE) bucket = CAT_ONE;
+            if (DEBUG) System.out.println("    - readjusted to CAT(" + bucket + ")");
+        }
+
+
+            questionBucket.get(bucket).add(question);
     }
 
     /**
