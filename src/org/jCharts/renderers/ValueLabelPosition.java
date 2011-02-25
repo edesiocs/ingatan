@@ -75,7 +75,7 @@ public class ValueLabelPosition {
 
 	/*******************************************************************************
 	 *
-	 * @return
+	 * @return position.
 	 ******************************************************************************/
 	public int getPosition() {
 		return position;

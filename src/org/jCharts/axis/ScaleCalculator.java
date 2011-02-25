@@ -189,7 +189,7 @@ public abstract class ScaleCalculator
 
    /*******************************************************************************
 	 *
-	 * @return
+	 * @return string representation.
 	 *******************************************************************************/
 	public String toString()
 	{

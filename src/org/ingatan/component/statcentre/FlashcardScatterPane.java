@@ -117,8 +117,7 @@ public class FlashcardScatterPane extends JPanel {
     };
 
     /**
-     * Creates a new <code>QuizHistoryWindow</code>.
-     * @param returnToOnClose the window to return to once this window has closed.
+     * Creates a new <code>FlashCardScatterPane</code>.
      */
     public FlashcardScatterPane() {
         this.setSize(new Dimension(900, 500));

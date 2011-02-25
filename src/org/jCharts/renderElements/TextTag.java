@@ -362,7 +362,7 @@ public class TextTag implements Serializable
 
 	/********************************************************************************************
 	 *
-	 * @return
+	 * @return string representation.
 	 ********************************************************************************************/
 	public String toString()
 	{

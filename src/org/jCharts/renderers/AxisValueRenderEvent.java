@@ -126,7 +126,7 @@ public class AxisValueRenderEvent extends EventObject {
 
 	/**************************************************************************************
 	 *
-	 * @return
+	 * @return x value
 	 *************************************************************************************/
 	public float getValueX() {
 		return valueX;

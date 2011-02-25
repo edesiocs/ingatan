@@ -96,8 +96,7 @@ public class RewardsPane extends JPanel implements ContainerListener {
     ArrayList<RewardItem> rewardItems = new ArrayList<RewardItem>();
 
     /**
-     * Creates a new <code>QuizHistoryWindow</code>.
-     * @param returnToOnClose the window to return to once this window has closed.
+     * Creates a new <code>RewardsPane</code>.
      */
     public RewardsPane() {
         this.setSize(new Dimension(600, 500));

@@ -59,12 +59,6 @@ import java.io.Serializable;
 public final class PolyMapArea extends ImageMapArea implements Serializable
 {
 
-	/***************************************************************************************
-	 *
-	 * @param numberOfPoints
-	 * @param value
-	 * @param areaType
-	 ****************************************************************************************/
 	public PolyMapArea( int numberOfPoints, double value, String xAxisLabel, String legendLabel )
 	{
 		super( numberOfPoints, value, xAxisLabel, legendLabel );

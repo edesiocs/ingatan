@@ -80,7 +80,6 @@ public class ScatterPlotDataSet implements IScatterPlotDataSet
 	 * Returns the type constant that this data set should be plotted as.
 	 *
 	 * @return ChartType
-	 * @see org.jCharts.types.ChartType
 	 *******************************************************************************************/
 	public final ChartType getChartType()
 	{

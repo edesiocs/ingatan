@@ -128,7 +128,6 @@ public class RewardEditorDialog extends JDialog implements FocusListener {
 
     /**
      * Creates a new <code>RewardEditorDialog</code>.
-     * @param parent the parent window for this dialog.
      * @param newReward whether or not this dialog is being used to create a new reward, false
      *        if this dialog is being used to edit a reward.
      */

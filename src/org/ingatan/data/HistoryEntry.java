@@ -54,7 +54,7 @@ public class HistoryEntry implements Comparable<HistoryEntry> {
     /**
      * Creates a new HistoryEntry object to act as a running total of results in quiz mode. The
      * encapsulated data will be recalculated every time a new value is added.
-     * @param data
+     * @param date The date of the entry.
      */
     public HistoryEntry(Date date) {
         this.entryDate = date;

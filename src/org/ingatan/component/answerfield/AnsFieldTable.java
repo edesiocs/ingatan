@@ -391,11 +391,6 @@ public class AnsFieldTable extends JPanel implements IAnswerField {
 
         /**
          * Creates a new <code>LibraryEditorDialog</code>.
-         * @param parent the parent window for this dialog.
-         * @param newLibrary whether or not this dialog is being used to create a new library, false
-         *        if this dialog is being used to edit a library.
-         * @param groupName if creating a new library, then it will be added to the specified group. Put this
-         * parameter as <code>null</code> if this is not desired.
          */
         public CreateTableDialog() {
             super();

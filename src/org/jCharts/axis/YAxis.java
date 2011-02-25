@@ -70,7 +70,7 @@ public final class YAxis extends Axis
 	/************************************************************************************
 	 * Need this value as horizontal plots start from the top of the axis and go down
 	 *
-	 * @return
+	 * @return the last y axis tick.
 	 ************************************************************************************/
 	public float getLastTickY()
 	{

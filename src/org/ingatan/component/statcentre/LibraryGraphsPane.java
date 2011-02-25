@@ -121,8 +121,7 @@ public class LibraryGraphsPane extends JPanel {
     };
 
     /**
-     * Creates a new <code>QuizHistoryWindow</code>.
-     * @param returnToOnClose the window to return to once this window has closed.
+     * Creates a new <code>LibraryGraphsPane</code>.
      */
     public LibraryGraphsPane() {
         this.setSize(new Dimension(900, 500));

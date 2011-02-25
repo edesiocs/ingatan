@@ -72,8 +72,7 @@ public class QuizHistoryPane extends JPanel {
     private PaintedJPanel menuPanel = new PaintedJPanel();
 
     /**
-     * Creates a new <code>QuizHistoryWindow</code>.
-     * @param returnToOnClose the window to return to once this window has closed.
+     * Creates a new <code>QuizHistoryPane</code>.
      */
     public QuizHistoryPane() {
         this.setSize(new Dimension(500, 300));
