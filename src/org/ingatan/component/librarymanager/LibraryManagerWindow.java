@@ -305,7 +305,7 @@ public class LibraryManagerWindow extends JFrame implements WindowListener {
         if (IOManager.isFirstTimeLoadingLibManager()) {
             RichTextArea dispArea = new RichTextArea();
 
-            dispArea.setPreferredSize(new Dimension(400, 280));
+            dispArea.setPreferredSize(new Dimension(640, 380));
             dispArea.setSize(new Dimension(400, 280));
             dispArea.setMinimumSize(new Dimension(400, 280));
 
@@ -315,9 +315,8 @@ public class LibraryManagerWindow extends JFrame implements WindowListener {
 
             dispArea.setRichText("[aln]0[!aln][fam]Dialog[!fam][sze]16[!sze][col]51,51,51[!col]Welcome to Ingatan[sze]12[!sze][br]"
                     + "This message will only be shown once.[br][br]"
-                    + "The library manager [u]automatically saves your work as you go[u]. Simply close the library manager window when you are done.[br][br]"
-                    + "To get started, click the green + icon to the left to create a new library, and then the green + icon "
-                    + "up the top to create a new question, as shown below.[br][br][aln]1[!aln][end]");
+                    + "The library manager [u]automatically saves your work as you go[u]. To get started, close this dialog and then click the green !osqb;+!csqb; icon to the left to create a new library, and then the green !osqb;+!csqb; icon "
+                    + "up the top to create a new question within your new library, as shown below. See [b]ingatan.org/wiki/Tutorial[b] to learn more.[br][br][aln]1[!aln][end]");
 
             BufferedImage img = null;
             try {

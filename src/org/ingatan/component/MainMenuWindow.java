@@ -46,6 +46,7 @@ import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -125,7 +126,7 @@ public class MainMenuWindow extends JFrame implements WindowListener {
                     + "[fam]Monospace[!fam]java -Dsun.java2d.pmoffscreen=false -jar !osqb;path_to_ingatan.jar!csqb;[br][br]"
                     + "[fam]Dialog[!fam]You can view this information again in the About menu.[end]");
 
-            JOptionPane.showMessageDialog(MainMenuWindow.this, dispArea, "Using OpenJDK", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(MainMenuWindow.this, dispArea, "Welcome to Ingatan", JOptionPane.INFORMATION_MESSAGE, new ImageIcon(IOManager.windowIcon));
             IOManager.setFirstTimeLoadingIngatan(false);
             ParserWriter.writePreferencesFile(IOManager.getSymbolMenuCharacterMap());
         }
