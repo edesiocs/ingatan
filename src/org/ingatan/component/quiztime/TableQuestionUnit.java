@@ -31,6 +31,7 @@ package org.ingatan.component.quiztime;
 import org.ingatan.data.IQuestion;
 import org.ingatan.data.TableQuestion;
 import java.util.Arrays;
+import org.ingatan.component.text.RichTextArea;
 
 /**
  * This class is used to represent a single entry in a TableQuestion. The class also

@@ -384,6 +384,9 @@ public class QuizWindow extends JFrame implements WindowListener {
                 questionText = chooseRandomEntry(ques.getQuestionColumnData());
                 questionTemplate = ques.getParentTableQuestion().getQuestionTemplateFwd();
             }
+            
+            //question text will be loaded into a RichTextArea, so ensure that the square brackets are expressed as RichTextArea markup charcodes
+            questionText = questionText.replace("[", RichTextArea.CHARCODE_OPENING_SQUARE_BRACKET).replace("]", RichTextArea.CHARCODE_CLOSING_SQUARE_BRACKET);
 
             //set question text to include the question template if we can.
             if ((questionTemplate.trim().isEmpty() == false) && (questionTemplate.contains("[q]"))) {
@@ -391,13 +394,13 @@ public class QuizWindow extends JFrame implements WindowListener {
                 String fontName = questionArea.getFont().getFamily();
                 int fontSize = questionArea.getFont().getSize();
 
+                //tags used to make the question phrase a larger font than the question template text
                 String insertText = "[" + RichTextArea.TAG_FONT_FAMILY + "]" + ques.getParentTableQuestion().getFontFamilyName() + "[!" + RichTextArea.TAG_FONT_FAMILY + "]"
                         + "[" + RichTextArea.TAG_FONT_SIZE + "]" + ques.getParentTableQuestion().getFontSize() + "[!" + RichTextArea.TAG_FONT_SIZE + "]"
                         + questionText
                         + "[" + RichTextArea.TAG_FONT_FAMILY + "]" + fontName + "[!" + RichTextArea.TAG_FONT_FAMILY + "]"
                         + "[" + RichTextArea.TAG_FONT_SIZE + "]" + fontSize + "[!" + RichTextArea.TAG_FONT_SIZE + "]";
 
-                //questionText = questionTemplate.replace("[q]", QUESTION_TEMPLATE_STYLE_OPEN + insertText + QUESTION_TEMPLATE_STYLE_CLOSE);
                 questionText = questionTemplate.replace("[q]", insertText) + "[" + RichTextArea.TAG_DOCUMENT_END + "]";
             } else {
                 questionText = "[" + RichTextArea.TAG_FONT_FAMILY + "]" + ques.getParentTableQuestion().getFontFamilyName() + "[!" + RichTextArea.TAG_FONT_FAMILY + "]"
