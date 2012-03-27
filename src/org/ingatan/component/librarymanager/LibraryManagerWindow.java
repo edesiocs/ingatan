@@ -409,6 +409,10 @@ public class LibraryManagerWindow extends JFrame implements WindowListener {
                     }
                     break;
                 case LibraryBrowser.EDIT_LIBRARY_ACTION:
+                    if (libBrowser.getSelectedLibraryIndex() == -1) {
+                        JOptionPane.showMessageDialog(LibraryManagerWindow.this, "Please select a library from the list to edit.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
+                        return;
+                    }
                     LibraryEditorDialog libEdit = new LibraryEditorDialog(LibraryManagerWindow.this, false, null);
                     libEdit.setLibraryNameText(libBrowser.getSelectedLibraryName());
                     try {
