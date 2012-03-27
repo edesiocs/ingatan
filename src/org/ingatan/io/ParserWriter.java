@@ -369,7 +369,9 @@ public abstract class ParserWriter {
     }
 
     /**
-     * Parse the answer field file, accumulating class names and their default values.
+     * Parse the answer field file, accumulating class names and their default values. This file is a list of class names and
+     * default values for each answer field. It is used so that the user can save new default values for answer fields that
+     * are loaded automatically when an answer field instance is created.
      * @param answerFieldFile the file to parse.
      * @return the new <code>AnswerFieldsFile</code>
      */

@@ -96,6 +96,20 @@ import org.jdom.output.XMLOutputter;
 public class AnsFieldMultiChoice extends JPanel implements IAnswerField {
 
     /**
+     * Code for the opening square brackets. This is distinct from the RichTextArea character codes
+     * because this answer field serialises rich text data within rich text data (e.g. it serialises rich
+     * text data within the flexi question's Answer rich text area). Thus the standard !osqb; and !csqb; codes
+     * are needed for the square brackets involved in the tags for this rich text area.
+     */
+    public static final String CHARCODE_MULTICHOICE_OPENING_SQUARE_BRACKET = "!mcosqb;";
+    /**
+     * Code for the closing square brackets. This is distinct from the RichTextArea character codes
+     * because this answer field serialises rich text data within rich text data (e.g. it serialises rich
+     * text data within the flexi question's Answer rich text area). Thus the standard !osqb; and !csqb; codes
+     * are needed for the square brackets involved in the tags for this rich text area.
+     */
+    public static final String CHARCODE_MULTICHOICE_CLOSING_SQUARE_BRACKET = "!mccsqb;";
+    /**
      * Listens for focus change in any of option text areas and hides/shows the
      * rich text toolbar accordingly.
      */
@@ -289,7 +303,13 @@ public class AnsFieldMultiChoice extends JPanel implements IAnswerField {
         OptionEntry curOption;
         while (iterate.hasNext()) {
             curOption = iterate.next();
-            rootElement.addContent(new Element("optionEntry").setAttribute("selected", String.valueOf(curOption.isSelected())).setAttribute("pctMarks", String.valueOf(curOption.getMarks())).setText(curOption.getRichText()));
+            Element curOptionEl = new Element("optionEntry");
+            curOptionEl.setAttribute("selected", String.valueOf(curOption.isSelected()));
+            curOptionEl.setAttribute("pctMarks", String.valueOf(curOption.getMarks()));
+            //RichText character codes are replaced by multi choice answer field codes so that they are preserved properly -> this is rich text within rich text and so standard all character codes would be converted on the first parse.
+            curOptionEl.setText(curOption.getRichText().replace(RichTextArea.CHARCODE_OPENING_SQUARE_BRACKET, CHARCODE_MULTICHOICE_OPENING_SQUARE_BRACKET).replace(RichTextArea.CHARCODE_CLOSING_SQUARE_BRACKET, CHARCODE_MULTICHOICE_CLOSING_SQUARE_BRACKET));
+            //add as content to root element
+            rootElement.addContent(curOptionEl);
         }
 
         //return the XML document as String representation
@@ -343,7 +363,10 @@ public class AnsFieldMultiChoice extends JPanel implements IAnswerField {
             try {
                 curEntry.setSelected(curEl.getAttribute("selected").getBooleanValue());
                 curEntry.setMarks(curEl.getAttribute("pctMarks").getDoubleValue());
-                curEntry.setRichText(curEl.getText().replace(RichTextArea.CHARCODE_OPENING_SQUARE_BRACKET, "[").replace(RichTextArea.CHARCODE_CLOSING_SQUARE_BRACKET, "]"));
+                //must replaced charcodes with brackets here as this is rich text within rich text, thus rich text tags such as [br] appear !osqb;br!csqb; etc.
+                //after replacing the standard rich text bracket codes, the multichoice answer field specific bracket codes are replaced to the standard rich text bracket code
+                //as these will be replaced to bracket characters by the setRichText method of the RichTextArea field.
+                curEntry.setRichText(curEl.getText().replace(RichTextArea.CHARCODE_OPENING_SQUARE_BRACKET, "[").replace(RichTextArea.CHARCODE_CLOSING_SQUARE_BRACKET, "]").replace(CHARCODE_MULTICHOICE_OPENING_SQUARE_BRACKET, RichTextArea.CHARCODE_OPENING_SQUARE_BRACKET).replace(CHARCODE_MULTICHOICE_CLOSING_SQUARE_BRACKET, RichTextArea.CHARCODE_CLOSING_SQUARE_BRACKET));
 
             } catch (DataConversionException ex) {
                 Logger.getLogger(AnsFieldMultiChoice.class.getName()).log(Level.SEVERE, "While trying to create an OptionEntry for an xml entry in the readInXML method.", ex);

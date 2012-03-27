@@ -81,8 +81,7 @@ public class AboutWindow extends JDialog {
                 "[u]JOgg and JOrbis[u] from www.jcraft.com under LGPL 3 - Great libraries made so much easier using the EasyOgg wrapper by Kevin from http://www.cokeandcode.com.[br][br]" +
                 "[u]JCharts[u] http://jcharts.sf.net: 'jCharts license' (bundled inside this JAR). Author: Nathaniel G. Auvil.[br][br]" +
                 "[u]Arrow2D.java[u] from www.geotools.org under LGPL 2.1 - Thanks, glad not to write my own.[br][br]" +
-                "Icons other than those from the silk set are from the Gnome desktop (under GPL2) and Tango set (public domain).[br][br]" +
-                "Thankyou to Hugh for being my bug hunter. [end]");
+                "Icons other than those from the silk set are from the Gnome desktop (under GPL2) and Tango set (public domain).[br][br][end]");
 
         txtAbout.setCaretPosition(0);
     }

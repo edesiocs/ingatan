@@ -81,7 +81,20 @@ import org.jdom.output.XMLOutputter;
  * @version 1.0
  */
 public class AnsFieldSelfGraded extends JPanel implements IAnswerField {
-
+    /**
+     * Code for the opening square brackets. This is distinct from the RichTextArea character codes
+     * because this answer field serialises rich text data within rich text data (e.g. it serialises rich
+     * text data within the flexi question's Answer rich text area). Thus the standard !osqb; and !csqb; codes
+     * are needed for the square brackets involved in the tags for this rich text area.
+     */
+    public static final String CHARCODE_SELFG_OPENING_SQUARE_BRACKET = "!sgosqb;";
+    /**
+     * Code for the closing square brackets. This is distinct from the RichTextArea character codes
+     * because this answer field serialises rich text data within rich text data (e.g. it serialises rich
+     * text data within the flexi question's Answer rich text area). Thus the standard !osqb; and !csqb; codes
+     * are needed for the square brackets involved in the tags for this rich text area.
+     */
+    public static final String CHARCODE_SELFG_CLOSING_SQUARE_BRACKET = "!sgcsqb;";
     /**
      * Rich text area for answer entry.
      */
@@ -196,7 +209,8 @@ public class AnsFieldSelfGraded extends JPanel implements IAnswerField {
         //version field allows future versions of this field to be back compatible.
         //especially important for default fields!
         e.setAttribute("version", "1.0");
-        e.setText(txtArea.getRichText());
+        //RichText character codes are replaced by self graded answer field codes so that they are preserved properly -> this is rich text within rich text and so standard all character codes would be converted on the first parse.
+        e.setText(txtArea.getRichText().replace(RichTextArea.CHARCODE_OPENING_SQUARE_BRACKET, CHARCODE_SELFG_OPENING_SQUARE_BRACKET).replace(RichTextArea.CHARCODE_CLOSING_SQUARE_BRACKET, CHARCODE_SELFG_CLOSING_SQUARE_BRACKET));
         doc.setRootElement(e);
 
         XMLOutputter fmt = new XMLOutputter();
@@ -227,7 +241,10 @@ public class AnsFieldSelfGraded extends JPanel implements IAnswerField {
 
         spinMarks.setValue(Integer.valueOf(doc.getRootElement().getAttributeValue("marks")));
         parentLibraryID = doc.getRootElement().getAttributeValue("parentLib");
-        correctAnswer = doc.getRootElement().getText().replace(RichTextArea.CHARCODE_OPENING_SQUARE_BRACKET, "[").replace(RichTextArea.CHARCODE_CLOSING_SQUARE_BRACKET, "]");
+        //must replaced charcodes with brackets here as this is rich text within rich text, thus rich text tags such as [br] appear !osqb;br!csqb; etc.
+        //after replacing the standard rich text bracket codes, the multichoice answer field specific bracket codes are replaced to the standard rich text bracket code
+        //as these will be replaced to bracket characters by the setRichText method of the RichTextArea field.
+        correctAnswer = doc.getRootElement().getText().replace(RichTextArea.CHARCODE_OPENING_SQUARE_BRACKET, "[").replace(RichTextArea.CHARCODE_CLOSING_SQUARE_BRACKET, "]").replace(CHARCODE_SELFG_OPENING_SQUARE_BRACKET, RichTextArea.CHARCODE_OPENING_SQUARE_BRACKET).replace(CHARCODE_SELFG_CLOSING_SQUARE_BRACKET, RichTextArea.CHARCODE_CLOSING_SQUARE_BRACKET);
 
         if (inEditContext) {
             txtArea.setRichText(correctAnswer);

@@ -325,7 +325,8 @@ public class RichTextArea extends JTextPane {
                     }
                     if (newField != null) {
                         //tell the new field instance to read in the content text, and then insert it into the document.
-                        newField.readInXML(ansFieldData[1].replace("[", CHARCODE_OPENING_SQUARE_BRACKET).replace("]", CHARCODE_CLOSING_SQUARE_BRACKET));
+                        //replace square bracket codes with the square bracket characters
+                        newField.readInXML(ansFieldData[1].replace(CHARCODE_OPENING_SQUARE_BRACKET, "[").replace(CHARCODE_CLOSING_SQUARE_BRACKET, "]"));
                         this.insertComponent((JComponent) newField);
                     } else {
                         System.out.println("Answer field was null after instantiation attempt - could not insert. Originating from RichTextArea.setRichText()");
