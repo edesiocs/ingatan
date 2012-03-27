@@ -237,7 +237,7 @@ public class AnsFieldSimpleText extends JPanel implements IAnswerField {
 
     public float checkAnswer() {
         for (int i = 0; i < correctAnswers.length; i++) {
-            if (correctAnswers[i].toLowerCase().equals(txtField.getText().toLowerCase())) {
+            if (correctAnswers[i].toLowerCase().trim().equals(txtField.getText().toLowerCase().trim())) {
                 return 1.0f;
             }
         }

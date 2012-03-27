@@ -116,7 +116,7 @@ public class AnsFieldTable extends JPanel implements IAnswerField {
                 if (tableData[i][j].charAt(0) != '*') {
                     fieldCount++;
                     //if the answer is correct, ignoring case.
-                    if (((String) table.getValueAt(i, j)).toLowerCase().compareTo(tableData[i][j].toLowerCase()) == 0) {
+                    if (((String) table.getValueAt(i, j)).toLowerCase().trim().compareTo(tableData[i][j].toLowerCase().trim()) == 0) {
                         markCount++;
                     }
                 }
